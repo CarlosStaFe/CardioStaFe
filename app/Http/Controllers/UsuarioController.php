@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class UsuarioController extends Controller
 {
     public function index()
     {
-        $usuarios = \App\Models\User::all();
+        $usuarios = User::all();
         return view('admin.usuarios.index', compact('usuarios'));
     }
 
@@ -29,7 +30,7 @@ class UsuarioController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $usuario = new \App\Models\User();
+        $usuario = new User();
         $usuario->name = $request->name;
         $usuario->email = $request->email;
         $usuario->password = bcrypt($request->password);
@@ -42,13 +43,13 @@ class UsuarioController extends Controller
 
     public function show($id)
     {
-        $usuario = \App\Models\User::findOrFail($id);
+        $usuario = User::findOrFail($id);
         return view('admin.usuarios.show', compact('usuario'));
     }
 
     public function edit($id)
     {
-        $usuario = \App\Models\User::findOrFail($id);
+        $usuario = User::findOrFail($id);
         return view('admin.usuarios.edit', compact('usuario'));
     }
     
@@ -60,7 +61,7 @@ class UsuarioController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
-        $usuario = \App\Models\User::findOrFail($id);
+        $usuario = User::findOrFail($id);
         $usuario->name = $request->name;
         $usuario->email = $request->email;
         if ($request->password) {
@@ -75,13 +76,13 @@ class UsuarioController extends Controller
 
     public function confirmDelete($id)
     {
-        $usuario = \App\Models\User::findOrFail($id);
+        $usuario = User::findOrFail($id);
         return view('admin.usuarios.delete', compact('usuario'));
     }
 
     public function destroy($id)
     {
-        $usuario = \App\Models\User::findOrFail($id);
+        $usuario = User::findOrFail($id);
         $usuario->delete();
 
         return redirect()->route('admin.usuarios.index')

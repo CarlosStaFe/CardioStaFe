@@ -1,15 +1,15 @@
 @extends('layouts.admin')
 
 @section('content')
-<h1>Listado de Usuarios</h1>
+<h1>Listado de Secretarias</h1>
 
 <div class="col-md-12">
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title">Usuarios Registrados</h3>
+            <h3 class="card-title">Secretarias Registradas</h3>
 
             <div class="card-tools">
-                <a href="{{url('/admin/usuarios/create')}}" class="btn btn-primary">
+                <a href="{{url('/admin/secretarias/create')}}" class="btn btn-primary">
                     Registrar Usuario
                 </a>
             </div>
@@ -20,23 +20,26 @@
                 <thead style="background-color:rgb(14, 107, 169); color: white;">
                     <tr>
                         <th style="text-align: center; width: 5%;">#</th>
-                        <th style="text-align: center; width: 36%;">USUARIO</th>
-                        <th style="text-align: center; width: 48%;">E-MAIL</th>
+                        <th style="text-align: center; width: 20%;">APELLIDOS Y NOMBRES</th>
+                        <th style="text-align: center; width: 20%;">TELÉFONO</th>
+                        <th style="text-align: center; width: 20%;">DOMICILIO</th>
+                        <th style="text-align: center; width: 24%;">E-MAIL</th>
                         <th style="text-align: center; width: 11%;">ACCIONES</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php $linea = 1; ?>
-                    @foreach($usuarios as $usuario)
+                    @foreach($secretarias as $secretaria)
                     <tr>
-                         <!--<td style="text-align: right;">{{ $usuario->id }}</td> -->
                         <td style="text-align: right;">{{ $linea++ }}</td>
-                        <td>{{ $usuario->name }}</td>
-                        <td>{{ $usuario->email }}</td>
+                        <td>{{ $secretaria->apel_nombres }}</td>
+                        <td>{{ $secretaria->telefono }}</td>
+                        <td>{{ $secretaria->domicilio }}</td>
+                        <td>{{ $secretaria->user->email }}</td>
                         <td>
-                            <a href="{{url('admin/usuarios/'.$usuario->id)}}" type="button" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
-                            <a href="{{url('admin/usuarios/'.$usuario->id.'/edit')}}" type="button" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a>
-                            <a href="{{url('admin/usuarios/'.$usuario->id.'/confirm-delete')}}" type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
+                            <a href="{{url('admin/secretarias/'.$secretaria->id)}}" type="button" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                            <a href="{{url('admin/secretarias/'.$secretaria->id.'/edit')}}" type="button" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a>
+                            <a href="{{url('admin/secretarias/'.$secretaria->id.'/confirm-delete')}}" type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
                         </td>
                     </tr>
                     @endforeach
@@ -67,7 +70,7 @@
                             },
                         },
                         "columnDefs": [
-                            { "orderable": false, "targets": 3 }
+                            { "orderable": false, "targets": 5 }
                         ]
                     }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
                 });

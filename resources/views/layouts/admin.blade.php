@@ -100,8 +100,54 @@
                             </ul>
                         </li>
                         <li class="nav-item">
+                            <a href="#" class="nav-link active">
+                                <i class="nav-icon fas bi bi-person-circle"></i>
+                                <p>
+                                    Secretarias
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{url('admin/secretarias/create')}}" class="nav-link active">
+                                        <i class="bi bi-person-plus-fill nav-icon"></i>
+                                        <p>Crear Secretarias</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{url('admin/secretarias')}}" class="nav-link active">
+                                        <i class="bi bi-person-lines-fill nav-icon"></i>
+                                        <p>Listado de Secretarias</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active">
+                                <i class="nav-icon fas bi bi-heart-pulse-fill"></i>
+                                <p>
+                                    Pacientes
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{url('admin/pacientes/create')}}" class="nav-link active">
+                                        <i class="bi bi-person-plus-fill nav-icon"></i>
+                                        <p>Crear Pacientes</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{url('admin/pacientes')}}" class="nav-link active">
+                                        <i class="bi bi-person-lines-fill nav-icon"></i>
+                                        <p>Listado de Pacientes</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
                             <a href="#" class="nav-link" style="background-color: #a9200e;">
-                                <i class="nav-icon fas bi bi-door-closed-fill"></i>
+                                <i class="nav-icon fas bi bi-door-open-fill"></i>
                                 <p>
                                     Cerrar Sesión
                                 </p>
@@ -136,7 +182,7 @@
                     icon: "{{$icono}}",
                     title: "{{$message}}",
                     showConfirmButton: false,
-                    timer: 4000
+                    timer: 3500
                 });
             </script>
         @endif
