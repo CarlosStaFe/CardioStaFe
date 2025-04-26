@@ -67,7 +67,7 @@
                             },
                         },
                         "columnDefs": [
-                            { "orderable": false, "targets": 3 }
+                            { "orderable": false, "targets": [3] }
                         ]
                     }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
                 });

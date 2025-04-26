@@ -32,7 +32,7 @@
                     @foreach($pacientes as $paciente)
                     <tr>
                         <td style="text-align: right;">{{ $linea++ }}</td>
-                        <td>{{ $paciente->apel_nombres }}</td>
+                        <td>{{ strtoupper($paciente->apel_nombres) }}</td>
                         <td>{{ $paciente->telefono }}</td>
                         <td>{{ $paciente->domicilio }}</td>
                         <td>{{ $paciente->email }}</td>
@@ -70,7 +70,7 @@
                             },
                         },
                         "columnDefs": [
-                            { "orderable": false, "targets": 5 }
+                            { "orderable": false, "targets": [5] }
                         ]
                     }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
                 });

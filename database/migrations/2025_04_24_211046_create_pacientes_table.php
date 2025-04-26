@@ -16,7 +16,10 @@ return new class extends Migration
             $table->string('tipo_documento', 5)->nullable();
             $table->integer('num_documento')->unique();
             $table->string('domicilio', 50)->nullable();
-            $table->integer('cod_postal_id')->nullable();
+
+            $table->unsignedBigInteger('cod_postal_id');            
+            $table->foreign('cod_postal_id')->references('id')->on('localidades');
+
             $table->string('telefono', 30)->nullable();
             $table->string('email', 80)->nullable();
             $table->string('obra_social', 50)->nullable();

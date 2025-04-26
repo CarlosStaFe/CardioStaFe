@@ -70,7 +70,7 @@
                             },
                         },
                         "columnDefs": [
-                            { "orderable": false, "targets": 5 }
+                            { "orderable": false, "targets": [5] }
                         ]
                     }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
                 });

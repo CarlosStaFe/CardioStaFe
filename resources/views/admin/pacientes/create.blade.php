@@ -16,10 +16,14 @@
             <form action="{{url('/admin/pacientes/create')}}" method="POST">
                 @csrf
                 <div class="row">
+                    <div>
+                        <input id="nombrelocal" name="nombrelocal" type="hidden">
+                        <input id="nombreprov" name="nombreprov" type="hidden">
+                    </div>
                     <div class="col-md-5 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="apel_nombres">Apellidos y Nombres</label><b>*</b>
-                            <input type="text" class="form-control" value="{{old('apel_nombres')}}" id="apel_nombres" name="apel_nombres" placeholder="Apellidos y nombres" required>
+                            <input type="text" class="form-control" value="{{old('apel_nombres')}}" id="apel_nombres" name="apel_nombres" placeholder="Apellidos y nombres"  style="text-transform: uppercase;" required>
                             @error('apel_nombres')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -36,7 +40,7 @@
                     </div>
                     <div class="col-md-1 col-sm-4 position-relative">
                         <div class="form-group">
-                            <label for="nacimiento">Sexo</label><b>*</b>
+                            <label for="sexo">Sexo</label><b>*</b>
                             <select type="text" class="form-control" value="{{old('sexo')}}" id="sexo" name="sexo" placeholder="Sexo" required>
                                 <option value="M">M</option>
                                 <option value="F">F</option>
@@ -85,6 +89,7 @@
                         <div class="form-group">
                             <label for="provincia">Provincia</label>
                             <select type="text" class="form-control" value="{{old('provincia')}}" id="provincia" name="provincia" placeholder="Provincia">
+                                <option selected disabled>Elige provincia...</option>
                                 <option value="82">SANTA FE</option>
                                 <option value="6">BUENOS AIRES</option>
                                 <option value="2">CABA</option>
@@ -194,5 +199,57 @@
         </div>
     </div>
 </div>
+
+<!-- // Script para seleccionar la provincia y la localidad -->
+<script>
+    document.getElementById('provincia').addEventListener('change', function () {
+        const idProv = this.value;
+        const nombreProv = this.options[this.selectedIndex].text;
+        const localidadSelect = document.getElementById('localidad');
+        document.getElementById('nombreprov').value = nombreProv;
+
+        // Limpiar las opciones actuales
+        localidadSelect.innerHTML = '<option value="">Seleccione una localidad</option>';
+
+        if (idProv) {
+            // Realizar la solicitud AJAX
+            fetch(`{{url('admin/localidades') }}/${idProv}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(localidad => {
+                        const option = document.createElement('option');
+                        option.value = localidad.id_local;
+                        option.textContent = localidad.localidad;
+                        localidadSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error al cargar localidades:', error));
+        }
+    });
+
+    document.getElementById('localidad').addEventListener('change', function() {
+        const idLocal = this.value;
+        const nombreLocal = this.options[this.selectedIndex].text;
+        const codpostalSelect = document.getElementById('cod_postal');
+        document.getElementById('nombrelocal').value = nombreLocal;
+
+        // Limpiar las opciones de códigos postales
+        codpostalSelect.innerHTML = '<option selected disabled>Elige un Código...</option>';
+
+        // Hacer una solicitud AJAX para obtener las localidades
+        fetch(`{{url('admin/codpostales') }}/${idLocal}`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(codigos => {
+                    const option = document.createElement('option');
+                    option.value = codigos.id;
+                    option.textContent = codigos.cod_postal;
+                    codpostalSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error al obtener los códigos postales:', error));
+    });
+
+</script>
 
 @endsection

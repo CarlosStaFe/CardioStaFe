@@ -66,7 +66,7 @@
                 <br>
                 <div class="form group">
                     <a href="{{url('admin/secretarias')}}" class="btn btn-secondary">Cancelar</a>
-                    <button type="submit" class="btn btn-primary">Actualizar Secretaria</button>
+                    <button type="submit" class="btn btn-info">Actualizar Secretaria</button>
                 </div>
             </form>
         </div>
