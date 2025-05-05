@@ -12,6 +12,8 @@ class Localidad extends Model
     // Especifica el nombre correcto de la tabla
     protected $table = 'localidades';
 
+    protected $fillable = ['nombre', 'codigo_postal', 'provincia_id'];
+
     public function pacientes()
     {
         return $this->hasMany(Paciente::class, 'cod_postal_id');

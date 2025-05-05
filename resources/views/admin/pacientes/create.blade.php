@@ -23,7 +23,7 @@
                     <div class="col-md-5 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="apel_nombres">Apellidos y Nombres</label><b>*</b>
-                            <input type="text" class="form-control" value="{{old('apel_nombres')}}" id="apel_nombres" name="apel_nombres" placeholder="Apellidos y nombres"  style="text-transform: uppercase;" required>
+                            <input type="text" class="form-control" value="{{old('apel_nombres')}}" id="apel_nombres" name="apel_nombres" placeholder="Apellidos y nombres" style="text-transform: uppercase;" required>
                             @error('apel_nombres')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -191,6 +191,16 @@
                     </div>
                 </div>
                 <br>
+                <div class="col-md-12 position-relative">
+                    <div class="form-group">
+                        <label for="observacion">Observación</label>
+                        <textarea class="form-control" id="observacion" name="observacion" placeholder="Ingrese una observación">{{ old('observacion') }}</textarea>
+                        @error('observacion')
+                            <small style="color: red">{{ $message }}</small>
+                        @enderror
+                    </div>
+                </div>
+                <br>
                 <div class="form group">
                     <a href="{{url('admin/pacientes')}}" class="btn btn-secondary">Cancelar</a>
                     <button type="submit" class="btn btn-primary">Registrar Paciente</button>
@@ -202,7 +212,7 @@
 
 <!-- // Script para seleccionar la provincia y la localidad -->
 <script>
-    document.getElementById('provincia').addEventListener('change', function () {
+    document.getElementById('provincia').addEventListener('change', function() {
         const idProv = this.value;
         const nombreProv = this.options[this.selectedIndex].text;
         const localidadSelect = document.getElementById('localidad');
@@ -249,7 +259,6 @@
             })
             .catch(error => console.error('Error al obtener los códigos postales:', error));
     });
-
 </script>
 
 @endsection

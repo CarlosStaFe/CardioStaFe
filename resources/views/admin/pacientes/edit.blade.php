@@ -20,6 +20,7 @@
                     <div>
                         <input id="nombrelocal" name="nombrelocal" type="hidden">
                         <input id="nombreprov" name="nombreprov" type="hidden">
+                        <input id="codigopostal" name="codigopostal" type="hidden" value="{{$paciente->localidad->id}}">
                     </div>
                     <div class="col-md-5 col-sm-12 position-relative">
                         <div class="form group">
@@ -89,7 +90,8 @@
                     <div class="col-md-2 col-sm-12 position-relative">
                         <div class="form-group">
                             <label for="provincia">Provincia</label>
-                            <select type="text" class="form-control" value="{{$paciente->localidad->provincia}}" id="provincia" name="provincia" placeholder="Provincia">
+                            <select type="text" class="form-control" value="{{strtoupper($paciente->localidad->provincia ?? 'N/A')}}" id="provincia" name="provincia" placeholder="Provincia">
+                                <option value="{{$paciente->localidad->id_prov}}">{{strtoupper($paciente->localidad->provincia ?? 'N/A')}}</option>
                                 <option value="82">SANTA FE</option>
                                 <option value="6">BUENOS AIRES</option>
                                 <option value="2">CABA</option>
@@ -123,7 +125,8 @@
                     <div class="col-md-3 col-sm-12 position-relative">
                         <div class="form-group">
                             <label for="localidad">Localidad</label>
-                            <select type="text" class="form-control" value="{{$paciente->localidad->localidad}}" id="localidad" name="localidad" placeholder="Localidad">
+                            <select type="text" class="form-control" value="{{strtoupper($paciente->localidad->localidad ?? 'N/A')}}" id="localidad" name="localidad" placeholder="Localidad">
+                                <option value="{{$paciente->localidad->id_local}}">{{strtoupper($paciente->localidad->localidad ?? 'N/A')}}</option>
                             </select>
                             @error('localidad')
                                 <small style="color: red">{{$message}}</small>
@@ -133,7 +136,8 @@
                     <div class="col-md-2 col-sm-12 position-relative">
                         <div class="form-group">
                             <label for="cod_postal">Cod.Postal</label>
-                            <select type="text" class="form-control" value="{{$paciente->localidad->cod_postal}}" id="cod_postal" name="cod_postal" placeholder="Código">
+                            <select type="text" class="form-control" value="{{$paciente->localidad->cod_postal ?? 'N/A' }}" id="cod_postal" name="cod_postal" placeholder="Código">
+                                <option value="{{$paciente->localidad->id}}">{{strtoupper($paciente->localidad->cod_postal ?? 'N/A')}}</option>
                             </select>
                             @error('cod_postal')
                                 <small style="color: red">{{$message}}</small>
@@ -185,6 +189,15 @@
                             <label for="num_afiliado">Afiliado</label>
                             <input type="text" class="form-control" value="{{$paciente->num_afiliado}}" id="num_afiliado" name="num_afiliado" placeholder="Afiliado">
                             @error('num_afiliado')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-12 position-relative">
+                        <div class="form-group">
+                            <label for="observacion">Observación</label>
+                            <textarea class="form-control" id="observacion" name="observacion">{{ $paciente->observacion }}</textarea>
+                            @error('observacion')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>

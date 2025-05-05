@@ -107,6 +107,12 @@
                         <p>{{$paciente->afiliado}}</p>
                     </div>
                 </div>
+                <div class="col-md-12 position-relative">
+                    <div class="form-group">
+                        <label for="observacion">Observación</label>
+                        <p>{{$paciente->observacion}}</p>
+                    </div>
+                </div>
             </div>
             <br>
             <div class="form group">
