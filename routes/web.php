@@ -2,8 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsuarioController;
-use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\SecretariaController;
+use App\Http\Controllers\PacienteController;
+use App\Http\Controllers\ConsultorioController;
 use App\Http\Controllers\LocalidadController;
 
 Route::get('/', function () {
@@ -45,6 +46,26 @@ Route::get('/admin/pacientes/{id}/edit', [PacienteController::class, 'edit'])->n
 Route::put('/admin/pacientes/{id}', [PacienteController::class, 'update'])->name('admin.pacientes.update')->middleware(middleware:'auth');
 Route::get('/admin/pacientes/{id}/confirm-delete', [PacienteController::class, 'confirmDelete'])->name('admin.pacientes.confirmDelete')->middleware(middleware:'auth');
 Route::delete('/admin/pacientes/{id}', [PacienteController::class, 'destroy'])->name('admin.pacientes.destroy')->middleware(middleware:'auth');
+
+//RUTA PARA EL ADMIN - CONSULTORIOS
+Route::get('/admin/consultorios', [ConsultorioController::class, 'index'])->name('admin.consultorios.index')->middleware(middleware:'auth');
+Route::get('/admin/consultorios/create', [ConsultorioController::class, 'create'])->name('admin.consultorios.create')->middleware(middleware:'auth');
+Route::post('/admin/consultorios/create', [ConsultorioController::class, 'store'])->name('admin.consultorios.store')->middleware(middleware:'auth');
+Route::get('/admin/consultorios/{id}', [ConsultorioController::class, 'show'])->name('admin.consultorios.show')->middleware(middleware:'auth');
+Route::get('/admin/consultorios/{id}/edit', [ConsultorioController::class, 'edit'])->name('admin.consultorios.edit')->middleware(middleware:'auth');
+Route::put('/admin/consultorios/{id}', [ConsultorioController::class, 'update'])->name('admin.consultorios.update')->middleware(middleware:'auth');
+Route::get('/admin/consultorios/{id}/confirm-delete', [ConsultorioController::class, 'confirmDelete'])->name('admin.consultorios.confirmDelete')->middleware(middleware:'auth');
+Route::delete('/admin/consultorios/{id}', [ConsultorioController::class, 'destroy'])->name('admin.consultorios.destroy')->middleware(middleware:'auth');
+
+//RUTA PARA EL ADMIN - MEDICOS
+Route::get('/admin/medicos', [ConsultorioController::class, 'index'])->name('admin.medicos.index')->middleware(middleware:'auth');
+Route::get('/admin/medicos/create', [ConsultorioController::class, 'create'])->name('admin.medicos.create')->middleware(middleware:'auth');
+Route::post('/admin/medicos/create', [ConsultorioController::class, 'store'])->name('admin.medicos.store')->middleware(middleware:'auth');
+Route::get('/admin/medicos/{id}', [ConsultorioController::class, 'show'])->name('admin.medicos.show')->middleware(middleware:'auth');
+Route::get('/admin/medicos/{id}/edit', [ConsultorioController::class, 'edit'])->name('admin.medicos.edit')->middleware(middleware:'auth');
+Route::put('/admin/medicos/{id}', [ConsultorioController::class, 'update'])->name('admin.medicos.update')->middleware(middleware:'auth');
+Route::get('/admin/medicos/{id}/confirm-delete', [ConsultorioController::class, 'confirmDelete'])->name('admin.medicos.confirmDelete')->middleware(middleware:'auth');
+Route::delete('/admin/medicos/{id}', [ConsultorioController::class, 'destroy'])->name('admin.medicos.destroy')->middleware(middleware:'auth');
 
 //RUTA PARA BUSCAR LAS LOCALIDADES SEGÚN LA PROVINCIA Y LA LOCALIDAD
 Route::get('/admin/localidades/{idProv}', [LocalidadController::class, 'getLocalidades']);

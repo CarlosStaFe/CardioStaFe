@@ -162,8 +162,12 @@
                     </div>
                     <div class="col-md-3 col-sm-4 position-relative">
                         <div class="form-group">
-                            <label for="obra_social">Obra Social</label>
-                            <select type="text" class="form-control" value="{{old('obra_social')}}" id="obra_social" name="obra_social" placeholder="Obra Social">
+                            <label for="obra_social">Obra Social</label><b>*</b>
+                            <select type="text" class="form-control" value="{{old('obra_social')}}" id="obra_social" name="obra_social" placeholder="Obra Social" required>
+                                <option selected disabled>Elige una obra social...</option>
+                                @foreach ($obrasSociales as $obra)
+                                    <option value="{{$obra->id}}">{{$obra->nombre}}</option>
+                                @endforeach
                             </select>
                             @error('obra_social')
                                 <small style="color: red">{{$message}}</small>

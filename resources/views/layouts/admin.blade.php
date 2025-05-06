@@ -9,7 +9,7 @@
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="{{url('plugins/fontawesome-free/css/all.min.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{url('dist/css/adminlte.min.css')}}">
     <!-- Iconos Bootstrap -->
@@ -59,7 +59,7 @@
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
             <a href="{{url('index3.html')}}" class="brand-link">
-                <img src="{{url('dist/img/AdminLTELogo.png')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <img src="{{url('dist/img/LogoChico.jpg')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">Cardiología Infantil</span>
             </a>
 
@@ -78,7 +78,7 @@
                         <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
                         <li class="nav-item">
                             <a href="#" class="nav-link active">
-                                <i class="nav-icon fas bi bi-people-fill"></i>
+                                <i class="nav-icon fas bi bi-person-badge"></i>
                                 <p>
                                     Usuarios
                                     <i class="right fas fa-angle-left"></i>
@@ -124,7 +124,7 @@
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link active">
-                                <i class="nav-icon fas bi bi-heart-pulse-fill"></i>
+                                <i class="nav-icon fas bi bi-person-fill-check"></i>
                                 <p>
                                     Pacientes
                                     <i class="right fas fa-angle-left"></i>
@@ -145,6 +145,53 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active">
+                                <i class="nav-icon fa-solid fa-house-medical"></i>
+                                <p>
+                                    Consultorios
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{url('admin/consultorios/create')}}" class="nav-link active">
+                                        <i class="bi bi-clipboard2-plus-fill nav-icon"></i>
+                                        <p>Crear Consultorio</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{url('admin/consultorios')}}" class="nav-link active">
+                                        <i class="fa-solid fa-file-medical nav-icon"></i>
+                                        <p>Listado de Consultorios</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active">
+                                <i class="nav-icon fas fa-solid fa-stethoscope"></i>
+                                <p>
+                                    Médicos
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{url('admin/pacientes/create')}}" class="nav-link active">
+                                        <i class="bi bi-person-plus-fill nav-icon"></i>
+                                        <p>Crear Médicos</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{url('admin/pacientes')}}" class="nav-link active">
+                                        <i class="bi bi-person-lines-fill nav-icon"></i>
+                                        <p>Listado de Médicos</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
                         <li class="nav-item">
                             <a href="#" class="nav-link" style="background-color: #a9200e;">
                                 <i class="nav-icon fas bi bi-door-open-fill"></i>

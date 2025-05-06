@@ -112,14 +112,14 @@ class PacienteController extends Controller
 
     public function confirmDelete($id)
     {
-        $paciente = Paciente::with('localidad')->findOrFail($id);
-        return view('admin.pacientes.confirmDelete', compact('paciente'));
+        $paciente = Paciente::findOrFail($id);
+        return view('admin.pacientes.delete', compact('paciente'));
     }
 
     public function destroy($id)
     {
         $paciente = Paciente::findOrFail($id);
-
+        
         $paciente->delete();
 
         return redirect()->route('admin.pacientes.index')
