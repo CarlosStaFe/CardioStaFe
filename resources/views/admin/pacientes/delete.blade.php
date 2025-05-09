@@ -7,7 +7,7 @@
 </div>
 
 <div class="col-md-12">
-    <div class="card card-outline card-danger">
+    <div class="card card-danger">
         <div class="card-header">
             <h3 class="card-title">¿Desea eliminar este registro?</h3>
         </div>

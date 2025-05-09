@@ -13,7 +13,6 @@
         </div>
 
         <div class="card-body">
-            @csrf
             <div class="row">
                 <div>
                     <input id="nombrelocal" name="nombrelocal" type="hidden">

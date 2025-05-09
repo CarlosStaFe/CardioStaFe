@@ -14,7 +14,7 @@
 
         <div class="card-body">
             <div class="form group">
-                <label for="apelnombres">Appellidos y Nombres</label>
+                <label for="apelnombres">Apellidos y Nombres</label>
                 <p>{{$secretaria->apel_nombres}}</p>
             </div>
             <br>

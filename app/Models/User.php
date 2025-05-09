@@ -9,7 +9,6 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -49,5 +48,10 @@ class User extends Authenticatable
     public function secretarias()
     {
         return $this->hasMany(Secretaria::class);
+    }
+
+    public function medicos()
+    {
+        return $this->hasOne(Medico::class);
     }
 }

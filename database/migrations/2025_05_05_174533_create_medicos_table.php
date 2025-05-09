@@ -14,6 +14,8 @@ return new class extends Migration
             $table->string('matricula', 20)->nullable();
             $table->string('telefono', 30);
             $table->string('especialidad', 50)->nullable();
+            $table->string('email', 50)->nullable();
+            $table->string('activo', 1)->default('1');
 
             $table->unsignedBigInteger('user_id');            
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

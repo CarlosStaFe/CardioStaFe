@@ -18,7 +18,7 @@
                 <div class="form group">
                     <label for="apel_nombres">Apellidos y Nombres</label><b>*</b>
                     <input type="text" class="form-control" value="{{old('apel_nombres')}}" id="apel_nombres" name="apel_nombres" placeholder="Apellido y nombres" required>
-                    @error('apelnombres')
+                    @error('apel_nombres')
                         <small style="color: red">{{$message}}</small>
                     @enderror
                 </div>

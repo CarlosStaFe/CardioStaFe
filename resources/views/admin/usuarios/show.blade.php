@@ -13,7 +13,6 @@
         </div>
 
         <div class="card-body">
-            @csrf
             <div class="form group">
                 <label for="name">Nombre del Usuario</label>
                 <p>{{$usuario->name}}</p>

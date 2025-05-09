@@ -61,6 +61,19 @@
             </div>
         </div>
 
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>{{$total_medicos}}</h3>
+                    <p>Médicos</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-solid fa-stethoscope"></i>
+                </div>
+                <a href="{{url('admin/medicos')}}" class="small-box-footer">Más información <i class="fas fa-solid fa-stethoscope"></i></a>
+            </div>
+        </div>
+
     </div>
 
 

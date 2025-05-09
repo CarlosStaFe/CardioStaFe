@@ -178,13 +178,13 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="{{url('admin/pacientes/create')}}" class="nav-link active">
+                                    <a href="{{url('admin/medicos/create')}}" class="nav-link active">
                                         <i class="bi bi-person-plus-fill nav-icon"></i>
                                         <p>Crear Médicos</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{url('admin/pacientes')}}" class="nav-link active">
+                                    <a href="{{url('admin/medicos')}}" class="nav-link active">
                                         <i class="bi bi-person-lines-fill nav-icon"></i>
                                         <p>Listado de Médicos</p>
                                     </a>
@@ -229,7 +229,7 @@
                     icon: "{{$icono}}",
                     title: "{{$message}}",
                     showConfirmButton: false,
-                    timer: 3500
+                    timer: 3000
                 });
             </script>
         @endif

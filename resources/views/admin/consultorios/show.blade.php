@@ -13,7 +13,6 @@
         </div>
 
         <div class="card-body">
-            @csrf
             <div class="row">
                     <div class="col-md-5 col-sm-12 position-relative">
                         <div class="form group">
