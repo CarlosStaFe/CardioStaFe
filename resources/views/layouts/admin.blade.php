@@ -68,138 +68,210 @@
                 <!-- Sidebar user panel (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="info">
-                        <a href="#" class="d-block">{{ Auth::user()->name }}</a>
+                        <a href="" class="d-block">Usuario: <b>{{ Auth::user()->name }}</b></a>
+                        <a href="" class="d-block">Rol: <b>{{ Auth::user()->roles->pluck('name')->first() }}</b></a>
                     </div>
                 </div>
 
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fas bi bi-person-badge"></i>
-                                <p>
-                                    Usuarios
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{url('admin/usuarios/create')}}" class="nav-link active">
-                                        <i class="bi bi-person-plus-fill nav-icon"></i>
-                                        <p>Crear Usuarios</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{url('admin/usuarios')}}" class="nav-link active">
-                                        <i class="bi bi-person-lines-fill nav-icon"></i>
-                                        <p>Listado de Usuarios</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fas bi bi-person-circle"></i>
-                                <p>
-                                    Secretarias
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{url('admin/secretarias/create')}}" class="nav-link active">
-                                        <i class="bi bi-person-plus-fill nav-icon"></i>
-                                        <p>Crear Secretarias</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{url('admin/secretarias')}}" class="nav-link active">
-                                        <i class="bi bi-person-lines-fill nav-icon"></i>
-                                        <p>Listado de Secretarias</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fas bi bi-person-fill-check"></i>
-                                <p>
-                                    Pacientes
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{url('admin/pacientes/create')}}" class="nav-link active">
-                                        <i class="bi bi-person-plus-fill nav-icon"></i>
-                                        <p>Crear Pacientes</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{url('admin/pacientes')}}" class="nav-link active">
-                                        <i class="bi bi-person-lines-fill nav-icon"></i>
-                                        <p>Listado de Pacientes</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fa-solid fa-house-medical"></i>
-                                <p>
-                                    Consultorios
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{url('admin/consultorios/create')}}" class="nav-link active">
-                                        <i class="bi bi-clipboard2-plus-fill nav-icon"></i>
-                                        <p>Crear Consultorio</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{url('admin/consultorios')}}" class="nav-link active">
-                                        <i class="fa-solid fa-file-medical nav-icon"></i>
-                                        <p>Listado de Consultorios</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fas fa-solid fa-stethoscope"></i>
-                                <p>
-                                    Médicos
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{url('admin/medicos/create')}}" class="nav-link active">
-                                        <i class="bi bi-person-plus-fill nav-icon"></i>
-                                        <p>Crear Médicos</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{url('admin/medicos')}}" class="nav-link active">
-                                        <i class="bi bi-person-lines-fill nav-icon"></i>
-                                        <p>Listado de Médicos</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        @can('admin.usuarios.index')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fas bi bi-person-badge"></i>
+                                    <p>
+                                        Usuarios
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/usuarios/create')}}" class="nav-link active">
+                                            <i class="bi bi-person-plus-fill nav-icon"></i>
+                                            <p>Crear Usuarios</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/usuarios')}}" class="nav-link active">
+                                            <i class="bi bi-person-lines-fill nav-icon"></i>
+                                            <p>Listado de Usuarios</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
+
+                        @can('admin.secretarias.index')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fas bi bi-person-circle"></i>
+                                    <p>
+                                        Secretarias
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/secretarias/create')}}" class="nav-link active">
+                                            <i class="bi bi-person-plus-fill nav-icon"></i>
+                                            <p>Crear Secretarias</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/secretarias')}}" class="nav-link active">
+                                            <i class="bi bi-person-lines-fill nav-icon"></i>
+                                            <p>Listado de Secretarias</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
+
+                        @can('admin.pacientes.index')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fas bi bi-person-fill-check"></i>
+                                    <p>
+                                        Pacientes
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/pacientes/create')}}" class="nav-link active">
+                                            <i class="bi bi-person-plus-fill nav-icon"></i>
+                                            <p>Crear Pacientes</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/pacientes')}}" class="nav-link active">
+                                            <i class="bi bi-person-lines-fill nav-icon"></i>
+                                            <p>Listado de Pacientes</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
+
+                        @can('admin.consultorios.index')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fa-solid fa-house-medical"></i>
+                                    <p>
+                                        Consultorios
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/consultorios/create')}}" class="nav-link active">
+                                            <i class="bi bi-clipboard2-plus-fill nav-icon"></i>
+                                            <p>Crear Consultorio</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/consultorios')}}" class="nav-link active">
+                                            <i class="fa-solid fa-file-medical nav-icon"></i>
+                                            <p>Listado de Consultorios</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
+
+                        @can('admin.practicas.index')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fa-solid fa-suitcase-medical"></i>
+                                    <p>
+                                        Prácticas
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/practicas/create')}}" class="nav-link active">
+                                            <i class="fa-solid fa-prescription-bottle-medical nav-icon"></i>
+                                            <p>Crear Prácticas</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/practicas')}}" class="nav-link active">
+                                            <i class="fa-solid fa-file-medical nav-icon"></i>
+                                            <p>Listado de Prácticas</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
+
+                        @can('admin.medicos.index')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fas fa-solid fa-stethoscope"></i>
+                                    <p>
+                                        Médicos
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/medicos/create')}}" class="nav-link active">
+                                            <i class="bi bi-person-plus-fill nav-icon"></i>
+                                            <p>Crear Médicos</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/medicos')}}" class="nav-link active">
+                                            <i class="bi bi-person-lines-fill nav-icon"></i>
+                                            <p>Listado de Médicos</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
+
+                        @can('admin.horarios.index')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fas fa-solid fa-calendar-days"></i>
+                                    <p>
+                                        Horarios
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/horarios/create')}}" class="nav-link active">
+                                            <i class="fa-solid fa-calendar-plus nav-icon"></i>
+                                            <p>Creación de Horarios</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/horarios')}}" class="nav-link active">
+                                            <i class="fa-solid fa-calendar-check nav-icon"></i>
+                                            <p>Listado de Horarios</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
 
                         <li class="nav-item">
-                            <a href="#" class="nav-link" style="background-color: #a9200e;">
+                            <a href="{{ route('logout') }}" class="nav-link" style="background-color: #a9200e;"
+                                onclick="event.preventDefault();
+                                document.getElementById('logout-form').submit();">
                                 <i class="nav-icon fas bi bi-door-open-fill"></i>
                                 <p>
                                     Cerrar Sesión
                                 </p>
                             </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                @csrf
+                            </form>
                         </li>
+
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->

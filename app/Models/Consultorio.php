@@ -8,9 +8,9 @@ class Consultorio extends Model
 {
     protected $fillable = ['nombre', 'numero', 'direccion', 'telefono', 'especialidad', 'observacion'];
     
-    public function doctores()
+    public function medicos()
     {
-        return $this->hasMany(Doctor::class);
+        return $this->hasMany(Medico::class);
     }
 
     public function horarios()

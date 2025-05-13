@@ -66,13 +66,15 @@
                     </div>
                 </div>
                 <br>
-                <div class="col-md-12 position-relative">
-                    <div class="form-group">
-                        <label for="observacion">Observación</label>
-                        <textarea class="form-control" id="observacion" name="observacion" placeholder="Ingrese una observación">{{ old('observacion') }}</textarea>
-                        @error('observacion')
-                            <small style="color: red">{{ $message }}</small>
-                        @enderror
+                <div class="row">
+                    <div class="col-md-12 position-relative">
+                        <div class="form-group">
+                            <label for="observacion">Observación</label>
+                            <textarea class="form-control" id="observacion" name="observacion" placeholder="Ingrese una observación">{{ old('observacion') }}</textarea>
+                            @error('observacion')
+                                <small style="color: red">{{ $message }}</small>
+                            @enderror
+                        </div>
                     </div>
                 </div>
                 <br>
