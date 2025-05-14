@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Paciente;
+use App\Models\ObraSocial;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -16,7 +17,8 @@ class PacienteController extends Controller
 
     public function create()
     {
-        return view('admin.pacientes.create');
+        $obrasociales = ObraSocial::all();
+        return view('admin.pacientes.create', compact('obrasociales'));
     }
 
     public function store(Request $request)
@@ -32,7 +34,6 @@ class PacienteController extends Controller
             'telefono' => 'required|string|max:255',
             'email' => 'required|string|max:255',
             'obra_social' => 'string|max:255',
-            'plan_os' => 'string|max:255',
             'num_afiliado' => 'string|max:255',
             'observacion' => 'string|max:255',
         ]);
@@ -48,7 +49,6 @@ class PacienteController extends Controller
         $paciente->telefono = $request->telefono;
         $paciente->email = $request->email;
         $paciente->obra_social = $request->obra_social;
-        $paciente->plan_os = $request->plan_os;
         $paciente->num_afiliado = $request->num_afiliado;
         $paciente->observacion = $request->observacion;
         $paciente->save();
@@ -85,7 +85,6 @@ class PacienteController extends Controller
             'telefono' => 'required|string|max:255',
             'email' => 'required|string|max:255',
             'obra_social' => 'string|max:255',
-            'plan_os' => 'string|max:255',
             'num_afiliado' => 'string|max:255',
             'observacion' => 'string|max:255',
         ]);
@@ -100,7 +99,6 @@ class PacienteController extends Controller
         $paciente->telefono = $request->telefono;
         $paciente->email = $request->email;
         $paciente->obra_social = $request->obra_social;
-        $paciente->plan_os = $request->plan_os;
         $paciente->num_afiliado = $request->num_afiliado;
         $paciente->observacion = $request->observacion;
         $paciente->save();

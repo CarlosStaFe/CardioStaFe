@@ -121,9 +121,9 @@
 						<div class="why-box" data-aos="zoom-out" data-aos-delay="200">
 							<h3>Reserva tu turno</h3>
 							<h4>Datos necesarios:</h4>
-							<p>DNI, nombre y apellido completo, sexo, fecha de nacimiento y obra social.</p>
+							<p>DNI, nombre y apellido completo, sexo, fecha de nacimiento, obra social y nro. afiliado.</p>
 							<div class="text-center">
-								<a href="#appointment" class="more-btn"><span>Reservar turno</span> <i class="bi bi-chevron-right"></i></a>
+								<a href="{{url('login')}}" class="more-btn"><span>Reservar turno</span> <i class="bi bi-chevron-right"></i></a>
 							</div>
 						</div>
 					</div><!-- End Why Box -->

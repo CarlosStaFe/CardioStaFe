@@ -22,8 +22,7 @@ return new class extends Migration
 
             $table->string('telefono', 30)->nullable();
             $table->string('email', 80)->nullable();
-            $table->string('obra_social', 50)->nullable();
-            $table->string('plan_os', 50)->nullable();
+            $table->string('obra_social', 100)->nullable();
             $table->string('num_afiliado', 50)->nullable();
             $table->string('observacion', 255)->nullable();
             $table->timestamps();

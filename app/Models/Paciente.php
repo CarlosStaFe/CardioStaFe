@@ -10,11 +10,17 @@ class Paciente extends Model
 
     protected $fillable = [
         'apel_nombres', 'nacimiento', 'sexo', 'tipo_documento', 'num_documento',
-        'domicilio', 'cod_postal_id', 'telefono', 'email', 'obra_social', 'plan_os', 'num_afiliado', 'observacion'
+        'domicilio', 'cod_postal_id', 'telefono', 'email', 'obra_social', 'num_afiliado', 'observacion'
     ];
     
     public function localidad()
     {
         return $this->belongsTo(Localidad::class , 'cod_postal_id');
     }
+
+    public function obrasocial()
+    {
+        return $this->belongsTo(Localidad::class , 'obra_social_id');
+    }
+
 }

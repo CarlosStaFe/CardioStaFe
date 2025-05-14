@@ -9,10 +9,9 @@ class Localidad extends Model
 {
     use HasFactory;
 
-    // Especifica el nombre correcto de la tabla
     protected $table = 'localidades';
 
-    protected $fillable = ['nombre', 'codigo_postal', 'provincia_id'];
+    protected $fillable = ['id_prov', 'provincia', 'id_local', 'localidad', 'cod_postal'];
 
     public function pacientes()
     {

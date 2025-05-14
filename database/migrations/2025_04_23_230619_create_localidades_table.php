@@ -11,9 +11,9 @@ return new class extends Migration
         Schema::create('localidades', function (Blueprint $table) {
             $table->id();
             $table->string('id_prov',2);
-            $table->string('provincia',255);
+            $table->string('provincia',100);
             $table->string('id_local',11);
-            $table->string('localidad',255);
+            $table->string('localidad',100);
             $table->string('cod_postal',10);
         });
     }

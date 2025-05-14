@@ -164,22 +164,12 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-3 col-sm-4 position-relative">
+                    <div class="col-md-4 col-sm-4 position-relative">
                         <div class="form-group">
                             <label for="obra_social">Obra Social</label>
                             <select type="text" class="form-control" value="{{$paciente->obra_social}}" id="obra_social" name="obra_social" placeholder="Obra Social">
                             </select>
                             @error('obra_social')
-                                <small style="color: red">{{$message}}</small>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-md-1 col-sm-4 position-relative">
-                        <div class="form-group">
-                            <label for="plan_os">Plan</label>
-                            <select type="text" class="form-control" value="{{$paciente->plan_os}}" id="plan_os" name="plan_os" placeholder="Plan">
-                            </select>
-                            @error('plan_os')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>

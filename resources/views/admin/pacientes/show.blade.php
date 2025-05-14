@@ -88,16 +88,10 @@
                         <p>{{$paciente->email}}</p>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-4 position-relative">
+                <div class="col-md-4 col-sm-4 position-relative">
                     <div class="form-group">
                         <label for="obra_social">Obra Social</label>
                         <p>{{$paciente->obra_social}}</p>
-                    </div>
-                </div>
-                <div class="col-md-1 col-sm-4 position-relative">
-                    <div class="form-group">
-                        <label for="plan_os">Plan</label>
-                        <p>{{$paciente->plan_os}}</p>
                     </div>
                 </div>
                 <div class="col-md-2 col-sm-12 position-relative">

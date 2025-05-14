@@ -6,18 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('horarios', function (Blueprint $table) {
             $table->id();
-            $table->string('dia', 10);
+            $table->string('dia', 20);
+            $table->date('fecha');
             $table->string('hora_inicio', 5);
             $table->string('hora_fin', 5);
-            $table->string('especialidad', 50);
+            $table->string('rango', 5);
 
+            $table->unsignedBigInteger('practica_id');
+            $table->foreign('practica_id')->references('id')->on('practicas')->onDelete('cascade');
             $table->foreignId('medico_id')->constrained('medicos')->onDelete('cascade');
             $table->foreignId('consultorio_id')->constrained('consultorios')->onDelete('cascade');
             
