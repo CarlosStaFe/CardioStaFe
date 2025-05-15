@@ -10,16 +10,24 @@ return new class extends Migration
     {
         Schema::create('horarios', function (Blueprint $table) {
             $table->id();
-            $table->string('dia', 20);
-            $table->date('fecha');
+            $table->date('fecha_inicio');
+            $table->date('fecha_fin');
             $table->string('hora_inicio', 5);
             $table->string('hora_fin', 5);
             $table->string('rango', 5);
 
-            $table->unsignedBigInteger('practica_id');
-            $table->foreign('practica_id')->references('id')->on('practicas')->onDelete('cascade');
             $table->foreignId('medico_id')->constrained('medicos')->onDelete('cascade');
             $table->foreignId('consultorio_id')->constrained('consultorios')->onDelete('cascade');
+            $table->unsignedBigInteger('practica_id');
+            $table->foreign('practica_id')->references('id')->on('practicas')->onDelete('cascade');
+
+            $table->boolean('lunes')->default(false);
+            $table->boolean('martes')->default(false);
+            $table->boolean('miercoles')->default(false);
+            $table->boolean('jueves')->default(false);
+            $table->boolean('viernes')->default(false);
+            $table->boolean('sabado')->default(false);
+            $table->boolean('domingo')->default(false);
             
             $table->timestamps();
         });

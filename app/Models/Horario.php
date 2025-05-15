@@ -6,12 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Horario extends Model
 {
-    protected $fillable = ['dia', 'fecha', 'hora_inicio', 'hora_fin', 'rango', 'practica_id',  'doctor_id', 'consultorio_id'];
-
-    public function practica()
-    {
-        return $this->belongsTo(Practica::class);
-    }
+    protected $fillable = ['fecha_inicio', 'fecha_fin', 'hora_inicio', 'hora_fin', 'rango',  'medico_id', 'consultorio_id', 'practica_id',
+                            'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
 
     public function medico()
     {
@@ -23,4 +19,8 @@ class Horario extends Model
         return $this->belongsTo(Consultorio::class);
     }
 
+    public function practica()
+    {
+        return $this->belongsTo(Practica::class);
+    }
 }

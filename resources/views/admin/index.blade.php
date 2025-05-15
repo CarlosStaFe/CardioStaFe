@@ -108,9 +108,9 @@
                         <p>Horarios</p>
                     </div>
                     <div class="icon">
-                        <i class="fas fa-solid fa-calendar-days"></i>
+                        <i class="fas fa-solid fa-clock"></i>
                     </div>
-                    <a href="{{url('admin/horarios')}}" class="small-box-footer">Más información <i class="fas fa-solid fa-calendar-days"></i></a>
+                    <a href="{{url('admin/horarios')}}" class="small-box-footer">Más información <i class="fas fa-solid fa-clock"></i></a>
                 </div>
             </div>
         @endcan

@@ -45,7 +45,7 @@ class PacienteController extends Controller
         $paciente->tipo_documento = $request->tipo_documento;
         $paciente->num_documento = $request->num_documento;
         $paciente->domicilio = $request->domicilio;
-        $paciente->cod_postal_id = $request->cod_postal; 
+        $paciente->cod_postal_id = $request->cod_postal_id ?? null; 
         $paciente->telefono = $request->telefono;
         $paciente->email = $request->email;
         $paciente->obra_social = $request->obra_social;
@@ -89,13 +89,13 @@ class PacienteController extends Controller
             'observacion' => 'string|max:255',
         ]);
 
-        $paciente->apel_nombres = $request->apel_nombres;
+        $paciente->apel_nombres = strtoupper($request->apel_nombres);
         $paciente->nacimiento = $request->nacimiento;
         $paciente->sexo = $request->sexo;
         $paciente->tipo_documento = $request->tipo_documento;
         $paciente->num_documento = $request->num_documento;
         $paciente->domicilio = $request->domicilio;
-        $paciente->cod_postal_id = $request->cod_postal; 
+        $paciente->cod_postal_id = $request->cod_postal_id ?? null;
         $paciente->telefono = $request->telefono;
         $paciente->email = $request->email;
         $paciente->obra_social = $request->obra_social;

@@ -19,9 +19,9 @@
             <table id="example1" class="table table-striped table-bordered table-hover table-sm">
                 <thead style="background-color:rgb(14, 107, 169); color: white;">
                     <tr>
-                        <th style="text-align: center; width: 8%;">#</th>
-                        <th style="text-align: center; width: 30%;">NOMBRE</th>
-                        <th style="text-align: center; width: 51%;">OBSERVACIÓN</th>
+                        <th style="text-align: center; width: 5%;">#</th>
+                        <th style="text-align: center; width: 42%;">NOMBRE</th>
+                        <th style="text-align: center; width: 42%;">OBSERVACIÓN</th>
                         <th style="text-align: center; width: 11%;">ACCIONES</th>
                     </tr>
                 </thead>

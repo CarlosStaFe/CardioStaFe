@@ -107,6 +107,16 @@ class DatabaseSeeder extends Seeder
         Permission::create(['name' => 'admin.practicas.confirmDelete'])->syncRoles([$admin,$secretaria]);
         Permission::create(['name' => 'admin.practicas.destroy'])->syncRoles([$admin,$secretaria]);
       
+        //RUTA PARA EL ADMIN - OBRAS SOCIALES
+        Permission::create(['name' => 'admin.obrasociales.index'])->syncRoles([$admin,$secretaria]);
+        Permission::create(['name' => 'admin.obrasociales.create'])->syncRoles([$admin,$secretaria]);
+        Permission::create(['name' => 'admin.obrasociales.store'])->syncRoles([$admin,$secretaria]);
+        Permission::create(['name' => 'admin.obrasociales.show'])->syncRoles([$admin,$secretaria]);
+        Permission::create(['name' => 'admin.obrasociales.edit'])->syncRoles([$admin,$secretaria]);
+        Permission::create(['name' => 'admin.obrasociales.update'])->syncRoles([$admin,$secretaria]);
+        Permission::create(['name' => 'admin.obrasociales.confirmDelete'])->syncRoles([$admin,$secretaria]);
+        Permission::create(['name' => 'admin.obrasociales.destroy'])->syncRoles([$admin,$secretaria]);
+      
         //RUTA PARA EL ADMIN - MEDICOS
         Permission::create(['name' => 'admin.medicos.index'])->syncRoles([$admin,$secretaria]);
         Permission::create(['name' => 'admin.medicos.create'])->syncRoles([$admin,$secretaria]);

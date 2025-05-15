@@ -24,8 +24,8 @@ class SecretariaController extends Controller
     {
         $request->validate([
             'apel_nombres' => 'required|string|max:255',
-            'telefono' => 'required|string|max:255',
-            'domicilio' => 'required|string|max:255',
+            'telefono' => 'string|max:255',
+            'domicilio' => 'string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
@@ -67,10 +67,10 @@ class SecretariaController extends Controller
 
 
         $request->validate([
-            'apel_nombres' => 'required|string|max:255',
-            'telefono' => 'required|string|max:255',
-            'domicilio' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $usuario->id,
+            'apel_nombres' => 'string|max:255',
+            'telefono' => 'string|max:255',
+            'domicilio' => 'string|max:255',
+            'email' => 'string|email|max:255|unique:users,email,' . $usuario->id,
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 

@@ -12,7 +12,7 @@ class Obrasocial extends Model
     protected $table = 'obrasociales';
 
     protected $fillable = [
-        'nombre', 'telefono', 'contacto', 'documentacion', 'observacion'
+        'nombre', 'telefono', 'contacto', 'email', 'activo', 'documentacion', 'observacion'
     ];
 
     public function pacientes()

@@ -8,44 +8,54 @@ use Illuminate\Http\Request;
 
 class ObrasocialController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index() //strtoupper($request->apel_nombres);
     {
-        //
+        $obrasociales = Obrasocial::all();
+        return view('admin.obrasociales.index', compact('obrasociales'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('admin.obrasociales.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'telefono' => 'string|max:255',
+            'contacto' => 'string|max:255',
+            'email' => 'string|max:255',
+            'activo' => 'nullable|boolean',
+            'documentacion' => 'string|max:255',
+            'observacion' => 'string|max:255',
+        ]);
+
+        $obrasocial = new Obrasocial();
+        $obrasocial->nombre = strtoupper($request->nombre);
+        $obrasocial->telefono = $request->telefono;
+        $obrasocial->contacto = $request->contacto;
+        $obrasocial->email = $request->email;
+        $obrasocial->activo = $request->has('activo') ? true : false;
+        $obrasocial->documentacion = $request->documentacion;
+        $obrasocial->observacion = $request->observacion;
+        $obrasocial->save();
+
+        return redirect()->route('admin.obrasociales.index')
+            ->with('mensaje', 'Obra Social creada con éxito.')
+            ->with('icono', 'success');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Obrasocial $obrasocial)
+    public function show($id)
     {
-        //
+        $obrasocial = Obrasocial::findOrFail($id);
+        return view('admin.obrasociales.show', compact('obrasocial'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Obrasocial $obrasocial)
+    public function edit($id)
     {
-        //
+        $obrasocial = Obrasocial::findOrFail($id);
+        return view('admin.obrasociales.edit', compact('obrasocial'));
     }
 
     /**

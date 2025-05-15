@@ -25,8 +25,8 @@ class MedicoController extends Controller
         $request->validate([
             'apel_nombres' => 'required|string|max:255',
             'matricula' => 'string|max:255',
-            'telefono' => 'required|string|max:255',
-            'especialidad' => 'required|string|max:255',
+            'telefono' => 'string|max:255',
+            'especialidad' => 'string|max:255',
             'email' => 'required|string|max:255|unique:medicos',
             'activo' => 'required|string|max:255',
             'password' => 'required|string|min:8|confirmed',
@@ -72,13 +72,12 @@ class MedicoController extends Controller
 
 
         $request->validate([
-            'apel_nombres' => 'required|string|max:255',
+            'apel_nombres' => 'string|max:255',
             'matricula' => 'string|max:255',
-            'telefono' => 'required|string|max:255',
-            'especialidad' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $usuario->id,
+            'telefono' => 'string|max:255',
+            'especialidad' => 'string|max:255',
+            'email' => 'string|email|max:255|unique:users,email,' . $usuario->id,
             'activo' => 'string|max:255',
-            'password' => 'string|min:8|confirmed',
         ]);
 
         $medico->apel_nombres = strtoupper($request->apel_nombres);
@@ -97,7 +96,7 @@ class MedicoController extends Controller
         $usuario->save();
 
         return redirect()->route('admin.medicos.index')
-            ->with('mensaje', 'Médico actualizada con éxito.')
+            ->with('mensaje', 'Médico actualizado con éxito.')
             ->with('icono', 'success');
     }
 

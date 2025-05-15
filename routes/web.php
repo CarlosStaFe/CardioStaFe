@@ -7,8 +7,10 @@ use App\Http\Controllers\SecretariaController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\ConsultorioController;
 use App\Http\Controllers\PracticaController;
+use App\Http\Controllers\ObrasocialController;
 use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\HorarioController;
+
 use App\Http\Controllers\LocalidadController;
 
 Route::get('/', function () {
@@ -70,6 +72,16 @@ Route::get('/admin/practicas/{id}/edit', [PracticaController::class, 'edit'])->n
 Route::put('/admin/practicas/{id}', [PracticaController::class, 'update'])->name('admin.practicas.update')->middleware(['auth', 'can:admin.practicas.update']);
 Route::get('/admin/practicas/{id}/confirm-delete', [PracticaController::class, 'confirmDelete'])->name('admin.practicas.confirmDelete')->middleware(['auth', 'can:admin.practicas.confirmDelete']);
 Route::delete('/admin/practicas/{id}', [PracticaController::class, 'destroy'])->name('admin.practicas.destroy')->middleware(['auth', 'can:admin.practicas.destroy']);
+
+//RUTA PARA EL ADMIN - OBRAS SOCIALES
+Route::get('/admin/obrasociales', [ObrasocialController::class, 'index'])->name('admin.obrasociales.index')->middleware(['auth', 'can:admin.obrasociales.index']);
+Route::get('/admin/obrasociales/create', [ObrasocialController::class, 'create'])->name('admin.obrasociales.create')->middleware(['auth', 'can:admin.obrasociales.create']);
+Route::post('/admin/obrasociales/create', [ObrasocialController::class, 'store'])->name('admin.obrasociales.store')->middleware(['auth', 'can:admin.obrasociales.store']);
+Route::get('/admin/obrasociales/{id}', [ObrasocialController::class, 'show'])->name('admin.obrasociales.show')->middleware(['auth', 'can:admin.obrasociales.show']);
+Route::get('/admin/obrasociales/{id}/edit', [ObrasocialController::class, 'edit'])->name('admin.obrasociales.edit')->middleware(['auth', 'can:admin.obrasociales.edit']);
+Route::put('/admin/obrasociales/{id}', [ObrasocialController::class, 'update'])->name('admin.obrasociales.update')->middleware(['auth', 'can:admin.obrasociales.update']);
+Route::get('/admin/obrasociales/{id}/confirm-delete', [ObrasocialController::class, 'confirmDelete'])->name('admin.obrasociales.confirmDelete')->middleware(['auth', 'can:admin.obrasociales.confirmDelete']);
+Route::delete('/admin/obrasociales/{id}', [ObrasocialController::class, 'destroy'])->name('admin.obrasociales.destroy')->middleware(['auth', 'can:admin.obrasociales.destroy']);
 
 //RUTA PARA EL ADMIN - MEDICOS
 Route::get('/admin/medicos', [MedicoController::class, 'index'])->name('admin.medicos.index')->middleware(['auth', 'can:admin.medicos.index']);

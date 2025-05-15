@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('content')
-<h1>Listado de Horarios</h1>
+<h1>Listado de Obra Sociales</h1>
 
 <div class="col-md-12">
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title">Horarios Registrados</h3>
+            <h3 class="card-title">Obras Sociales Registrados</h3>
 
             <div class="card-tools">
-                <a href="{{url('/admin/horarios/create')}}" class="btn btn-primary">
-                    Registrar Horarios
+                <a href="{{url('/admin/obrasociales/create')}}" class="btn btn-primary">
+                    Registrar Obra Social
                 </a>
             </div>
         </div>
@@ -20,32 +20,26 @@
                 <thead style="background-color:rgb(14, 107, 169); color: white;">
                     <tr>
                         <th style="text-align: center; width: 5%;">#</th>
-                        <th style="text-align: center; width: 10%;">F. DESDE</th>
-                        <th style="text-align: center; width: 10%;">F. HASTA</th>
-                        <th style="text-align: center; width: 10%;">HR.INICIO</th>
-                        <th style="text-align: center; width: 10%;">HR.FINAL</th>
-                        <th style="text-align: center; width: 20%;">MÉDICO</th>
-                        <th style="text-align: center; width: 15%;">CONSULTORIO</th>
-                        <th style="text-align: center; width: 20%;">ESPECIALIDAD</th>
+                        <th style="text-align: center; width: 34%;">NOMBRE</th>
+                        <th style="text-align: center; width: 20%;">TELÉFONO</th>
+                        <th style="text-align: center; width: 25%;">E-MAIL</th>
+                        <th style="text-align: center; width: 5%;">ACT.</th>
                         <th style="text-align: center; width: 11%;">ACCIONES</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php $linea = 1; ?>
-                    @foreach($horarios as $horario)
+                    @foreach($obrasociales as $obrasocial)
                     <tr>
                         <td style="text-align: right;">{{ $linea++ }}</td>
-                        <td>{{ $horario->dia }}</td>
-                        <td>{{ $horario->fecha_inicio }}</td>
-                        <td>{{ $horario->hora_inicio }}</td>
-                        <td>{{ $horario->hora_fin }}</td>
-                        <td>{{ $horario->medico->apel_nombres }}</td>
-                        <td>{{ $horario->consultorio->nombre }}</td>
-                        <td>{{ $horario->practica->nombre }}</td>
+                        <td>{{ strtoupper($obrasocial->nombre) }}</td>
+                        <td>{{ $obrasocial->telefono }}</td>
+                        <td>{{ $obrasocial->email }}</td>
+                        <td style="text-align: center;">{{ $obrasocial->activo }}</td>
                         <td>
-                            <a href="{{url('admin/horarios/'.$horario->id)}}" type="button" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
-                            <a href="{{url('admin/horarios/'.$horario->id.'/edit')}}" type="button" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a>
-                            <a href="{{url('admin/horarios/'.$horario->id.'/confirm-delete')}}" type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
+                            <a href="{{url('admin/obrasociales/'.$obrasocial->id)}}" type="button" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                            <a href="{{url('admin/obrasociales/'.$obrasocial->id.'/edit')}}" type="button" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a>
+                            <a href="{{url('admin/obrasociales/'.$obrasocial->id.'/confirm-delete')}}" type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
                         </td>
                     </tr>
                     @endforeach
@@ -76,7 +70,7 @@
                             },
                         },
                         "columnDefs": [
-                            { "orderable": false, "targets": [7] }
+                            { "orderable": false, "targets": [5] }
                         ]
                     }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
                 });

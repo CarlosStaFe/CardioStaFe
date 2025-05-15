@@ -89,7 +89,7 @@
                                 <label class="form-check-label" for="domingo" style="color: green;"><b>DOMINGO</b></label>
                             </div>
                             @error('dias')
-                                <small style="color: red">{{ $message }}</small>
+                                <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>
                     </div>

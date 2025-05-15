@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('domicilio', 50)->nullable();
 
             $table->unsignedBigInteger('cod_postal_id');            
-            $table->foreign('cod_postal_id')->references('id')->on('localidades');
+            $table->foreign('cod_postal_id')->references('id')->on('localidades')->nullable();
 
             $table->string('telefono', 30)->nullable();
             $table->string('email', 80)->nullable();

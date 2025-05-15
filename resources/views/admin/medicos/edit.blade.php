@@ -38,7 +38,7 @@
                     <div class="col-md-3 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="telefono">Teléfono</label><b>*</b>
-                            <input type="number" class="form-control" value="{{$medico->telefono}}" id="telefono" name="telefono" placeholder="Teléfono" required>
+                            <input type="text" class="form-control" value="{{$medico->telefono}}" id="telefono" name="telefono" placeholder="Teléfono" required>
                             @error('telefono')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -69,7 +69,7 @@
                         <div class="form group">
                             <label for="activo"></label>
                                 <div class="form-check" style="margin-top: 17px; margin-left: 20px;">
-                                    <input class="form-check-input" type="checkbox" id="activo" name="activo" value="S" style="transform: scale(2.0);" {{ $medico->activo == 'S' ? 'checked' : '' }} required>
+                                    <input class="form-check-input" type="checkbox" id="activo" name="activo" value="{{$medico->activo}}" style="transform: scale(2.0);" {{ $medico->activo == 'S' ? 'checked' : '' }} required>
                                     <label class="form-check-label" for="activo"><b>¿Está activo?</b><b>*</b></label>
                                 </div>
                                 @error('activo')
@@ -79,8 +79,8 @@
                     </div>
                     <div class="col-md-3 col-sm-12 position-relative">
                         <div class="form group">
-                            <label for="password">Contraseña</label><b>*</b>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required>
+                            <label for="password">Contraseña</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña">
                             @error('password')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -88,8 +88,8 @@
                     </div>
                     <div class="col-md-3 col-sm-12 position-relative">
                         <div class="form group">
-                            <label for="password_confirmation">Verificar Contraseña</label><b>*</b>
-                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Verificar Contraseña" required>
+                            <label for="password_confirmation">Verificar Contraseña</label>
+                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Verificar Contraseña">
                             @error('password_verify')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -99,7 +99,7 @@
                 <br>
                 <div class="form group">
                     <a href="{{url('admin/medicos')}}" class="btn btn-info">Cancelar</a>
-                    <button type="submit" class="btn btn-primary">Registrar Médico</button>
+                    <button type="submit" class="btn btn-primary">Actualizar</button>
                 </div>
             </form>
         </div>

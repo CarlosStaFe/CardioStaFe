@@ -206,6 +206,32 @@
                             </li>
                         @endcan
 
+                        @can('admin.obrasociales.index')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="nav-icon fas fa-solid fa-building-columns"></i>
+                                    <p>
+                                        Obras Sociales
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/obrasociales/create')}}" class="nav-link active">
+                                            <i class="fa-solid fa-building nav-icon"></i>
+                                            <p>Crear Obras Sociales</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/obrasociales')}}" class="nav-link active">
+                                            <i class="fa-solid fa-file-contract nav-icon"></i>
+                                            <p>Listado de Obras Soc.</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
+
                         @can('admin.medicos.index')
                             <li class="nav-item">
                                 <a href="#" class="nav-link active">
@@ -235,7 +261,7 @@
                         @can('admin.horarios.index')
                             <li class="nav-item">
                                 <a href="#" class="nav-link active">
-                                    <i class="nav-icon fas fa-solid fa-calendar-days"></i>
+                                    <i class="nav-icon fas fa-solid fa-clock"></i>
                                     <p>
                                         Horarios
                                         <i class="right fas fa-angle-left"></i>
@@ -244,13 +270,13 @@
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{url('admin/horarios/create')}}" class="nav-link active">
-                                            <i class="fa-solid fa-calendar-plus nav-icon"></i>
+                                            <i class="fa-regular fa-clock nav-icon"></i>
                                             <p>Creación de Horarios</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{url('admin/horarios')}}" class="nav-link active">
-                                            <i class="fa-solid fa-calendar-check nav-icon"></i>
+                                            <i class="fa-solid fa-table-cells nav-icon"></i>
                                             <p>Listado de Horarios</p>
                                         </a>
                                     </li>

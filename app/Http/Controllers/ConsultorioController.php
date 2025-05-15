@@ -30,16 +30,16 @@ class ConsultorioController extends Controller
             'observacion' => 'string|max:255',
         ]);
 
-        Consultorio::create($request->all()); //Reemplaza el método siguiente por este
+        //Consultorio::create($request->all()); //Reemplaza el método siguiente por este
         
-        //$consultorio = new Consultorio();
-        //$consultorio->nombre = $request->nombre;
-        //$consultorio->numero = $request->numero;
-        //$consultorio->direccion = $request->direccion;
-        //$consultorio->telefono = $request->telefono;
-        //$consultorio->especialidad = $request->especialidad;
-        //$consultorio->observacion = $request->observacion;
-        //$consultorio->save();
+        $consultorio = new Consultorio();
+        $consultorio->nombre = strtoupper($request->nombre);
+        $consultorio->numero = $request->numero;
+        $consultorio->direccion = $request->direccion;
+        $consultorio->telefono = $request->telefono;
+        $consultorio->especialidad = $request->especialidad;
+        $consultorio->observacion = $request->observacion;
+        $consultorio->save();
 
         return redirect()->route('admin.consultorios.index')
             ->with('mensaje', 'Consultorio creado con éxito.')

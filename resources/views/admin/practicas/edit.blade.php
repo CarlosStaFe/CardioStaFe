@@ -32,7 +32,7 @@
                     <div class="col-md-12 position-relative">
                         <div class="form-group">
                             <label for="observacion">Observación</label>
-                            <textarea class="form-control" id="observacion" name="observacion" placeholder="Ingrese una observación">{{$practica->observacion}}</    textarea>
+                            <textarea class="form-control" value="{{$practica->observacion}}" id="observacion" name="observacion" placeholder="Ingrese una observación"></textarea>
                             @error('observacion')
                                 <small style="color: red">{{ $message }}</small>
                             @enderror

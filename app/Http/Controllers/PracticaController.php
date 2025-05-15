@@ -26,7 +26,12 @@ class PracticaController extends Controller
             'observacion' => 'string|max:255',
         ]);
 
-        Practica::create($request->all());
+        //Practica::create($request->all());
+
+        $practica = new Practica();
+        $practica->nombre = strtoupper($request->nombre);
+        $practica->observacion = $request->observacion;
+        $practica->save();
 
         return redirect()->route('admin.practicas.index')
         ->with('mensaje', 'Práctica creada con éxito.')
@@ -47,13 +52,19 @@ class PracticaController extends Controller
 
     public function update(Request $request, $id)
     {
+        $practica = Practica::findOrFail($id);
+
         $request->validate([
-            'nombre' => 'required|string|max:255',
+            'nombre' => 'string|max:255',
             'observacion' => 'string|max:255',
         ]);
 
-        $practica = Practica::findOrFail($id);
-        $practica->update($request->all());
+        //$practica = Practica::findOrFail($id);
+        //$practica->update($request->all());
+
+        $practica->nombre = strtoupper($request->nombre);
+        $practica->observacion = $request->observacion;
+        $practica->save();
 
         return redirect()->route('admin.practicas.index')
         ->with('mensaje', 'Práctica actualizada con éxito.')
