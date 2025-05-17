@@ -41,40 +41,39 @@
                     </tr>
                     @endforeach
                 </tbody>
-            </table>
-
-            <script>
-                $(function() {
-                    $("#example1").DataTable({
-                        "responsive": true,
-                        "lengthChange": true,
-                        "autoWidth": false,
-                        "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
-                        "pageLength": 10,
-                        "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
-                        "language": {
-                            "lengthMenu": "Mostrar _MENU_ registros por página",
-                            "zeroRecords": "No se encontraron resultados",
-                            "info": "Mostrando página _PAGE_ de _PAGES_",
-                            "infoEmpty": "No hay registros disponibles",
-                            "infoFiltered": "(filtrado de _MAX_ registros totales)",
-                            "search": "Buscar:",
-                            "paginate": {
-                                "first": "Primero",
-                                "last": "Último",
-                                "next": "Siguiente",
-                                "previous": "Anterior"
-                            },
-                        },
-                        "columnDefs": [
-                            { "orderable": false, "targets": [3] }
-                        ]
-                    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-                });
-            </script>
-                
+            </table>                
         </div>
     </div>
 </div>
+
+<script>
+    $(function() {
+        $("#example1").DataTable({
+            "responsive": true,
+            "lengthChange": true,
+            "autoWidth": false,
+            "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+            "pageLength": 10,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+            "language": {
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "No hay registros disponibles",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                "search": "Buscar:",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                },
+            },
+            "columnDefs": [
+                { "orderable": false, "targets": [3] }
+            ]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    });
+</script>
 
 @endsection

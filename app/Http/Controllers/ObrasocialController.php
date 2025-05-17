@@ -58,19 +58,43 @@ class ObrasocialController extends Controller
         return view('admin.obrasociales.edit', compact('obrasocial'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Obrasocial $obrasocial)
+    public function update(Request $request, $id)
     {
-        //
+        $obrasocial = Obrasocial::findOrFail($id);
+
+        $request->validate([
+            'nombre' => 'string|max:255',
+            'observacion' => 'string|max:255',
+        ]);
+
+        $obrasocial->nombre = strtoupper($request->nombre);
+        $obrasocial->telefono = $request->telefono;
+        $obrasocial->contacto = $request->contacto;
+        $obrasocial->email = $request->email;
+        $obrasocial->activo = $request->has('activo') ? true : false;
+        $obrasocial->documentacion = $request->documentacion;
+        $obrasocial->observacion = $request->observacion;
+        $obrasocial->save();
+
+        return redirect()->route('admin.obrasociales.index')
+        ->with('mensaje', 'Obra Social actualizada con éxito.')
+        ->with('icono', 'success');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Obrasocial $obrasocial)
+        public function confirmDelete($id)
     {
-        //
+        $obrasocial = Obrasocial::findOrFail($id);
+        return view('admin.obrasociales.delete', compact('obrasocial'));
+    }
+
+    public function destroy($id)
+    {
+        $obrasocial = Obrasocial::findOrFail($id);
+        
+        $obrasocial->delete();
+
+        return redirect()->route('admin.obrasociales.index')
+            ->with('mensaje', 'Obra Social eliminada con éxito.')
+            ->with('icono', 'success');
     }
 }

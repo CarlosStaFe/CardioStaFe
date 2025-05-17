@@ -16,6 +16,7 @@
         </div>
 
         <div class="card-body">
+           
             <table id="example1" class="table table-striped table-bordered table-hover table-sm">
                 <thead style="background-color:rgb(14, 107, 169); color: white;">
                     <tr>
@@ -26,7 +27,7 @@
                         <th style="text-align: center; width: 10%;">HR.FINAL</th>
                         <th style="text-align: center; width: 20%;">MÉDICO</th>
                         <th style="text-align: center; width: 15%;">CONSULTORIO</th>
-                        <th style="text-align: center; width: 20%;">ESPECIALIDAD</th>
+                        <th style="text-align: center; width: 20%;">PRÁCTICA</th>
                         <th style="text-align: center; width: 11%;">ACCIONES</th>
                     </tr>
                 </thead>
@@ -51,39 +52,54 @@
                     @endforeach
                 </tbody>
             </table>
-
-            <script>
-                $(function() {
-                    $("#example1").DataTable({
-                        "responsive": true,
-                        "lengthChange": true,
-                        "autoWidth": false,
-                        "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
-                        "pageLength": 10,
-                        "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
-                        "language": {
-                            "lengthMenu": "Mostrar _MENU_ registros por página",
-                            "zeroRecords": "No se encontraron resultados",
-                            "info": "Mostrando página _PAGE_ de _PAGES_",
-                            "infoEmpty": "No hay registros disponibles",
-                            "infoFiltered": "(filtrado de _MAX_ registros totales)",
-                            "search": "Buscar:",
-                            "paginate": {
-                                "first": "Primero",
-                                "last": "Último",
-                                "next": "Siguiente",
-                                "previous": "Anterior"
-                            },
-                        },
-                        "columnDefs": [
-                            { "orderable": false, "targets": [7] }
-                        ]
-                    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-                });
-            </script>
-                
         </div>
     </div>
+    
+    <div class="card card-outline card-primary">
+        <div class="card-header">
+            <h3 class="card-title">Calendario de atención</h3>
+        </div>
+
+        <div class="col-md-3">
+            <select id="medico" class="form-control select2" style="width: 100%;">
+                <option value="">Seleccione un Médico</option>
+                @foreach($medicos as $medico)
+                    <option value="{{ $medico->id }}">{{ $medico->apel_nombres }}</option>
+                @endforeach
+            </select>
+        </div>                
+
+    </div>
 </div>
+
+<script>
+    $(function() {
+        $("#example1").DataTable({
+            "responsive": true,
+            "lengthChange": true,
+            "autoWidth": false,
+            "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+            "pageLength": 10,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+            "language": {
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "No hay registros disponibles",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                "search": "Buscar:",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                },
+            },
+            "columnDefs": [
+                { "orderable": false, "targets": [8] }
+            ]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    });
+</script>
 
 @endsection

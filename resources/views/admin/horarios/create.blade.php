@@ -20,6 +20,7 @@
                         <div class="form group">
                             <label for="medico">Médico</label><b>*</b>
                             <select class="form-control" id="medico" name="medico" required>
+                                <option value="">Seleccione un Médico</option>
                                 @foreach($medicos as $medico)
                                     <option value="{{$medico->id}}" {{ old('medico') == $medico->id ? 'selected' : '' }}>{{ strtoupper($medico->apel_nombres) }}</option>
                                 @endforeach
@@ -33,6 +34,7 @@
                         <div class="form group">
                             <label for="medico">Consultorio</label><b>*</b>
                             <select class="form-control" id="consultorio" name="consultorio" required>
+                                <option value="">Seleccione un Consultorio</option>
                                 @foreach($consultorios as $consultorio)
                                     <option value="{{$consultorio->id}}" {{ old('consultorio') == $consultorio->id ? 'selected' : '' }}>{{ $consultorio->nombre }}</option>
                                 @endforeach
@@ -46,6 +48,7 @@
                         <div class="form group">
                             <label for="medico">Práctica Médica</label><b>*</b>
                             <select class="form-control" id="practica" name="practica" required>
+                                <option value="">Seleccione una Práctica</option>
                                 @foreach($practicas as $practica)
                                     <option value="{{$practica->id}}" {{ old('practica') == $practica->id ? 'selected' : '' }}>{{ $practica->nombre }}</option>
                                 @endforeach

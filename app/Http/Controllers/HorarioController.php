@@ -13,8 +13,9 @@ class HorarioController extends Controller
 {
     public function index()
     {
+        $medicos = Medico::all();
         $horarios = Horario::with('medico', 'consultorio', 'practica')->get();
-        return view('admin.horarios.index', compact('horarios'));
+        return view('admin.horarios.index', compact('horarios', 'medicos'));
     }
 
     public function create()
@@ -31,7 +32,7 @@ class HorarioController extends Controller
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
             'hora_inicio' => 'required|time',
-            'hora_fin' => 'required|time',
+            'hora_fin' => 'required|time|after_or_equal:hora_inicio',
             'rango' => 'required|time',
             'medico_id' => 'required|exists:medicos,id',
             'consultorio_id' => 'required|exists:consultorios,id',
