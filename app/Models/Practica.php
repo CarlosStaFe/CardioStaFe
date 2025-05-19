@@ -17,4 +17,14 @@ class Practica extends Model
     {
         return $this->hasMany(Horario::class);
     }
+
+    public function practicas()
+    {
+        return $this->hasMany(Practica::class);
+    }
+    
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
 }

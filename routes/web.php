@@ -16,6 +16,7 @@ use App\Http\Controllers\LocalidadController;
 Route::get('/', function () {
     return view('index');
 });
+Route::get('/admin/eventos/create', [App\Http\Controllers\EventController::class, 'store'])->name('admin.eventos.create');
 
 Auth::routes();
 

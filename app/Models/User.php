@@ -55,4 +55,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Medico::class);
     }
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
+
 }

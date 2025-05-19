@@ -19,12 +19,12 @@
             <table id="example1" class="table table-striped table-bordered table-hover table-sm">
                 <thead style="background-color:rgb(14, 107, 169); color: white;">
                     <tr>
-                        <th style="text-align: center; width: 5%;">#</th>
-                        <th style="text-align: center; width: 15%;">NOMBRE</th>
-                        <th style="text-align: center; width: 6%;">NRO.</th>
-                        <th style="text-align: center; width: 20%;">DIRECCIÓN</th>
-                        <th style="text-align: center; width: 15%;">TELÉFONO</th>
-                        <th style="text-align: center; width: 28%;">ESPECIALIDAD</th>
+                        <th style="text-align: center; width: 6%;">#</th>
+                        <th style="text-align: center; width: 20%;">NOMBRE</th>
+                        <th style="text-align: center; width: 8%;">NRO.</th>
+                        <th style="text-align: center; width: 30%;">DIRECCIÓN</th>
+                        <th style="text-align: center; width: 25%;">TELÉFONO</th>
+                        <th style="text-align: center; width: 0%;"></th>
                         <th style="text-align: center; width: 11%;">ACCIONES</th>
                     </tr>
                 </thead>
@@ -37,7 +37,7 @@
                         <td style="text-align: right;">{{ $consultorio->numero }}</td>
                         <td>{{ $consultorio->direccion }}</td>
                         <td>{{ $consultorio->telefono }}</td>
-                        <td>{{ $consultorio->especialidad }}</td>
+                        <td></td>
                         <td>
                             <a href="{{url('admin/consultorios/'.$consultorio->id)}}" type="button" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
                             <a href="{{url('admin/consultorios/'.$consultorio->id.'/edit')}}" type="button" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a>
@@ -75,7 +75,8 @@
                 },
             },
             "columnDefs": [
-                { "orderable": false, "targets": [6] }
+                { "orderable": false, "targets": [6] },
+                { "visible": false, "targets": [5] }
             ]
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     });

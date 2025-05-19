@@ -17,7 +17,7 @@
                 @csrf
                 @method('PUT')
                 <div class="row">
-                    <div class="col-md-5 col-sm-12 position-relative">
+                    <div class="col-md-3 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="nombre">Nombre</label><b>*</b>
                             <input type="text" class="form-control" value="{{$consultorio->nombre}}" id="nombre" name="nombre" placeholder="Nombre" required>
@@ -35,7 +35,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-5 col-sm-12 position-relative">
+                    <div class="col-md-4 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="direccion">Dirección</label>
                             <input type="text" class="form-control" value="{{$consultorio->direccion}}" id="direccion" name="direccion" placeholder="Domicilio">
@@ -44,23 +44,11 @@
                             @enderror
                         </div>
                     </div>
-                </div>
-                <br>
-                <div class="row">
                     <div class="col-md-3 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="telefono">Teléfono</label>
                             <input type="text" class="form-control" value="{{$consultorio->telefono}}" id="telefono" name="telefono" placeholder="Teléfono">
                             @error('telefono')
-                                <small style="color: red">{{$message}}</small>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6 position-relative">
-                        <div class="form group">
-                            <label for="especialidad">Especialidad</label>
-                            <input type="especialidad" class="form-control" value="{{$consultorio->especialidad}}" id="especialidad" name="especialidad" placeholder="Especialidad">
-                            @error('especialidad')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>

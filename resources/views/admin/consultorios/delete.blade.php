@@ -17,7 +17,7 @@
                 @csrf
                 @method('DELETE')
                 <div class="row">
-                    <div class="col-md-5 col-sm-12 position-relative">
+                    <div class="col-md-3 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="nombre">Nombre</label>
                             <p>{{$consultorio->nombre}}</p>
@@ -29,28 +29,21 @@
                             <p>{{$consultorio->numero}}</p>
                         </div>
                     </div>
-                    <div class="col-md-5 col-sm-12 position-relative">
+                    <div class="col-md-4 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="direccion">Dirección</label>
                             <p>{{$consultorio->direccion}}</p>
                         </div>
                     </div>
-                </div>
-                <br>
-                <div class="row">
                     <div class="col-md-3 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="telefono">Teléfono</label>
                             <p>{{$consultorio->telefono}}</p>
                         </div>
                     </div>
-                    <div class="col-md-4 col-sm-6 position-relative">
-                        <div class="form group">
-                            <label for="especialidad">Especialidad</label>
-                            <p>{{$consultorio->especialidad}}</p>
-                        </div>
-                    </div>
-                    <br>
+                </div>
+                <br>
+                <div class="row">
                     <div class="col-md-12 position-relative">
                         <div class="form-group">
                             <label for="observacion">Observación</label>

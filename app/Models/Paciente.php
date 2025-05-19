@@ -18,7 +18,7 @@ class Paciente extends Model
         return $this->belongsTo(Localidad::class , 'cod_postal_id');
     }
 
-    public function obrasocial()
+    public function obrasociales()
     {
         return $this->belongsTo(Localidad::class , 'obra_social_id');
     }

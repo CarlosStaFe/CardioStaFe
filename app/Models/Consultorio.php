@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Consultorio extends Model
 {
-    protected $fillable = ['nombre', 'numero', 'direccion', 'telefono', 'especialidad', 'observacion'];
+    protected $fillable = ['nombre', 'numero', 'direccion', 'telefono', 'observacion'];
     
     public function medicos()
     {
@@ -16,5 +16,15 @@ class Consultorio extends Model
     public function horarios()
     {
         return $this->hasMany(Horario::class);
+    }
+
+    public function practicas()
+    {
+        return $this->hasMany(Practica::class);
+    }
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
     }
 }

@@ -25,6 +25,22 @@ class AdminController extends Controller
         $total_medicos = Medico::count();
         $total_horarios = Horario::count();
 
-        return view('admin.index',compact('total_usuarios','total_secretarias','total_pacientes', 'total_consultorios', 'total_practicas', 'total_obras', 'total_medicos', 'total_horarios'));
+        $consultorios = Consultorio::all();
+        $practicas = Practica::all();
+        $medicos = Medico::all();
+
+        return view('admin.index', [
+            'total_usuarios' => $total_usuarios,
+            'total_secretarias' => $total_secretarias,
+            'total_pacientes' => $total_pacientes,
+            'total_consultorios' => $total_consultorios,
+            'total_practicas' => $total_practicas,
+            'total_obras' => $total_obras,
+            'total_medicos' => $total_medicos,
+            'total_horarios' => $total_horarios,
+            'consultorios' => $consultorios,
+            'practicas' => $practicas,
+            'medicos' => $medicos
+        ]);
     }
 }

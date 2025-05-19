@@ -54,22 +54,6 @@
             </table>
         </div>
     </div>
-    
-    <div class="card card-outline card-primary">
-        <div class="card-header">
-            <h3 class="card-title">Calendario de atención</h3>
-        </div>
-
-        <div class="col-md-3">
-            <select id="medico" class="form-control select2" style="width: 100%;">
-                <option value="">Seleccione un Médico</option>
-                @foreach($medicos as $medico)
-                    <option value="{{ $medico->id }}">{{ $medico->apel_nombres }}</option>
-                @endforeach
-            </select>
-        </div>                
-
-    </div>
 </div>
 
 <script>

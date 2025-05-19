@@ -3,17 +3,24 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Horario extends Model
+class Event extends Model
 {
-    protected $fillable = ['fecha_inicio', 'fecha_fin', 'hora_inicio', 'hora_fin', 'rango',  'medico_id', 'consultorio_id', 'practica_id',
-                            'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+    use HasFactory;
+
+    protected $fillable = ['title', 'description', 'color', 'start_date', 'start_time', 'user_id', 'medico_id', 'consultorio_id', 'practica_id'];
+
+    public function users()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function medicos()
     {
         return $this->belongsTo(Medico::class);
     }
-    
+
     public function consultorios()
     {
         return $this->belongsTo(Consultorio::class);

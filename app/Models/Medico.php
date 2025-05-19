@@ -11,12 +11,12 @@ class Medico extends Model
 
     protected $fillable = ['apel_nombres', 'matricula', 'telefono', 'email', 'especialidad', 'user_id'];
 
-    public function consultorio()
+    public function consultorios()
     {
         return $this->belongsTo(Consultorio::class);
     }
 
-    public function horario()
+    public function horarios()
     {
         return $this->hasMany(Horario::class);
     }
@@ -25,4 +25,10 @@ class Medico extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
+
 }
