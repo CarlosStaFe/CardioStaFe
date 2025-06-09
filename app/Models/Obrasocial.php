@@ -20,4 +20,9 @@ class Obrasocial extends Model
         return $this->hasMany(Paciente::class, 'obra_social_id');
     }
 
+    public function events()
+    {
+        return $this->hasMany(Event::class, 'obra_social_id');
+    }
+
 }

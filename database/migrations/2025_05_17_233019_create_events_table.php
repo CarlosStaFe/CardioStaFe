@@ -13,11 +13,12 @@ return new class extends Migration
             $table->string('title');
             $table->string('description')->nullable();
             $table->string('color');
-            //$table->string('obra_social_id')->nullable(); AGREGAR ID_PACIENTE
             $table->date('start_date');
             $table->time('start_time');
 
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreignId('obra_social_id')->references('id')->on('obrasociales')->onDelete('cascade');
+            $table->foreignId('paciente_id')->references('id')->on('pacientes')->onDelete('cascade');
             $table->foreignId('medico_id')->references('id')->on('medicos')->onDelete('cascade');
             $table->foreignId('consultorio_id')->references('id')->on('consultorios')->onDelete('cascade');
             $table->foreignId('practica_id')->references('id')->on('practicas')->onDelete('cascade');
