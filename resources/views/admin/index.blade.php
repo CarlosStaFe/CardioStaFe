@@ -125,32 +125,34 @@
             </div>
             <br>
             <div class="row mb-3">
-                <div class="col-md-3">
-                    <select id="medico" class="form-control select2" style="width: 100%;">
-                        <option value="">Seleccione un Consultorio</option>
+                <div class="col-md-3 ml-3">
+                    <label for="consultorio">Seleccione un Consultorio</label>
+                    <select id="consultorio" class="form-control select2" style="width: 100%;">
+                        <option value="0">TODOS</option>
                         @foreach($consultorios as $consultorio)
                         <option value="{{ $consultorio->id }}">{{ $consultorio->nombre }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <select id="medico" class="form-control select2" style="width: 100%;">
-                        <option value="">Seleccione una Práctica</option>
+                    <label for="practica">Seleccione una Práctica</label>
+                    <select id="practica" class="form-control select2" style="width: 100%;">
+                        <option value="0">TODAS</option>
                         @foreach($practicas as $practica)
                         <option value="{{ $practica->id }}">{{ $practica->nombre }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-3">
+                    <label for="medico">Seleccione un Médico</label>
                     <select id="medico" class="form-control select2" style="width: 100%;">
-                        <option value="">Seleccione un Médico</option>
+                        <option value="0">TODOS</option>
                         @foreach($medicos as $medico)
                         <option value="{{ $medico->id }}">{{ $medico->apel_nombres }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2 d-flex align-items-center">
-                    <!-- Button trigger modal -->
+                <div class="col-md-2 d-flex align-items-center mt-4">
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                         Registrar Turno
                     </button>
@@ -164,20 +166,27 @@
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Reserva de Turno</h1>
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Reserva de Turno - Datos del Paciente</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="row">
-                                    <div class='col-md-12'>
+                                    <div class='col-md-6'>
                                         <div class="form-goup">
-                                            <label for="medico">Seleccione un Médico</label>
-                                            <select id="medico" class="form-control select2" style="width: 100%;">
-                                                <option value="">Seleccione un Médico</option>
-                                                @foreach($medicos as $medico)
-                                                <option value="{{ $medico->id }}">{{ $medico->apel_nombres }}</option>
-                                                @endforeach
+                                            <label for="tipo">Tipo Documento</label>
+                                            <select class="form-control" id="tipo" name="tipo" required>
+                                                <option value="DNI">DNI</option>
+                                                <option value="CI">CI</option>
+                                                <option value="PAS">PAS</option>
+                                                <option value="LE">LE</option>
+                                                <option value="LC">LC</option>
                                             </select>
+                                        </div>
+                                    </div>
+                                    <div class='col-md-6'>
+                                        <div class="form-goup">
+                                            <label for="documento">Documento</label>
+                                            <input type="text" class="form-control" id="documento" name="documento" placeholder="Ingrese el documento del paciente" required>
                                         </div>
                                     </div>
                                 </div>
