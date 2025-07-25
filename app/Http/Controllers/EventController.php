@@ -43,13 +43,12 @@ class EventController extends Controller
 
         $evento = new Event();
         $evento->title = strtoupper($request->title);
-        $evento->description = $request->nacimiento;
-        $evento->start_date = $request->sexo;
-        $evento->end_date = $request->tipo_documento;
-        $evento->start_time = $request->num_documento;
-        $evento->end_time = $request->domicilio;
-        $evento->user_id = $request->cod_postal_id ?? null; 
-        $evento->medico_id = $request->telefono;
+        $evento->description = $request->descripcion;
+        $evento->color = $request->color ?? '#0000FF';
+        $evento->start_date = $request->start_date;
+        $evento->start_time = $request->start_time;
+        $evento->user_id = $request->user_id ?? auth()->id(); 
+        $evento->medico_id = $request->medico_id ?? auth()->user()->medico->id;
         $evento->consultorio_id = $request->email;
         $evento->practica_id = $request->obra_social;
         $evento->num_afiliado = $request->num_afiliado;

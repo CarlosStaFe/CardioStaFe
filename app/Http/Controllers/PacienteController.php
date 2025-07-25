@@ -33,10 +33,12 @@ class PacienteController extends Controller
             'cod_postal_id' => 'string|max:255',
             'telefono' => 'required|string|max:255',
             'email' => 'required|string|max:255',
-            'obra_social' => 'string|max:255',
+            'obra_social_id' => 'string|max:255',
             'num_afiliado' => 'string|max:255',
             'observacion' => 'string|max:255',
         ]);
+
+        // dd($request->all());
 
         $paciente = new Paciente();
         $paciente->apel_nombres = strtoupper($request->apel_nombres);
@@ -45,10 +47,10 @@ class PacienteController extends Controller
         $paciente->tipo_documento = $request->tipo_documento;
         $paciente->num_documento = $request->num_documento;
         $paciente->domicilio = $request->domicilio;
-        $paciente->cod_postal_id = $request->cod_postal_id ?? null; 
+        $paciente->cod_postal_id = $request->cod_postal; 
         $paciente->telefono = $request->telefono;
         $paciente->email = $request->email;
-        $paciente->obra_social = $request->obra_social;
+        $paciente->obra_social_id = $request->obra_social;
         $paciente->num_afiliado = $request->num_afiliado;
         $paciente->observacion = $request->observacion;
         $paciente->save();
@@ -61,6 +63,7 @@ class PacienteController extends Controller
     public function show($id)
     {
         $paciente = Paciente::with('localidad')->findOrFail($id);
+        $paciente = Paciente::with('obrasociales')->findOrFail($id);
         return view('admin.pacientes.show', compact('paciente'));
     }
 
@@ -84,7 +87,7 @@ class PacienteController extends Controller
             'cod_postal_id' => 'string|max:255',
             'telefono' => 'required|string|max:255',
             'email' => 'required|string|max:255',
-            'obra_social' => 'string|max:255',
+            'obra_social_id' => 'string|max:255',
             'num_afiliado' => 'string|max:255',
             'observacion' => 'string|max:255',
         ]);
@@ -95,10 +98,10 @@ class PacienteController extends Controller
         $paciente->tipo_documento = $request->tipo_documento;
         $paciente->num_documento = $request->num_documento;
         $paciente->domicilio = $request->domicilio;
-        $paciente->cod_postal_id = $request->cod_postal_id ?? null;
+        $paciente->cod_postal_id = $request->cod_postal;
         $paciente->telefono = $request->telefono;
         $paciente->email = $request->email;
-        $paciente->obra_social = $request->obra_social;
+        $paciente->obra_social_id = $request->obra_social;
         $paciente->num_afiliado = $request->num_afiliado;
         $paciente->observacion = $request->observacion;
         $paciente->save();
