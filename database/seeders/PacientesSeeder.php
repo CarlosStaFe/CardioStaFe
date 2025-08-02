@@ -20,7 +20,6 @@ class PacientesSeeder extends Seeder
         $chunks = array_chunk($pacientes, 500);
 
         foreach ($chunks as $chunk) {
-            $datos = [];
             $numero = 0;
             foreach ($chunk as $paciente) {
                 $num_documento = $paciente['NumeroDoc'] ?? '';
@@ -29,6 +28,11 @@ class PacientesSeeder extends Seeder
                 //if (in_array($num_documento, $documentos)) {
                 //    continue;
                 //}
+
+                $nombre_obra = !empty(trim($paciente['ObraSocial'] ?? '')) ? trim($paciente['ObraSocial']) : 'NO TIENE';
+                $obra_social_id = DB::table('obrasociales')
+                    ->where('nombre', $nombre_obra)
+                    ->value('id');
 
                 // Verifica si el número de documento ya existe en la base de datos
                 if (DB::table('pacientes')->where('num_documento', $num_documento)->exists()) {
@@ -49,7 +53,7 @@ class PacientesSeeder extends Seeder
                                 'cod_postal_id'   => $paciente['CodPostal'] ?? 1,
                                 'telefono'        => $paciente['Telefono'] ?? '-',
                                 'email'           => $paciente['Email'] ?? '@',
-                                'obra_social_id'  => 1,
+                                'obra_social_id'  => $obra_social_id,
                                 'num_afiliado'    => $paciente['Afiliado'] ?? '1',
                                 'observacion'     => $paciente['Obs'] ?? '',
                             ]);
@@ -67,7 +71,7 @@ class PacientesSeeder extends Seeder
                         'cod_postal_id'   => $paciente['CodPostal'] ?? 1,
                         'telefono'        => $paciente['Telefono'] ?? '-',
                         'email'           => $paciente['Email'] ?? '@',
-                        'obra_social_id'  => 1,
+                        'obra_social_id'  => $obra_social_id,
                         'num_afiliado'    => $paciente['Afiliado'] ?? '1',
                         'observacion'     => $paciente['Obs'] ?? '',
                     ]);

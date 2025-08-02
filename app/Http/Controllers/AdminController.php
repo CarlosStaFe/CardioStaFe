@@ -23,6 +23,7 @@ class AdminController extends Controller
         $total_practicas = Practica::count();
         $total_obras = Obrasocial::count();
         $total_medicos = Medico::count();
+        $total_obras_sociales = Obrasocial::count();
         $total_horarios = Horario::count();
 
         $consultorios = Consultorio::all();
@@ -37,6 +38,7 @@ class AdminController extends Controller
             'total_practicas' => $total_practicas,
             'total_obras' => $total_obras,
             'total_medicos' => $total_medicos,
+            'total_obras_sociales' => $total_obras_sociales,
             'total_horarios' => $total_horarios,
             'consultorios' => $consultorios,
             'practicas' => $practicas,

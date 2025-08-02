@@ -100,9 +100,24 @@
     </div>
     @endcan
 
-    @can('admin.horarios.index')
+    @can('admin.obrasociales.index')
     <div class="col-lg-3 col-6">
         <div class="small-box bg-info">
+            <div class="inner">
+                <h3>{{$total_obras_sociales}}</h3>
+                <p>Obras Sociales</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-solid fa-building-columns"></i>
+            </div>
+            <a href="{{url('admin/obrasociales')}}" class="small-box-footer">Más información <i class="fas fa-solid fa-building-columns"></i></a>
+        </div>
+    </div>
+    @endcan
+
+    @can('admin.horarios.index')
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-primary">
             <div class="inner">
                 <h3>{{$total_horarios}}</h3>
                 <p>Horarios</p>
