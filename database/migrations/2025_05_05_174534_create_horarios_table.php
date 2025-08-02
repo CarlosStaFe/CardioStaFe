@@ -12,9 +12,9 @@ return new class extends Migration
             $table->id();
             $table->date('fecha_inicio');
             $table->date('fecha_fin');
-            $table->string('hora_inicio', 5);
-            $table->string('hora_fin', 5);
-            $table->string('rango', 5);
+            $table->string('hora_inicio');
+            $table->string('hora_fin');
+            $table->string('rango');
 
             $table->foreignId('medico_id')->constrained('medicos')->onDelete('cascade');
             $table->foreignId('consultorio_id')->constrained('consultorios')->onDelete('cascade');

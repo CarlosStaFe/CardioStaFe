@@ -22,7 +22,7 @@
                             <select class="form-control" id="medico" name="medico" required>
                                 <option value="">Seleccione un Médico</option>
                                 @foreach($medicos as $medico)
-                                    <option value="{{$medico->id}}" {{ old('medico') == $medico->id ? 'selected' : '' }}>{{ strtoupper($medico->apel_nombres) }}</option>
+                                    <option value="{{$medico->id}}">{{ strtoupper($medico->apel_nombres) }}</option>
                                 @endforeach
                             </select>
                             @error('telefono')
@@ -36,7 +36,7 @@
                             <select class="form-control" id="consultorio" name="consultorio" required>
                                 <option value="">Seleccione un Consultorio</option>
                                 @foreach($consultorios as $consultorio)
-                                    <option value="{{$consultorio->id}}" {{ old('consultorio') == $consultorio->id ? 'selected' : '' }}>{{ $consultorio->nombre }}</option>
+                                    <option value="{{$consultorio->id}}">{{ $consultorio->nombre }}</option>
                                 @endforeach
                             </select>
                             @error('consultorio')
@@ -50,7 +50,7 @@
                             <select class="form-control" id="practica" name="practica" required>
                                 <option value="">Seleccione una Práctica</option>
                                 @foreach($practicas as $practica)
-                                    <option value="{{$practica->id}}" {{ old('practica') == $practica->id ? 'selected' : '' }}>{{ $practica->nombre }}</option>
+                                    <option value="{{$practica->id}}">{{ $practica->nombre }}</option>
                                 @endforeach
                             </select>
                             @error('practica')
@@ -64,31 +64,31 @@
                     <div class="col-md-12 col-sm-12 position-relative">
                         <div class="form group">
                             <div class="form-check form-check-inline col-md-1">
-                                <input class="form-check-input" type="checkbox" id="lunes" name="dias[]" value="LUNES" {{ is_array(old('dias')) && in_array('LUNES', old ('dias')) ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" id="lunes" name="lunes" value="lunes">
                                 <label class="form-check-label" for="lunes" style="color: green;"><b>LUNES</b></label>
                             </div>
                             <div class="form-check form-check-inline col-md-1">
-                                <input class="form-check-input" type="checkbox" id="martes" name="dias[]" value="MARTES" {{ is_array(old('dias')) && in_array('MARTES', old ('dias')) ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" id="martes" name="martes" value="martes">
                                 <label class="form-check-label" for="martes" style="color: green;"><b>MARTES</b></label>
                             </div>
                             <div class="form-check form-check-inline col-md-1">
-                                <input class="form-check-input" type="checkbox" id="miercoles" name="dias[]" value="MIERCOLES" {{ is_array(old('dias')) && in_array ('MIERCOLES', old ('dias')) ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" id="miercoles" name="miercoles" value="miercoles">
                                 <label class="form-check-label" for="miercoles" style="color: green;"><b>MIERCOLES</b></label>
                             </div>
                             <div class="form-check form-check-inline col-md-1">
-                                <input class="form-check-input" type="checkbox" id="jueves" name="dias[]" value="JUEVES" {{ is_array(old('dias')) && in_array('JUEVES', old ('dias')) ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" id="jueves" name="jueves" value="jueves">
                                 <label class="form-check-label" for="jueves" style="color: green;"><b>JUEVES</b></label>
                             </div>
                             <div class="form-check form-check-inline col-md-1">
-                                <input class="form-check-input" type="checkbox" id="viernes" name="dias[]" value="VIERNES" {{ is_array(old('dias')) && in_array('VIERNES',  old ('dias')) ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" id="viernes" name="viernes" value="viernes">
                                 <label class="form-check-label" for="viernes" style="color: green;"><b>VIERNES</b></label>
                             </div>
                             <div class="form-check form-check-inline col-md-1">
-                                <input class="form-check-input" type="checkbox" id="sabado" name="dias[]" value="SABADO" {{ is_array(old('dias')) && in_array('SABADO', old ('dias')) ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" id="sabado" name="sabado" value="sabado">
                                 <label class="form-check-label" for="sabado" style="color: green;"><b>SABADO</b></label>
                             </div>
                             <div class="form-check form-check-inline col-md-1">
-                                <input class="form-check-input" type="checkbox" id="domingo" name="dias[]" value="DOMINGO" {{ is_array(old('dias')) && in_array('DOMINGO', old ('dias')) ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" id="domingo" name="domingo" value="domingo">
                                 <label class="form-check-label" for="domingo" style="color: green;"><b>DOMINGO</b></label>
                             </div>
                             @error('dias')

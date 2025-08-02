@@ -16,7 +16,7 @@ class LocalidadesSeeder extends Seeder
         // Decodificar el JSON a un array
         $localidades = json_decode($json, true);
 
-      // Dividir los datos en lotes de 500 registros
+        // Dividir los datos en lotes de 500 registros
         $chunks = array_chunk($localidades, 500);
 
         foreach ($chunks as $chunk) {

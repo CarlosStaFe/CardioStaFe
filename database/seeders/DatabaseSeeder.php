@@ -22,12 +22,6 @@ class DatabaseSeeder extends Seeder
         $paciente = Role::create(['name' => 'paciente', 'guard_name' => 'web']);
         $usuario = Role::create(['name' => 'usuario', 'guard_name' => 'web']);
 
-        // User::factory(10)->create();
-
-        //User::factory()->create([
-        //    'name' => 'Test User',
-        //    'email' => 'test@example.com',
-        //]);
         User::create([
             'name' => 'Administrador',
             'email' => 'admin@admin.com',
@@ -137,9 +131,14 @@ class DatabaseSeeder extends Seeder
         Permission::create(['name' => 'admin.horarios.confirmDelete'])->syncRoles([$admin,$secretaria]);
         Permission::create(['name' => 'admin.horarios.destroy'])->syncRoles([$admin,$secretaria]);
 
-
-
-
+        $this->call([
+            ConsultoriosSeeder::class,
+            LocalidadesSeeder::class,
+            MedicosSeeder::class,
+            ObraSocialesSeeder::class,
+            PacientesSeeder::class,
+            PracticasSeeder::class,
+        ]);
 
     }
 }

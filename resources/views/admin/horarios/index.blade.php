@@ -21,12 +21,12 @@
                 <thead style="background-color:rgb(14, 107, 169); color: white;">
                     <tr>
                         <th style="text-align: center; width: 5%;">#</th>
-                        <th style="text-align: center; width: 10%;">F. DESDE</th>
-                        <th style="text-align: center; width: 10%;">F. HASTA</th>
-                        <th style="text-align: center; width: 10%;">HR.INICIO</th>
-                        <th style="text-align: center; width: 10%;">HR.FINAL</th>
-                        <th style="text-align: center; width: 20%;">MÉDICO</th>
-                        <th style="text-align: center; width: 15%;">CONSULTORIO</th>
+                        <th style="text-align: center; width: 9%;">DESDE</th>
+                        <th style="text-align: center; width: 9%;">HASTA</th>
+                        <th style="text-align: center; width: 9%;">HR.DES.</th>
+                        <th style="text-align: center; width: 9%;">HR.HAS.</th>
+                        <th style="text-align: center; width: 15%;">MÉDICO</th>
+                        <th style="text-align: center; width: 10%;">CONSULT.</th>
                         <th style="text-align: center; width: 20%;">PRÁCTICA</th>
                         <th style="text-align: center; width: 11%;">ACCIONES</th>
                     </tr>
@@ -36,8 +36,8 @@
                     @foreach($horarios as $horario)
                     <tr>
                         <td style="text-align: right;">{{ $linea++ }}</td>
-                        <td>{{ $horario->dia }}</td>
                         <td>{{ $horario->fecha_inicio }}</td>
+                        <td>{{ $horario->fecha_fin }}</td>
                         <td>{{ $horario->hora_inicio }}</td>
                         <td>{{ $horario->hora_fin }}</td>
                         <td>{{ $horario->medico->apel_nombres }}</td>

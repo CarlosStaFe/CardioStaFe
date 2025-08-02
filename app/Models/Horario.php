@@ -9,17 +9,17 @@ class Horario extends Model
     protected $fillable = ['fecha_inicio', 'fecha_fin', 'hora_inicio', 'hora_fin', 'rango',  'medico_id', 'consultorio_id', 'practica_id',
                             'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
 
-    public function medicos()
+    public function medico()
     {
         return $this->belongsTo(Medico::class);
     }
     
-    public function consultorios()
+    public function consultorio()
     {
         return $this->belongsTo(Consultorio::class);
     }
 
-    public function practicas()
+    public function practica()
     {
         return $this->belongsTo(Practica::class);
     }
