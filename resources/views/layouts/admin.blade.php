@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{url('dist/css/adminlte.min.css')}}">
     <!-- Iconos Bootstrap -->
@@ -19,10 +21,10 @@
     <script src="{{url('plugins/jquery/jquery.min.js')}}"></script>
     <!-- Sweetalert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- DataTables -->
-    <link rel="stylesheet" href="{{url('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
-    <link rel="stylesheet" href="{{url('plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
-    <link rel="stylesheet" href="{{url('plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
+    <!-- DataTables Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
     <!-- Full Calendar -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
     <script src="{{url('fullcalendar/es.global.js')}}"></script>
@@ -285,6 +287,12 @@
                                             <p>Listado de Horarios</p>
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.eventos.generar') }}" class="nav-link active">
+                                            <i class="fa-solid fa-calendar-plus nav-icon"></i>
+                                            <p>Generar Horarios Disponibles</p>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         @endcan
@@ -350,21 +358,21 @@
 
     <!-- REQUIRED SCRIPTS -->
 
-    <!-- Bootstrap 4 -->
-    <script src="{{url('plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-    <!-- DataTables  & Plugins -->
-    <script src="{{url('plugins/datatables/jquery.dataTables.min.js')}}"></script>
-    <script src="{{url('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
-    <script src="{{url('plugins/datatables-responsive/js/dataTables.responsive.min.js')}}"></script>
-    <script src="{{url('plugins/datatables-responsive/js/responsive.bootstrap4.min.js')}}"></script>
-    <script src="{{url('plugins/datatables-buttons/js/dataTables.buttons.min.js')}}"></script>
-    <script src="{{url('plugins/datatables-buttons/js/buttons.bootstrap4.min.js')}}"></script>
+    <!-- Bootstrap 5 JS + Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables Bootstrap 5 & Plugins -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
     <script src="{{url('plugins/jszip/jszip.min.js')}}"></script>
     <script src="{{url('plugins/pdfmake/pdfmake.min.js')}}"></script>
     <script src="{{url('plugins/pdfmake/vfs_fonts.js')}}"></script>
-    <script src="{{url('plugins/datatables-buttons/js/buttons.html5.min.js')}}"></script>
-    <script src="{{url('plugins/datatables-buttons/js/buttons.print.min.js')}}"></script>
-    <script src="{{url('plugins/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
     <!-- AdminLTE App -->
     <script src="{{url('dist/js/adminlte.min.js')}}"></script>
 </body>

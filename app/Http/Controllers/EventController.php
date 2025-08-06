@@ -22,46 +22,151 @@ class EventController extends Controller
      */
     public function create()
     {
-        //
+        $medicos = \App\Models\Medico::all();
+        $consultorios = \App\Models\Consultorio::all();
+        $practicas = \App\Models\Practica::all();
+        
+        return view('admin.eventos.create', compact('medicos', 'consultorios', 'practicas'));
     }
 
     public function store(Request $request)
     {
-        //$datos = request()->all();
-        //return response()->json($datos)
+        // Validar los datos recibidos
+        $request->validate([
+            'fecha_inicio' => 'required|date|after_or_equal:today',
+            'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+            'hora_inicio' => 'required',
+            'hora_fin' => 'required',
+            'rango' => 'required|integer|min:10|max:60', // Rango en minutos
+            'medico_id' => 'required|exists:medicos,id',
+            'consultorio_id' => 'required|exists:consultorios,id',
+            'practica_id' => 'required|exists:practicas,id',
+        ]);
 
-        //$request->validate([
-            //'apel_nombres' => 'required|string|max:255',
-        //]);
+        // Obtener días de la semana seleccionados
+        $diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+        $diasSeleccionados = [];
+        foreach ($diasSemana as $dia) {
+            if ($request->has($dia) && $request->$dia) {
+                $diasSeleccionados[] = $dia;
+            }
+        }
 
-        //$medico = Medico::find($request->medico_id);
-        //$evento->user_id = Auth::user()->id;
+        // Obtener las horas como strings
+        $horaInicioStr = $request->hora_inicio;
+        $horaFinStr = $request->hora_fin;
 
-        $evento = new Event();
-        $evento->title = 'prueba';
-        $evento->description = 'descripcion';
-        $evento->color = '#08e408c7';
-        $evento->start = $request->fecha_turno;
-        $evento->end = '2024-06-20 10:30:00';
-        $evento->user_id = Auth::user()->id;
-        $evento->obra_social_id = 1;
-        $evento->paciente_id = 1;
-        $evento->medico_id = 1;
-        $evento->consultorio_id = 1;
-        $evento->practica_id = 1;
-        //$evento->color = $request->color ?? '#0000FF';
-        //$evento->start = $request->start;
-        //$evento->end = $request->end;
-        //$evento->user_id = $request->user_id; 
-        //$evento->medico_id = $request->medico_id;
-        //$evento->consultorio_id = $request->email;
-        //$evento->practica_id = $request->obra_social;
-        //$evento->num_afiliado = $request->num_afiliado;
-        //$evento->observacion = $request->observacion;
-        $evento->save();
+        if (empty($diasSeleccionados)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('mensaje', 'Debe seleccionar al menos un día de la semana.')
+                ->with('icono', 'error');
+        }
+
+        // Validar que la hora de inicio sea menor que la hora de fin
+        if (strtotime($horaInicioStr) >= strtotime($horaFinStr)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('mensaje', 'La hora de inicio debe ser menor que la hora de fin.')
+                ->with('icono', 'error');
+        }
+
+        // Mapeo de días a números (0 = domingo, 1 = lunes, etc.)
+        $diasNumero = [
+            'domingo' => 0,
+            'lunes' => 1,
+            'martes' => 2,
+            'miercoles' => 3,
+            'jueves' => 4,
+            'viernes' => 5,
+            'sabado' => 6,
+        ];
+
+        $fechaInicio = new \DateTime($request->fecha_inicio);
+        $fechaFin = new \DateTime($request->fecha_fin);
+        
+        $rangoMinutos = (int)$request->rango;
+
+        $eventosCreados = 0;
+
+        // Iterar por cada día en el rango de fechas
+        for ($fecha = clone $fechaInicio; $fecha <= $fechaFin; $fecha->modify('+1 day')) {
+            $diaSemanaNum = (int)$fecha->format('w'); // 0 = domingo, 1 = lunes, etc.
+            $diaSemanaTexto = array_search($diaSemanaNum, $diasNumero);
+
+            // Verificar si este día está seleccionado
+            if (in_array($diaSemanaTexto, $diasSeleccionados)) {
+                // Generar horarios para este día usando strings de tiempo
+                $horaActual = $horaInicioStr;
+                
+                while (strtotime($horaActual) < strtotime($horaFinStr)) {
+                    // Calcular hora fin del turno
+                    $timestampHoraFin = strtotime($horaActual) + ($rangoMinutos * 60);
+                    $horaFinTurno = date('H:i', $timestampHoraFin);
+                    
+                    // Verificar que no se pase de la hora fin
+                    if (strtotime($horaFinTurno) <= strtotime($horaFinStr)) {
+                        // Verificar que no existe ya un evento en este horario
+                        $existeEvento = Event::where('medico_id', $request->medico_id)
+                            ->where('consultorio_id', $request->consultorio_id)
+                            ->where('practica_id', $request->practica_id)
+                            ->whereDate('start', $fecha->format('Y-m-d'))
+                            ->whereTime('start', $horaActual . ':00')
+                            ->exists();
+
+                        if (!$existeEvento) {
+                            $evento = new Event();
+                            $evento->title = '- Horario disponible';
+                            $evento->description = '';
+                            $evento->color = '#08e408c7';
+                            $evento->start = $fecha->format('Y-m-d') . ' ' . $horaActual . ':00';
+                            $evento->end = $fecha->format('Y-m-d') . ' ' . $horaFinTurno . ':00';
+                            $evento->user_id = Auth::user()->id;
+                            $evento->obra_social_id = 1; // Valor por defecto
+                            $evento->paciente_id = 1; // Valor por defecto
+                            $evento->medico_id = $request->medico_id;
+                            $evento->consultorio_id = $request->consultorio_id;
+                            $evento->practica_id = $request->practica_id;
+                            $evento->save();
+                            
+                            $eventosCreados++;
+                        }
+                    }
+                    
+                    // Avanzar al siguiente turno
+                    $timestampSiguiente = strtotime($horaActual) + ($rangoMinutos * 60);
+                    $horaActual = date('H:i', $timestampSiguiente);
+                }
+            }
+        }
 
         return redirect()->route('admin.index')
-            ->with('mensaje', 'Se registró la reserva.')
+            ->with('mensaje', "Se crearon {$eventosCreados} horarios disponibles exitosamente.")
+            ->with('icono', 'success');
+    }
+
+    /**
+     * Función auxiliar para limpiar horarios disponibles existentes
+     */
+    public function limpiarHorariosDisponibles(Request $request)
+    {
+        $request->validate([
+            'medico_id' => 'required|exists:medicos,id',
+            'consultorio_id' => 'required|exists:consultorios,id',
+            'practica_id' => 'required|exists:practicas,id',
+            'fecha_inicio' => 'required|date',
+            'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+        ]);
+
+        $eventosEliminados = Event::where('medico_id', $request->medico_id)
+            ->where('consultorio_id', $request->consultorio_id)
+            ->where('practica_id', $request->practica_id)
+            ->where('title', '- Horario disponible')
+            ->whereBetween('start', [$request->fecha_inicio, $request->fecha_fin . ' 23:59:59'])
+            ->delete();
+
+        return redirect()->back()
+            ->with('mensaje', "Se eliminaron {$eventosEliminados} horarios disponibles.")
             ->with('icono', 'success');
     }
 

@@ -183,57 +183,38 @@
                 @csrf
                 <input type="hidden" id="evento_id" name="evento_id" value="">
                 <input type="hidden" id="form_method" name="_method" value="">
+                <input type="hidden" id="title" name="title" value="">
+                <input type="hidden" id="description" name="description" value="">
                 <!-- Modal fuera del row para evitar problemas de anidamiento -->
                 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Reserva de Turno - Datos del Paciente</h1>
-                                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                                <h1 class="modal-title fs-5" id="exampleModalLabel"><b>Reserva de Turno</b></h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div>
+                                <h4 class="ms-3">*** Datos del paciente ***</h4>
                             </div>
                             <div class="modal-body">
                                 <div class="row">
-                                    <div class='col-md-6'>
+                                    <div class='col-md-4'>
                                         <div class="form-goup">
                                             <label for="fecha_turno">Fecha Turno</label>
-                                            <input type="date" class="form-control" id="fecha_turno" value="<?php echo date('Y-m-d');?>" name="fecha_turno" required>
-                                            <!-- Validamos que la fecha no sea menor -->
-                                            <script>
-                                                document.addEventListener('DOMContentLoaded', function() {
-                                                    const fechaTurnoInput = document.getElementById('fecha_turno');
-                                                    fechaTurnoInput.addEventListener('change', function() {
-                                                        const fechaSeleccionada = new Date(fechaTurnoInput.value);
-                                                        const hoy = new Date();
-                                                        if (fechaSeleccionada < hoy) {
-                                                            alert('La fecha seleccionada no puede ser anterior a hoy.');
-                                                            fechaTurnoInput.value = '';
-                                                        }
-                                                    });
-                                                });
-                                            </script>
+                                            <input type="date" class="form-control" id="fecha_turno" value="<?php echo date('Y-m-d');?>" name="fecha_turno" readonly>
                                         </div>
                                     </div>
-                                    <div class='col-md-6'>
+                                    <div class='col-md-4'>
                                         <div class="form-group">
-                                            <label for="title">Título del Evento</label>
-                                            <input type="text" class="form-control" id="title" name="title" placeholder="Título del evento">
+                                            <label for="horario">Horario</label>
+                                            <input type="time" class="form-control" id="horario" name="horario" value="<?php echo date('H:i');?>" readonly>
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="row">
-                                    <div class='col-md-12'>
-                                        <div class="form-group">
-                                            <label for="description">Descripción</label>
-                                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Descripción del evento"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class='col-md-6'>
+                                    <div class='col-md-3'>
                                         <div class="form-goup">
-                                            <label for="tipo">Tipo Documento</label>
+                                            <label for="tipo">Tipo Doc.</label>
                                             <select class="form-control" id="tipo" name="tipo" required>
                                                 <option value="DNI">DNI</option>
                                                 <option value="CI">CI</option>
@@ -243,18 +224,33 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class='col-md-6'>
+                                    <div class='col-md-9'>
                                         <div class="form-goup">
                                             <label for="documento">Documento</label>
-                                            <input type="text" class="form-control" id="documento" name="documento" placeholder="Ingrese el documento del paciente" required>
+                                            <input type="text" class="form-control" id="documento" name="documento" placeholder="Ingrese documento del paciente" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class='col-md-12'>
+                                        <div class="form-goup">
+                                            <label for="nombre">Apellido y Nombres</label>
+                                            <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese nombre del paciente" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class='col-md-12'>
+                                        <div class="form-goup">
+                                            <label for="obra_social">Obra Social</label>
+                                            <input type="text" class="form-control" id="obra_social" name="obra_social" placeholder="Ingrese obra social del paciente" required>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                                <button type="button" class="btn btn-danger" id="eliminarEventoBtn" style="display: none;" onclick="eliminarEvento()">Eliminar</button>
-                                <button type="submit" class="btn btn-primary" id="guardarEventoBtn">Registrar</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-primary" id="guardarEventoBtn">Reservar</button>
                             </div>
                         </div>
                     </div>
@@ -272,6 +268,8 @@
 
 <script>
     let calendar; // Variable global para el calendario
+    let medicoSeleccionado = ''; // Variable global para el médico seleccionado
+    let practicaSeleccionada = ''; // Variable global para la práctica seleccionada
 
     document.addEventListener('DOMContentLoaded', function() {
         // Inicializar el calendario pero no renderizarlo todavía
@@ -303,7 +301,8 @@
             dateClick: function(info) {
                 // Abrir modal para crear evento en la fecha seleccionada
                 document.getElementById('fecha_turno').value = info.dateStr;
-                $('#exampleModal').modal('show');
+                var myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+                myModal.show();
             }
         });
     });
@@ -313,11 +312,15 @@
         const practica = document.getElementById('practica').value;
         const medico = document.getElementById('medico').value;
 
-        // Validar que al menos un filtro esté seleccionado
+        // Validar que todos los filtros estén seleccionados
         if (consultorio === '0' || practica === '0' || medico === '0') {
             alert('Por favor, seleccione todos los filtros: consultorio, práctica y médico.');
             return;
         }
+
+        // Guardar nombres del médico y práctica seleccionados
+        medicoSeleccionado = document.getElementById('medico').selectedOptions[0].text;
+        practicaSeleccionada = document.getElementById('practica').selectedOptions[0].text;
 
         // Mostrar indicador de carga
         const calendarioContainer = document.getElementById('calendario-container');
@@ -333,6 +336,11 @@
         fetch(`{{ route('admin.eventos.filtrar') }}?${params.toString()}`)
             .then(response => response.json())
             .then(eventos => {
+                // Filtrar solo eventos con título "- Horario disponible"
+                const eventosDisponibles = eventos.filter(evento => 
+                    evento.title === '- Horario disponible'
+                );
+                
                 // Restaurar el contenido del calendario
                 calendarioContainer.innerHTML = '<div class="col-md-12"><div id="calendar"></div></div>';
                 
@@ -355,7 +363,7 @@
                         week: 'Semana',
                         day: 'Día'
                     },
-                    events: eventos.map(evento => ({
+                    events: eventosDisponibles.map(evento => ({
                         id: evento.id,
                         title: evento.title,
                         start: evento.start,
@@ -370,9 +378,14 @@
                     editable: true,
                     selectable: true,
                     dateClick: function(info) {
+                        // Actualizar título del modal con médico y práctica
+                        const tituloModal = `<b>Reserva de Turno Dr. ${medicoSeleccionado}  <br>  ${practicaSeleccionada}</b>`;
+                        document.getElementById('exampleModalLabel').innerHTML = tituloModal;
+                        
                         // Abrir modal para crear evento en la fecha seleccionada
                         document.getElementById('fecha_turno').value = info.dateStr;
-                        $('#exampleModal').modal('show');
+                        var myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+                        myModal.show();
                     }
                 });
                 
@@ -389,6 +402,10 @@
         document.getElementById('consultorio').value = '0';
         document.getElementById('practica').value = '0';
         document.getElementById('medico').value = '0';
+        
+        // Limpiar variables globales
+        medicoSeleccionado = '';
+        practicaSeleccionada = '';
         
         // Ocultar el calendario
         document.getElementById('calendario-container').style.display = 'none';
@@ -417,18 +434,24 @@
                         String(fecha.getMonth() + 1).padStart(2, '0') + '-' + 
                         String(fecha.getDate()).padStart(2, '0');
                     document.getElementById('fecha_turno').value = fechaFormateada;
+                    
+                    // Formatear la hora para el input time
+                    const horaFormateada = String(fecha.getHours()).padStart(2, '0') + ':' + 
+                        String(fecha.getMinutes()).padStart(2, '0');
+                    document.getElementById('horario').value = horaFormateada;
                 }
                 
                 // Cambiar el título del modal y el texto del botón
-                document.getElementById('exampleModalLabel').textContent = 'Editar Evento';
-                document.getElementById('guardarEventoBtn').textContent = 'Actualizar';
-                document.getElementById('eliminarEventoBtn').style.display = 'inline-block';
+                const tituloModal = `<b>Reserva de Turno Dr. ${medicoSeleccionado} <br> ${practicaSeleccionada}</b>`;
+                document.getElementById('exampleModalLabel').innerHTML = tituloModal;
+                document.getElementById('guardarEventoBtn').textContent = 'Reservar';
                 
                 // Cambiar la acción del formulario
                 document.getElementById('eventoForm').action = `{{ url("admin/eventos") }}/${evento.id}`;
                 
                 // Abrir el modal
-                $('#exampleModal').modal('show');
+                var myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+                myModal.show();
             })
             .catch(error => {
                 console.error('Error al cargar evento:', error);
@@ -443,30 +466,20 @@
         document.getElementById('title').value = '';
         document.getElementById('description').value = '';
         document.getElementById('fecha_turno').value = '<?php echo date('Y-m-d'); ?>';
+        document.getElementById('horario').value = '<?php echo date('H:i'); ?>';
         document.getElementById('tipo').value = 'DNI';
         document.getElementById('documento').value = '';
         
         // Restaurar el título del modal y el texto del botón
-        document.getElementById('exampleModalLabel').textContent = 'Reserva de Turno - Datos del Paciente';
+        document.getElementById('exampleModalLabel').innerHTML = '<b>Reserva de Turno</b>';
         document.getElementById('guardarEventoBtn').textContent = 'Registrar';
-        document.getElementById('eliminarEventoBtn').style.display = 'none';
         
         // Restaurar la acción del formulario
         document.getElementById('eventoForm').action = '{{ url("admin/eventos/create") }}';
     }
 
-    function eliminarEvento() {
-        const eventoId = document.getElementById('evento_id').value;
-        if (confirm('¿Está seguro de que desea eliminar este evento?')) {
-            // Aquí puedes agregar la lógica para eliminar el evento
-            console.log('Eliminando evento:', eventoId);
-            // Por ahora solo cerrar el modal
-            $('#exampleModal').modal('hide');
-        }
-    }
-
     // Evento para limpiar el formulario cuando se cierra el modal
-    $('#exampleModal').on('hidden.bs.modal', function() {
+    document.getElementById('exampleModal').addEventListener('hidden.bs.modal', function() {
         limpiarFormulario();
     });
 
@@ -493,7 +506,8 @@
             .then(data => {
                 if (data.success) {
                     alert('Evento actualizado correctamente');
-                    $('#exampleModal').modal('hide');
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+                    modal.hide();
                     // Recargar el calendario
                     filtrarCalendario();
                 } else {

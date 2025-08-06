@@ -47,22 +47,6 @@ class AdminController extends Controller
             'medicos',
             'eventosfc'
         ));
-
-        //return view('admin.index', [
-        //    'total_usuarios' => $total_usuarios,
-        //    'total_secretarias' => $total_secretarias,
-        //    'total_pacientes' => $total_pacientes,
-        //    'total_consultorios' => $total_consultorios,
-        //    'total_practicas' => $total_practicas,
-        //    'total_obras' => $total_obras,
-        //    'total_medicos' => $total_medicos,
-        //    'total_obras_sociales' => $total_obras_sociales,
-        //    'total_horarios' => $total_horarios,
-        //    'consultorios' => $consultorios,
-        //    'practicas' => $practicas,
-        //    'medicos' => $medicos,
-        //    'eventos' => $eventos
-        //]);
     }
 
     public function filtrarEventos()
