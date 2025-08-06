@@ -13,8 +13,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('description')->nullable();
             $table->string('color');
-            $table->date('start_date');
-            $table->time('start_time');
+            $table->datetime('start');
+            $table->datetime('end')->nullable();
 
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreignId('obra_social_id')->references('id')->on('obrasociales')->onDelete('cascade');

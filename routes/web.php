@@ -16,7 +16,10 @@ use App\Http\Controllers\LocalidadController;
 Route::get('/', function () {
     return view('index');
 });
-Route::get('/admin/eventos/create', [App\Http\Controllers\EventController::class, 'store'])->name('admin.eventos.create');
+Route::post('/admin/eventos/create', [App\Http\Controllers\EventController::class, 'store'])->name('admin.eventos.create');
+Route::get('/admin/eventos/filtrar', [App\Http\Controllers\AdminController::class, 'filtrarEventos'])->name('admin.eventos.filtrar')->middleware('auth');
+Route::get('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'show'])->name('admin.eventos.show')->middleware('auth');
+Route::put('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'update'])->name('admin.eventos.update')->middleware('auth');
 
 Auth::routes();
 

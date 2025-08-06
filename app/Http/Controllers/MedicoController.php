@@ -48,6 +48,8 @@ class MedicoController extends Controller
         $medico->activo = $request->activo;
         $medico->save();
 
+        $usuario->assignRole(_role: 'medico'); // Asignar rol de médico
+        
         return redirect()->route('admin.medicos.index')
             ->with('mensaje', 'Médico creado con éxito.')
             ->with('icono', 'success');

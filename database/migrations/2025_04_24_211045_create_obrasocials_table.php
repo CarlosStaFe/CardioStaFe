@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('obrasocials', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 70);
+            $table->string('plan', 50)->nullable();
             $table->string('telefono', 20)->nullable();
             $table->string('contacto', 50)->nullable();
             $table->string('email', 50)->nullable();

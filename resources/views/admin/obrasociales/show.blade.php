@@ -20,24 +20,30 @@
                         <p>{{$obrasocial->nombre}}</p>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-12 position-relative">
+                <div class="col-md-4 col-sm-12 position-relative">
                     <div class="form group">
-                        <label for="matricula">Teléfono</label>
-                        <p>{{$obrasocial->telefono}}</p>
+                        <label for="plan">Plan</label>
+                        <p>{{$obrasocial->plan}}</p>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-12 position-relative">
                     <div class="form group">
-                        <label for="telefono">Contacto</label>
-                        <p>{{$obrasocial->contacto}}</p>
+                        <label for="telefono">Teléfono</label>
+                        <p>{{$obrasocial->telefono}}</p>
                     </div>
                 </div>
             </div>
             <br>
             <div class="row">
+                <div class="col-md-3 col-sm-12 position-relative">
+                    <div class="form group">
+                        <label for="contacto">Contacto</label>
+                        <p>{{$obrasocial->contacto}}</p>
+                    </div>
+                </div>
                 <div class="col-md-4 col-sm-12 position-relative">
                     <div class="form group">
-                        <label for="especialidad">E-mail</label>
+                        <label for="email">E-mail</label>
                         <p>{{$obrasocial->email}}</p>
                     </div>
                 </div>

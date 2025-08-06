@@ -13,6 +13,7 @@ class ConsultoriosSeeder extends Seeder
             ['nombre' => 'SANTA FE', 'numero' => '1', 'direccion' => '', 'telefono' =>'342123', 'observacion' => ''],
             ['nombre' => 'PARANÁ', 'numero' => '2', 'direccion' => '', 'telefono' =>'342123', 'observacion' => ''],
             ['nombre' => 'RAFAELA', 'numero' => '3', 'direccion' => '', 'telefono' =>'342123', 'observacion' => ''],
+            ['nombre' => 'GALVEZ', 'numero' => '4', 'direccion' => '', 'telefono' =>'342123', 'observacion' => ''],
         ]);
     }
 }

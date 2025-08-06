@@ -138,6 +138,7 @@ class DatabaseSeeder extends Seeder
             ObraSocialesSeeder::class,
             PacientesSeeder::class,
             PracticasSeeder::class,
+            SecretariasSeeder::class,
         ]);
 
     }

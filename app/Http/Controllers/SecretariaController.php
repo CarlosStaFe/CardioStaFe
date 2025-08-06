@@ -43,6 +43,8 @@ class SecretariaController extends Controller
         $secretaria->domicilio = $request->domicilio;
         $secretaria->save();
 
+        $usuario->assignRole(_role: 'secretaria'); // Asignar rol de secretaria        
+
         return redirect()->route('admin.secretarias.index')
             ->with('mensaje', 'Secretaria creada con éxito.')
             ->with('icono', 'success');

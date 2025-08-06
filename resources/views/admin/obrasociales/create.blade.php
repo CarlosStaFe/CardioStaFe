@@ -25,16 +25,28 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-3 col-sm-12 position-relative">
+                    <div class="col-md-4 col-sm-12 position-relative">
                         <div class="form group">
-                            <label for="telefono">Teléfono</label><b>*</b>
-                            <input type="number" class="form-control" value="{{old('telefono')}}" id="telefono" name="telefono" placeholder="Teléfono" required>
-                            @error('telefono')
+                            <label for="plan">Plan</label>
+                            <input type="text" class="form-control" value="{{old('plan')}}" id="plan" name="plan" placeholder="Plan Obra Social">
+                            @error('nombre')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-12 position-relative">
+                        <div class="form group">
+                            <label for="telefono">Teléfono</label><b>*</b>
+                            <input type="number" class="form-control" value="{{old('telefono')}}" id="telefono" name="telefono" placeholder="Teléfono">
+                            @error('telefono')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-4 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="contacto">Contacto</label>
                             <input type="text" class="form-control" value="{{old('contacto')}}" id="contacto" name="contacto" placeholder="Contacto">
@@ -43,9 +55,6 @@
                             @enderror
                         </div>
                     </div>
-                </div>
-                <br>
-                <div class="row">
                     <div class="col-md-4 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="email">E-mail</label><b>*</b>

@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Sistema Clínica</title>
 
     <!-- Google Font: Source Sans Pro -->
@@ -319,8 +320,8 @@
         <aside class="control-sidebar control-sidebar-dark">
             <!-- Control sidebar content goes here -->
             <div class="p-3">
-                <h5>Title</h5>
-                <p>Sidebar content</p>
+                <h5>Título</h5>
+                <p>Contenido Barra Lateral</p>
             </div>
         </aside>
 
@@ -340,7 +341,7 @@
         <footer class="main-footer">
             <!-- To the right -->
             <div class="float-right d-none d-sm-inline">
-                Anything you want
+                Reserva de turno
             </div>
             <!-- Default to the left -->
             <strong>Copyright &copy; 2025 <a href="https://adminlte.io"> OM Computación </a>.</strong> Todos los derechos reservados.

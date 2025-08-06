@@ -22,6 +22,7 @@ class ObrasocialesSeeder extends Seeder
         foreach ($chunks as $lote) {
             foreach ($lote as $obra) {
                 $nombre = $obra['Nombre'] ?? 'X';
+                $plan = '';
                 $telefono = $obra['Telefono'] ?? '-';
                 $contacto = '-';
                 $email = $obra['Email'] ?? '@';
@@ -31,6 +32,7 @@ class ObrasocialesSeeder extends Seeder
             
                 DB::table('obrasociales')->insert([
                     'nombre'          => $nombre,
+                    'plan'            => $plan,
                     'telefono'        => $telefono,
                     'contacto'        => $contacto,
                     'email'           => $email,
@@ -41,7 +43,7 @@ class ObrasocialesSeeder extends Seeder
             }
         }
         DB::table('obrasociales')->insert([
-            ['nombre' => 'NO TIENE', 'telefono' => 'NO BORRAR', 'contacto' => '', 'email' => 'NO BORRAR', 'activo' => 1, 'documentacion' => '', 'observacion' => ''],
+            ['nombre' => 'NO TIENE','plan' => 'NO BORRAR', 'telefono' => 'NO BORRAR', 'contacto' => '', 'email' => 'NO BORRAR', 'activo' => 1, 'documentacion' => '', 'observacion' => ''],
         ]);
 
     }

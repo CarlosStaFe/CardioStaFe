@@ -126,7 +126,7 @@ class HorarioController extends Controller
                     $evento->color = '#00AA00';
                     $evento->start_date = $fecha->format('Y-m-d');
                     $evento->start_time = $horario->hora_inicio;
-                    $evento->user_id = auth()->id();
+                    //$evento->user_id = auth()->id();
                     $evento->obra_social_id = 1;
                     $evento->paciente_id = 1;
                     $evento->medico_id = $horario->medico_id;

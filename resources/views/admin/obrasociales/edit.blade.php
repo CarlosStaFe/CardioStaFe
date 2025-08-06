@@ -26,6 +26,15 @@
                             @enderror
                         </div>
                     </div>
+                    <div class="col-md-4 col-sm-12 position-relative">
+                        <div class="form group">
+                            <label for="plan">Plan</label>
+                            <input type="text" class="form-control" value="{{$obrasocial->plan}}" id="plan" name="plan" placeholder="Plan Obra Social">
+                            @error('contacto')
+                                <small style="color: red">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
                     <div class="col-md-3 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="telefono">Teléfono</label><b>*</b>
@@ -35,7 +44,10 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-3 col-sm-12 position-relative">
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-4 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="contacto">Contacto</label>
                             <input type="text" class="form-control" value="{{$obrasocial->contacto}}" id="contacto" name="contacto" placeholder="Contacto">
@@ -44,9 +56,6 @@
                             @enderror
                         </div>
                     </div>
-                </div>
-                <br>
-                <div class="row">
                     <div class="col-md-4 col-sm-12 position-relative">
                         <div class="form group">
                             <label for="email">E-mail</label><b>*</b>

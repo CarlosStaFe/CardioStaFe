@@ -11,6 +11,7 @@ use App\Models\Practica;
 use App\Models\Obrasocial;
 use App\Models\Medico;
 use App\Models\Horario;
+use App\Models\Event;
 
 class AdminController extends Controller
 {
@@ -29,20 +30,63 @@ class AdminController extends Controller
         $consultorios = Consultorio::all();
         $practicas = Practica::all();
         $medicos = Medico::all();
+        $eventosfc = Event::all();
 
-        return view('admin.index', [
-            'total_usuarios' => $total_usuarios,
-            'total_secretarias' => $total_secretarias,
-            'total_pacientes' => $total_pacientes,
-            'total_consultorios' => $total_consultorios,
-            'total_practicas' => $total_practicas,
-            'total_obras' => $total_obras,
-            'total_medicos' => $total_medicos,
-            'total_obras_sociales' => $total_obras_sociales,
-            'total_horarios' => $total_horarios,
-            'consultorios' => $consultorios,
-            'practicas' => $practicas,
-            'medicos' => $medicos
-        ]);
+        return view('admin.index', compact(
+            'total_usuarios',
+            'total_secretarias',
+            'total_pacientes',
+            'total_consultorios',
+            'total_practicas',
+            'total_obras',
+            'total_medicos',
+            'total_obras_sociales',
+            'total_horarios',
+            'consultorios',
+            'practicas',
+            'medicos',
+            'eventosfc'
+        ));
+
+        //return view('admin.index', [
+        //    'total_usuarios' => $total_usuarios,
+        //    'total_secretarias' => $total_secretarias,
+        //    'total_pacientes' => $total_pacientes,
+        //    'total_consultorios' => $total_consultorios,
+        //    'total_practicas' => $total_practicas,
+        //    'total_obras' => $total_obras,
+        //    'total_medicos' => $total_medicos,
+        //    'total_obras_sociales' => $total_obras_sociales,
+        //    'total_horarios' => $total_horarios,
+        //    'consultorios' => $consultorios,
+        //    'practicas' => $practicas,
+        //    'medicos' => $medicos,
+        //    'eventos' => $eventos
+        //]);
+    }
+
+    public function filtrarEventos()
+    {
+        $consultorio_id = request('consultorio_id');
+        $practica_id = request('practica_id');
+        $medico_id = request('medico_id');
+
+        $query = Event::query();
+
+        if ($consultorio_id && $consultorio_id != '0') {
+            $query->where('consultorio_id', $consultorio_id);
+        }
+
+        if ($practica_id && $practica_id != '0') {
+            $query->where('practica_id', $practica_id);
+        }
+
+        if ($medico_id && $medico_id != '0') {
+            $query->where('medico_id', $medico_id);
+        }
+
+        $eventos = $query->select('id', 'title', 'description', 'color', 'start', 'end')->get();
+
+        return response()->json($eventos);
     }
 }
