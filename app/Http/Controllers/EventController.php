@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
@@ -214,6 +215,47 @@ class EventController extends Controller
      */
     public function destroy(Event $event)
     {
-        //
+        try {
+            // Log para debugging
+            Log::info('Intentando eliminar evento', ['event_id' => $event->id]);
+            
+            // Verificar que el evento existe
+            if (!$event || !$event->exists) {
+                Log::warning('Evento no encontrado', ['event_id' => $event->id ?? 'null']);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Evento no encontrado'
+                ], 404);
+            }
+
+            // Eliminar el evento
+            $deleted = $event->delete();
+            
+            if ($deleted) {
+                Log::info('Evento eliminado exitosamente', ['event_id' => $event->id]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Evento eliminado correctamente'
+                ]);
+            } else {
+                Log::error('Error al eliminar evento - delete() retornó false', ['event_id' => $event->id]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al eliminar el evento'
+                ], 500);
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('Excepción al eliminar evento', [
+                'event_id' => $event->id ?? 'unknown',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar el evento: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

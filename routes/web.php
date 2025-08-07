@@ -16,19 +16,15 @@ use App\Http\Controllers\LocalidadController;
 Route::get('/', function () {
     return view('index');
 });
-Route::get('/admin/eventos/generar-horarios', [App\Http\Controllers\EventController::class, 'create'])->name('admin.eventos.generar')->middleware('auth');
-Route::post('/admin/eventos/create', [App\Http\Controllers\EventController::class, 'store'])->name('admin.eventos.create');
-Route::get('/admin/pacientes/buscar/{documento}', [PacienteController::class, 'buscarPorDocumento'])->name('admin.pacientes.buscar')->middleware('auth');
-Route::get('/admin/eventos/filtrar', [App\Http\Controllers\AdminController::class, 'filtrarEventos'])->name('admin.eventos.filtrar')->middleware('auth');
-Route::get('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'show'])->name('admin.eventos.show')->middleware('auth');
-Route::put('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'update'])->name('admin.eventos.update')->middleware('auth');
 
 Auth::routes();
 
 //RUTA PARA EL HOME
 //Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
 //RUTA PARA EL ADMIN
 Route::get('/admin', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.index')->middleware(middleware:'auth');
+
 //RUTA PARA EL ADMIN - USUARIO
 Route::get('/admin/usuarios', [App\Http\Controllers\UsuarioController::class, 'index'])->name('admin.usuarios.index')->middleware(['auth', 'can:admin.usuarios.index']);
 Route::get('/admin/usuarios/create', [UsuarioController::class, 'create'])->name('admin.usuarios.create')->middleware(['auth', 'can:admin.usuarios.create']);
@@ -58,6 +54,10 @@ Route::get('/admin/pacientes/{id}/edit', [PacienteController::class, 'edit'])->n
 Route::put('/admin/pacientes/{id}', [PacienteController::class, 'update'])->name('admin.pacientes.update')->middleware(['auth', 'can:admin.pacientes.update']);
 Route::get('/admin/pacientes/{id}/confirm-delete', [PacienteController::class, 'confirmDelete'])->name('admin.pacientes.confirmDelete')->middleware(['auth', 'can:admin.pacientes.confirmDelete']);
 Route::delete('/admin/pacientes/{id}', [PacienteController::class, 'destroy'])->name('admin.pacientes.destroy')->middleware(['auth', 'can:admin.pacientes.destroy']);
+Route::get('/admin/eventos/filtrar', [App\Http\Controllers\AdminController::class, 'filtrarEventos'])->name('admin.eventos.filtrar')->middleware('auth');
+Route::get('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'show'])->name('admin.eventos.show')->middleware('auth');
+Route::put('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'update'])->name('admin.eventos.update')->middleware('auth');
+Route::delete('/admin/eventos/{event}', [App\Http\Controllers\EventController::class, 'destroy'])->name('admin.eventos.destroy')->middleware(['auth', 'can:admin.eventos.destroy']);
 
 //RUTA PARA EL ADMIN - CONSULTORIOS
 Route::get('/admin/consultorios', [ConsultorioController::class, 'index'])->name('admin.consultorios.index')->middleware(['auth', 'can:admin.consultorios.index']);
@@ -98,6 +98,14 @@ Route::get('/admin/medicos/{id}/edit', [MedicoController::class, 'edit'])->name(
 Route::put('/admin/medicos/{id}', [MedicoController::class, 'update'])->name('admin.medicos.update')->middleware(['auth', 'can:admin.medicos.update']);
 Route::get('/admin/medicos/{id}/confirm-delete', [MedicoController::class, 'confirmDelete'])->name('admin.medicos.confirmDelete')->middleware(['auth', 'can:admin.medicos.confirmDelete']);
 Route::delete('/admin/medicos/{id}', [MedicoController::class, 'destroy'])->name('admin.medicos.destroy')->middleware(['auth', 'can:admin.medicos.destroy']);
+
+//RUTA PARA EL ADMIN - EVENTOS
+Route::get('/admin/eventos/generar-horarios', [App\Http\Controllers\EventController::class, 'create'])->name('admin.eventos.generar')->middleware('auth');
+Route::post('/admin/eventos/create', [App\Http\Controllers\EventController::class, 'store'])->name('admin.eventos.create');
+Route::get('/admin/eventos/filtrar', [App\Http\Controllers\AdminController::class, 'filtrarEventos'])->name('admin.eventos.filtrar')->middleware('auth');
+Route::get('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'show'])->name('admin.eventos.show')->middleware('auth');
+Route::put('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'update'])->name('admin.eventos.update')->middleware('auth');
+Route::delete('/admin/eventos/{event}', [App\Http\Controllers\EventController::class, 'destroy'])->name('admin.eventos.destroy')->middleware(['auth', 'can:admin.eventos.destroy']);
 
 //RUTA PARA EL ADMIN - HORARIOS
 Route::get('/admin/horarios', [HorarioController::class, 'index'])->name('admin.horarios.index')->middleware(['auth', 'can:admin.horarios.index']);

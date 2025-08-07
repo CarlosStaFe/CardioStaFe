@@ -241,6 +241,20 @@
                                     </div>
                                 </div>
                                 <div class="row mt-3">
+                                    <div class='col-md-6'>
+                                        <div class="form-goup">
+                                            <label for="email">Email</label><b>*</b>
+                                            <input type="email" class="form-control" id="email" name="email" placeholder="Ingrese email del paciente" required>
+                                        </div>
+                                    </div>
+                                    <div class='col-md-6'>
+                                        <div class="form-goup">
+                                            <label for="telefono">Teléfono</label><b>*</b>
+                                            <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Ingrese teléfono del paciente" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
                                     <div class='col-md-12'>
                                         <div class="form-goup">
                                             <label for="obra_social">Obra Social</label><b>*</b>
@@ -255,6 +269,10 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
+                                @can('admin.eventos.destroy')
+                                    <button type="button" class="btn btn-danger" id="eliminarEventoBtn" onclick="eliminarEvento()" style="display: none;">Eliminar</button>
+                                @endcan
+                                <button type="button" class="btn btn-warning" onclick="limpiarDatosPaciente()">Limpiar</button>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                                 <button type="submit" class="btn btn-primary" id="guardarEventoBtn">Reservar</button>
                             </div>
@@ -273,18 +291,20 @@
 </div>
 
 <script>
+
     let calendar; // Variable global para el calendario
     let medicoSeleccionado = ''; // Variable global para el médico seleccionado
     let practicaSeleccionada = ''; // Variable global para la práctica seleccionada
 
+    //***** INICIALIZA EL FORMULARIO EN BLANCO SIN MOSTRAR LOS TURNOS DISPONIBLES *****/
     document.addEventListener('DOMContentLoaded', function() {
         // Inicializar el calendario pero no renderizarlo todavía
         var calendarEl = document.getElementById('calendar');
         calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             weekends: false,
-            startTime: '08:00',
-            endTime: '20:00',
+            slotMinTime: '08:00:00',
+            slotMaxTime: '20:00:00',
             locale: 'es',
             headerToolbar: {
                 left: 'prev,next today',
@@ -356,8 +376,8 @@
                 calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
                     weekends: false,
-                    startTime: '08:00',
-                    endTime: '20:00',
+                    slotMinTime: '08:00:00',
+                    slotMaxTime: '20:00:00',
                     locale: 'es',
                     headerToolbar: {
                         left: 'prev,next today',
@@ -433,7 +453,9 @@
                     
                     document.getElementById('tipo').value = paciente.tipo_documento || 'DNI';
                     document.getElementById('nombre').value = paciente.apel_nombres || '';
-                    
+                    document.getElementById('email').value = paciente.email || '{{ Auth::user()->email }}';
+                    document.getElementById('telefono').value = paciente.telefono || '';
+
                     // Buscar y seleccionar la obra social en el dropdown
                     const obraSocialSelect = document.getElementById('obra_social');
                     const obraSocialNombre = paciente.obra_social;
@@ -523,6 +545,12 @@
                 document.getElementById('exampleModalLabel').innerHTML = tituloModal;
                 document.getElementById('guardarEventoBtn').textContent = 'Reservar';
                 
+                // Mostrar el botón eliminar solo si existe el botón (el usuario tiene permisos)
+                const eliminarBtn = document.getElementById('eliminarEventoBtn');
+                if (eliminarBtn) {
+                    eliminarBtn.style.display = 'inline-block';
+                }
+                
                 // Cambiar la acción del formulario
                 document.getElementById('eventoForm').action = `{{ url("admin/eventos") }}/${evento.id}`;
                 
@@ -536,7 +564,30 @@
             });
     }
 
-    //***** LIMPIAR EL FORMULARIO MODAL *****/
+    // Evento para limpiar el formulario cuando se cierra el modal
+    document.getElementById('exampleModal').addEventListener('hidden.bs.modal', function() {
+        limpiarFormulario();
+    });
+
+    //***** LIMPIAR SOLO LOS DATOS DEL PACIENTE *****/
+    function limpiarDatosPaciente() {
+        // Limpiar solo los campos de datos del paciente, manteniendo fecha y horario
+        document.getElementById('tipo').value = 'DNI';
+        document.getElementById('documento').value = '';
+        document.getElementById('nombre').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('telefono').value = '';
+        document.getElementById('obra_social').selectedIndex = 0; // Restablece a "Seleccione una obra social"
+        
+        // Limpiar mensaje de búsqueda de paciente
+        const mensajeElement = document.getElementById('documento-mensaje');
+        if (mensajeElement) {
+            mensajeElement.textContent = '';
+            mensajeElement.className = 'form-text text-muted';
+        }
+    }
+
+    //***** LIMPIAR EL FORMULARIO MODAL COMPLETO *****/
     function limpiarFormulario() {
         // Limpiar campos del formulario
         document.getElementById('evento_id').value = '';
@@ -548,6 +599,8 @@
         document.getElementById('tipo').value = 'DNI';
         document.getElementById('documento').value = '';
         document.getElementById('nombre').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('telefono').value = '';
         document.getElementById('obra_social').selectedIndex = 0; // Restablece a "Seleccione una obra social"
         
         // Limpiar mensaje de búsqueda
@@ -561,23 +614,31 @@
         document.getElementById('exampleModalLabel').innerHTML = '<b>Reserva de Turno</b>';
         document.getElementById('guardarEventoBtn').textContent = 'Registrar';
         
+        // Ocultar el botón eliminar
+        const eliminarBtn = document.getElementById('eliminarEventoBtn');
+        if (eliminarBtn) {
+            eliminarBtn.style.display = 'none';
+        }
+        
         // Restaurar la acción del formulario
         document.getElementById('eventoForm').action = '{{ url("admin/eventos/create") }}';
     }
 
-    // Evento para limpiar el formulario cuando se cierra el modal
-    document.getElementById('exampleModal').addEventListener('hidden.bs.modal', function() {
-        limpiarFormulario();
-    });
-
     // Manejar el envío del formulario
     document.getElementById('eventoForm').addEventListener('submit', function(e) {
         e.preventDefault();
+        reservarTurno();
+    });
+
+    //***** FUNCIÓN PARA RESERVAR TURNO *****/
+    function reservarTurno() {
         const eventoId = document.getElementById('evento_id').value;
         const isEditing = eventoId !== '';
+        const form = document.getElementById('eventoForm');
+        
         if (isEditing) {
             // Actualizar evento existente
-            const formData = new FormData(this);
+            const formData = new FormData(form);
             formData.append('_method', 'PUT');
             fetch(`{{ url("admin/eventos") }}/${eventoId}`, {
                 method: 'POST',
@@ -604,9 +665,73 @@
             });
         } else {
             // Crear nuevo evento - enviar el formulario normalmente
-            this.submit();
+            form.submit();
         }
-    });
+    }
+
+    //***** FUNCIÓN PARA ELIMINAR EVENTO *****/
+    function eliminarEvento() {
+        const eventoId = document.getElementById('evento_id').value;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        
+        console.log('ID del evento a eliminar:', eventoId);
+        console.log('CSRF Token encontrado:', csrfToken ? 'Sí' : 'No');
+        
+        if (!eventoId) {
+            alert('No hay un evento seleccionado para eliminar');
+            return;
+        }
+        
+        if (!csrfToken) {
+            alert('Token CSRF no encontrado');
+            return;
+        }
+        
+        // Confirmar la eliminación
+        if (confirm('¿Está seguro de que desea eliminar este turno? Esta acción no se puede deshacer.')) {
+            const url = `{{ url("admin/eventos") }}/${eventoId}`;
+            console.log('URL de eliminación:', url);
+            
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        console.error('Response text:', text);
+                        throw new Error(`HTTP ${response.status}: ${text}`);
+                    });
+                }
+                
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    alert('Turno eliminado correctamente');
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+                    modal.hide();
+                    // Recargar el calendario
+                    filtrarCalendario();
+                } else {
+                    alert('Error al eliminar el turno: ' + (data.message || 'Error desconocido'));
+                }
+            })
+            .catch(error => {
+                console.error('Error completo:', error);
+                alert('Error al eliminar el turno: ' + error.message);
+            });
+        }
+    }
 
 </script>
 
