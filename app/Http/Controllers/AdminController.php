@@ -30,6 +30,7 @@ class AdminController extends Controller
         $consultorios = Consultorio::all();
         $practicas = Practica::all();
         $medicos = Medico::all();
+        $obras_sociales = Obrasocial::all();
         $eventosfc = Event::all();
 
         return view('admin.index', compact(
@@ -45,6 +46,7 @@ class AdminController extends Controller
             'consultorios',
             'practicas',
             'medicos',
+            'obras_sociales',
             'eventosfc'
         ));
     }

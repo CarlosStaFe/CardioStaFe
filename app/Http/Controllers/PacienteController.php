@@ -127,4 +127,41 @@ class PacienteController extends Controller
             ->with('mensaje', 'Paciente eliminada con éxito.')
             ->with('icono', 'success');
     }
+
+    /**
+     * Buscar paciente por número de documento
+     */
+    public function buscarPorDocumento($documento)
+    {
+        try {
+            $paciente = Paciente::with('obraSocial')
+                ->where('num_documento', $documento)
+                ->first();
+
+            if ($paciente) {
+                return response()->json([
+                    'success' => true,
+                    'paciente' => [
+                        'id' => $paciente->id,
+                        'apel_nombres' => $paciente->apel_nombres,
+                        'tipo_documento' => $paciente->tipo_documento,
+                        'num_documento' => $paciente->num_documento,
+                        'obra_social' => $paciente->obraSocial->nombre ?? $paciente->obra_social ?? 'Sin obra social',
+                        'telefono' => $paciente->telefono,
+                        'email' => $paciente->email,
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Paciente no encontrado'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al buscar paciente: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

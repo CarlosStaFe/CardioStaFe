@@ -214,7 +214,7 @@
                                 <div class="row">
                                     <div class='col-md-3'>
                                         <div class="form-goup">
-                                            <label for="tipo">Tipo Doc.</label>
+                                            <label for="tipo">Tipo Doc.</label><b>*</b>
                                             <select class="form-control" id="tipo" name="tipo" required>
                                                 <option value="DNI">DNI</option>
                                                 <option value="CI">CI</option>
@@ -226,15 +226,16 @@
                                     </div>
                                     <div class='col-md-9'>
                                         <div class="form-goup">
-                                            <label for="documento">Documento</label>
-                                            <input type="text" class="form-control" id="documento" name="documento" placeholder="Ingrese documento del paciente" required>
+                                            <label for="documento">Documento</label><b>*</b>
+                                            <input type="text" class="form-control" id="documento" name="documento" placeholder="Ingrese documento del paciente" required onblur="buscarPaciente()">
+                                            <small id="documento-mensaje" class="form-text text-muted"></small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row mt-3">
                                     <div class='col-md-12'>
                                         <div class="form-goup">
-                                            <label for="nombre">Apellido y Nombres</label>
+                                            <label for="nombre">Apellido y Nombres</label><b>*</b>
                                             <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese nombre del paciente" required>
                                         </div>
                                     </div>
@@ -242,8 +243,13 @@
                                 <div class="row mt-3">
                                     <div class='col-md-12'>
                                         <div class="form-goup">
-                                            <label for="obra_social">Obra Social</label>
-                                            <input type="text" class="form-control" id="obra_social" name="obra_social" placeholder="Ingrese obra social del paciente" required>
+                                            <label for="obra_social">Obra Social</label><b>*</b>
+                                            <select class="form-control" id="obra_social" name="obra_social" required>
+                                                <option value="" disabled selected>Seleccione una obra social</option>
+                                                @foreach($obras_sociales as $obra_social)
+                                                    <option value="{{ $obra_social->nombre }}">{{ $obra_social->nombre }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -307,6 +313,7 @@
         });
     });
 
+    //***** FILTRAR LOS EVENTOS PARA MOSTRAR *****/
     function filtrarCalendario() {
         const consultorio = document.getElementById('consultorio').value;
         const practica = document.getElementById('practica').value;
@@ -368,7 +375,9 @@
                         title: evento.title,
                         start: evento.start,
                         end: evento.end,
-                        color: evento.color,
+                        backgroundColor: '#28a745', // Color de fondo verde
+                        borderColor: '#1e7e34',     // Color del borde
+                        textColor: 'white',         // Color del texto
                         description: evento.description
                     })),
                     eventClick: function(info) {
@@ -397,6 +406,73 @@
             });
     }
 
+    //***** BUSCAR PACIENTE POR DOCUMENTO *****/
+    function buscarPaciente() {
+        const documento = document.getElementById('documento').value.trim();
+        const mensajeElement = document.getElementById('documento-mensaje');
+        
+        // Limpiar mensaje anterior
+        mensajeElement.textContent = '';
+        mensajeElement.className = 'form-text text-muted';
+        
+        if (documento === '') {
+            return;
+        }
+        
+        // Mostrar indicador de búsqueda
+        mensajeElement.textContent = 'Buscando paciente...';
+        mensajeElement.className = 'form-text text-info';
+        
+        // Hacer petición AJAX para buscar el paciente
+        fetch(`{{ url('admin/pacientes/buscar') }}/${documento}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.paciente) {
+                    // Paciente encontrado - llenar los campos
+                    const paciente = data.paciente;
+                    
+                    document.getElementById('tipo').value = paciente.tipo_documento || 'DNI';
+                    document.getElementById('nombre').value = paciente.apel_nombres || '';
+                    
+                    // Buscar y seleccionar la obra social en el dropdown
+                    const obraSocialSelect = document.getElementById('obra_social');
+                    const obraSocialNombre = paciente.obra_social;
+                    let obraSocialEncontrada = false;
+                    
+                    for (let i = 0; i < obraSocialSelect.options.length; i++) {
+                        if (obraSocialSelect.options[i].value === obraSocialNombre) {
+                            obraSocialSelect.selectedIndex = i;
+                            obraSocialEncontrada = true;
+                            break;
+                        }
+                    }
+                    
+                    // Si no se encuentra la obra social exacta, seleccionar la primera opción por defecto
+                    if (!obraSocialEncontrada && obraSocialNombre) {
+                        obraSocialSelect.selectedIndex = 0; // Opción "Seleccione una obra social"
+                    }
+                    
+                    // Mostrar mensaje de éxito
+                    mensajeElement.textContent = '✓ Paciente encontrado';
+                    mensajeElement.className = 'form-text text-success';
+                    
+                } else {
+                    // Paciente no encontrado - limpiar campos y mostrar mensaje
+                    document.getElementById('nombre').value = '';
+                    document.getElementById('obra_social').value = '';
+                    
+                    mensajeElement.textContent = '⚠ Paciente no encontrado. Complete los datos manualmente.';
+                    mensajeElement.className = 'form-text text-warning';
+                }
+            })
+            .catch(error => {
+                console.error('Error al buscar paciente:', error);
+                mensajeElement.textContent = '✗ Error al buscar paciente';
+                mensajeElement.className = 'form-text text-danger';
+            });
+    }
+
+    //***** LIMPIAR LOS FILTROS DEL FORMULARIO *****/
     function limpiarFiltros() {
         // Limpiar los select boxes
         document.getElementById('consultorio').value = '0';
@@ -416,6 +492,7 @@
         }
     }
 
+    //***** CARGA EL EVENTO SELECCIONADO PARA RESERVAR *****/
     function cargarEventoParaEditar(eventoId) {
         // Hacer petición AJAX para obtener los datos del evento
         fetch(`{{ url('admin/eventos') }}/${eventoId}`)
@@ -459,6 +536,7 @@
             });
     }
 
+    //***** LIMPIAR EL FORMULARIO MODAL *****/
     function limpiarFormulario() {
         // Limpiar campos del formulario
         document.getElementById('evento_id').value = '';
@@ -469,6 +547,15 @@
         document.getElementById('horario').value = '<?php echo date('H:i'); ?>';
         document.getElementById('tipo').value = 'DNI';
         document.getElementById('documento').value = '';
+        document.getElementById('nombre').value = '';
+        document.getElementById('obra_social').selectedIndex = 0; // Restablece a "Seleccione una obra social"
+        
+        // Limpiar mensaje de búsqueda
+        const mensajeElement = document.getElementById('documento-mensaje');
+        if (mensajeElement) {
+            mensajeElement.textContent = '';
+            mensajeElement.className = 'form-text text-muted';
+        }
         
         // Restaurar el título del modal y el texto del botón
         document.getElementById('exampleModalLabel').innerHTML = '<b>Reserva de Turno</b>';
@@ -486,15 +573,12 @@
     // Manejar el envío del formulario
     document.getElementById('eventoForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        
         const eventoId = document.getElementById('evento_id').value;
         const isEditing = eventoId !== '';
-        
         if (isEditing) {
             // Actualizar evento existente
             const formData = new FormData(this);
             formData.append('_method', 'PUT');
-            
             fetch(`{{ url("admin/eventos") }}/${eventoId}`, {
                 method: 'POST',
                 body: formData,
@@ -523,6 +607,7 @@
             this.submit();
         }
     });
+
 </script>
 
 @endsection

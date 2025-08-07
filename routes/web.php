@@ -18,6 +18,7 @@ Route::get('/', function () {
 });
 Route::get('/admin/eventos/generar-horarios', [App\Http\Controllers\EventController::class, 'create'])->name('admin.eventos.generar')->middleware('auth');
 Route::post('/admin/eventos/create', [App\Http\Controllers\EventController::class, 'store'])->name('admin.eventos.create');
+Route::get('/admin/pacientes/buscar/{documento}', [PacienteController::class, 'buscarPorDocumento'])->name('admin.pacientes.buscar')->middleware('auth');
 Route::get('/admin/eventos/filtrar', [App\Http\Controllers\AdminController::class, 'filtrarEventos'])->name('admin.eventos.filtrar')->middleware('auth');
 Route::get('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'show'])->name('admin.eventos.show')->middleware('auth');
 Route::put('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'update'])->name('admin.eventos.update')->middleware('auth');
