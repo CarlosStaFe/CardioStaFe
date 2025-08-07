@@ -54,10 +54,7 @@ Route::get('/admin/pacientes/{id}/edit', [PacienteController::class, 'edit'])->n
 Route::put('/admin/pacientes/{id}', [PacienteController::class, 'update'])->name('admin.pacientes.update')->middleware(['auth', 'can:admin.pacientes.update']);
 Route::get('/admin/pacientes/{id}/confirm-delete', [PacienteController::class, 'confirmDelete'])->name('admin.pacientes.confirmDelete')->middleware(['auth', 'can:admin.pacientes.confirmDelete']);
 Route::delete('/admin/pacientes/{id}', [PacienteController::class, 'destroy'])->name('admin.pacientes.destroy')->middleware(['auth', 'can:admin.pacientes.destroy']);
-Route::get('/admin/eventos/filtrar', [App\Http\Controllers\AdminController::class, 'filtrarEventos'])->name('admin.eventos.filtrar')->middleware('auth');
-Route::get('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'show'])->name('admin.eventos.show')->middleware('auth');
-Route::put('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'update'])->name('admin.eventos.update')->middleware('auth');
-Route::delete('/admin/eventos/{event}', [App\Http\Controllers\EventController::class, 'destroy'])->name('admin.eventos.destroy')->middleware(['auth', 'can:admin.eventos.destroy']);
+Route::get('/admin/pacientes/buscar/{documento}', [PacienteController::class, 'buscarPorDocumento'])->name('admin.pacientes.buscar')->middleware('auth');
 
 //RUTA PARA EL ADMIN - CONSULTORIOS
 Route::get('/admin/consultorios', [ConsultorioController::class, 'index'])->name('admin.consultorios.index')->middleware(['auth', 'can:admin.consultorios.index']);

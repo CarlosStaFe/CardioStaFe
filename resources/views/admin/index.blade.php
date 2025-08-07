@@ -190,24 +190,24 @@
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel"><b>Reserva de Turno</b></h1>
+                                <h1 class="modal-title fs-5" id="exampleModalLabel"><b>Reservar Turno</b></h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div>
-                                <h4 class="ms-3">*** Datos del paciente ***</h4>
+                                <h4 class="ms-3" style="color: #1b5a10ff;">*** Datos del paciente ***</h4>
                             </div>
                             <div class="modal-body">
                                 <div class="row">
                                     <div class='col-md-4'>
                                         <div class="form-goup">
-                                            <label for="fecha_turno">Fecha Turno</label>
-                                            <input type="date" class="form-control" id="fecha_turno" value="<?php echo date('Y-m-d');?>" name="fecha_turno" readonly>
+                                            <label for="fecha_turno" style="color: #08a1ddff;">Fecha Turno</label>
+                                            <input type="date" class="form-control fw-bold" id="fecha_turno" value="<?php echo date('Y-m-d');?>" name="fecha_turno" readonly style="background-color: #d4edda; color: #080808ff;">
                                         </div>
                                     </div>
                                     <div class='col-md-4'>
                                         <div class="form-group">
-                                            <label for="horario">Horario</label>
-                                            <input type="time" class="form-control" id="horario" name="horario" value="<?php echo date('H:i');?>" readonly>
+                                            <label for="horario" style="color: #08a1ddff;">Horario</label>
+                                            <input type="time" class="form-control fw-bold" id="horario" name="horario" value="<?php echo date('H:i');?>" readonly style="background-color: #d4edda; color: #080808ff;">
                                         </div>
                                     </div>
                                 </div>
@@ -295,6 +295,7 @@
     let calendar; // Variable global para el calendario
     let medicoSeleccionado = ''; // Variable global para el médico seleccionado
     let practicaSeleccionada = ''; // Variable global para la práctica seleccionada
+    let consultorioSeleccionado = ''; // Variable global para el consultorio seleccionado
 
     //***** INICIALIZA EL FORMULARIO EN BLANCO SIN MOSTRAR LOS TURNOS DISPONIBLES *****/
     document.addEventListener('DOMContentLoaded', function() {
@@ -305,6 +306,8 @@
             weekends: false,
             slotMinTime: '08:00:00',
             slotMaxTime: '20:00:00',
+            dayMaxEvents: 3, // Limitar a 3 eventos por día, muestra "+ más" si hay más
+            moreLinkClick: 'popover', // Muestra los eventos adicionales en un popover
             locale: 'es',
             headerToolbar: {
                 left: 'prev,next today',
@@ -324,7 +327,53 @@
             },
             editable: true,
             selectable: true,
+            selectAllow: function(selectInfo) {
+                // Permitir selección solo en días que tengan eventos
+                const events = calendar.getEvents();
+                const selectedDate = selectInfo.start.toISOString().split('T')[0];
+                
+                // Verificar si hay eventos en la fecha seleccionada
+                const hasEvents = events.some(event => {
+                    const eventDate = event.start.toISOString().split('T')[0];
+                    return eventDate === selectedDate;
+                });
+                
+                return hasEvents;
+            },
+            dayCellDidMount: function(info) {
+                // Verificar si el día tiene eventos
+                const events = calendar.getEvents();
+                const cellDate = info.date.toISOString().split('T')[0];
+                
+                const hasEvents = events.some(event => {
+                    const eventDate = event.start.toISOString().split('T')[0];
+                    return eventDate === cellDate;
+                });
+                
+                // Si no hay eventos, deshabilitar el día
+                if (!hasEvents) {
+                    info.el.style.backgroundColor = '#f8f9fa';
+                    info.el.style.color = '#6c757d';
+                    info.el.style.cursor = 'not-allowed';
+                    info.el.style.opacity = '0.6';
+                    info.el.title = 'No hay horarios disponibles';
+                }
+            },
             dateClick: function(info) {
+                // Verificar si hay eventos en la fecha antes de abrir el modal
+                const events = calendar.getEvents();
+                const clickedDate = info.dateStr;
+                
+                const hasEvents = events.some(event => {
+                    const eventDate = event.start.toISOString().split('T')[0];
+                    return eventDate === clickedDate;
+                });
+                
+                if (!hasEvents) {
+                    alert('No hay horarios disponibles para esta fecha.');
+                    return;
+                }
+                
                 // Abrir modal para crear evento en la fecha seleccionada
                 document.getElementById('fecha_turno').value = info.dateStr;
                 var myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
@@ -348,6 +397,7 @@
         // Guardar nombres del médico y práctica seleccionados
         medicoSeleccionado = document.getElementById('medico').selectedOptions[0].text;
         practicaSeleccionada = document.getElementById('practica').selectedOptions[0].text;
+        consultorioSeleccionado = document.getElementById('consultorio').selectedOptions[0].text;
 
         // Mostrar indicador de carga
         const calendarioContainer = document.getElementById('calendario-container');
@@ -378,6 +428,8 @@
                     weekends: false,
                     slotMinTime: '08:00:00',
                     slotMaxTime: '20:00:00',
+                    dayMaxEvents: 3, // Limitar a 3 eventos por día, muestra "+ más" si hay más
+                    moreLinkClick: 'popover', // Muestra los eventos adicionales en un popover
                     locale: 'es',
                     headerToolbar: {
                         left: 'prev,next today',
@@ -406,9 +458,55 @@
                     },
                     editable: true,
                     selectable: true,
+                    selectAllow: function(selectInfo) {
+                        // Permitir selección solo en días que tengan eventos
+                        const events = calendar.getEvents();
+                        const selectedDate = selectInfo.start.toISOString().split('T')[0];
+                        
+                        // Verificar si hay eventos en la fecha seleccionada
+                        const hasEvents = events.some(event => {
+                            const eventDate = event.start.toISOString().split('T')[0];
+                            return eventDate === selectedDate;
+                        });
+                        
+                        return hasEvents;
+                    },
+                    dayCellDidMount: function(info) {
+                        // Verificar si el día tiene eventos
+                        const events = calendar.getEvents();
+                        const cellDate = info.date.toISOString().split('T')[0];
+                        
+                        const hasEvents = events.some(event => {
+                            const eventDate = event.start.toISOString().split('T')[0];
+                            return eventDate === cellDate;
+                        });
+                        
+                        // Si no hay eventos, deshabilitar el día
+                        if (!hasEvents) {
+                            info.el.style.backgroundColor = '#f8f9fa';
+                            info.el.style.color = '#6c757d';
+                            info.el.style.cursor = 'not-allowed';
+                            info.el.style.opacity = '0.6';
+                            info.el.title = 'No hay horarios disponibles';
+                        }
+                    },
                     dateClick: function(info) {
+                        // Verificar si hay eventos en la fecha antes de abrir el modal
+                        const events = calendar.getEvents();
+                        const clickedDate = info.dateStr;
+                        
+                        const hasEvents = events.some(event => {
+                            const eventDate = event.start.toISOString().split('T')[0];
+                            return eventDate === clickedDate;
+                        });
+                        
+                        if (!hasEvents) {
+                            alert('No hay horarios disponibles para esta fecha.');
+                            return;
+                        }
+                        
                         // Actualizar título del modal con médico y práctica
-                        const tituloModal = `<b>Reserva de Turno Dr. ${medicoSeleccionado}  <br>  ${practicaSeleccionada}</b>`;
+                        const tituloModal = `<b>* Reservar Turno * <br> Dr. ${medicoSeleccionado}  <br>  ${practicaSeleccionada} <br>  ${consultorioSeleccionado}</b>`;
                         document.getElementById('exampleModalLabel').innerHTML = tituloModal;
                         
                         // Abrir modal para crear evento en la fecha seleccionada
@@ -439,14 +537,36 @@
             return;
         }
         
+        // Validar que el documento tenga al menos 6 dígitos
+        if (documento.length < 6) {
+            mensajeElement.textContent = '⚠ El documento debe tener al menos 6 dígitos';
+            mensajeElement.className = 'form-text text-warning';
+            return;
+        }
+        
         // Mostrar indicador de búsqueda
         mensajeElement.textContent = 'Buscando paciente...';
         mensajeElement.className = 'form-text text-info';
         
         // Hacer petición AJAX para buscar el paciente
-        fetch(`{{ url('admin/pacientes/buscar') }}/${documento}`)
-            .then(response => response.json())
+        fetch(`{{ url('admin/pacientes/buscar') }}/${documento}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Datos recibidos:', data);
                 if (data.success && data.paciente) {
                     // Paciente encontrado - llenar los campos
                     const paciente = data.paciente;
@@ -470,7 +590,7 @@
                     }
                     
                     // Si no se encuentra la obra social exacta, seleccionar la primera opción por defecto
-                    if (!obraSocialEncontrada && obraSocialNombre) {
+                    if (!obraSocialEncontrada && obraSocialNombre && obraSocialNombre !== 'Sin obra social') {
                         obraSocialSelect.selectedIndex = 0; // Opción "Seleccione una obra social"
                     }
                     
@@ -481,7 +601,9 @@
                 } else {
                     // Paciente no encontrado - limpiar campos y mostrar mensaje
                     document.getElementById('nombre').value = '';
-                    document.getElementById('obra_social').value = '';
+                    document.getElementById('email').value = '{{ Auth::user()->email }}';
+                    document.getElementById('telefono').value = '';
+                    document.getElementById('obra_social').selectedIndex = 0;
                     
                     mensajeElement.textContent = '⚠ Paciente no encontrado. Complete los datos manualmente.';
                     mensajeElement.className = 'form-text text-warning';
@@ -489,7 +611,7 @@
             })
             .catch(error => {
                 console.error('Error al buscar paciente:', error);
-                mensajeElement.textContent = '✗ Error al buscar paciente';
+                mensajeElement.textContent = `✗ Error: ${error.message}`;
                 mensajeElement.className = 'form-text text-danger';
             });
     }
@@ -504,6 +626,7 @@
         // Limpiar variables globales
         medicoSeleccionado = '';
         practicaSeleccionada = '';
+        consultorioSeleccionado = '';
         
         // Ocultar el calendario
         document.getElementById('calendario-container').style.display = 'none';
@@ -541,7 +664,7 @@
                 }
                 
                 // Cambiar el título del modal y el texto del botón
-                const tituloModal = `<b>Reserva de Turno Dr. ${medicoSeleccionado} <br> ${practicaSeleccionada}</b>`;
+                const tituloModal = `<b>* Reservar Turno * <br> Dr. ${medicoSeleccionado} <br> ${practicaSeleccionada} <br> ${consultorioSeleccionado}</b>`;
                 document.getElementById('exampleModalLabel').innerHTML = tituloModal;
                 document.getElementById('guardarEventoBtn').textContent = 'Reservar';
                 
@@ -611,8 +734,8 @@
         }
         
         // Restaurar el título del modal y el texto del botón
-        document.getElementById('exampleModalLabel').innerHTML = '<b>Reserva de Turno</b>';
-        document.getElementById('guardarEventoBtn').textContent = 'Registrar';
+        document.getElementById('exampleModalLabel').innerHTML = '<b>Reservar Turno</b>';
+        document.getElementById('guardarEventoBtn').textContent = 'Reservar';
         
         // Ocultar el botón eliminar
         const eliminarBtn = document.getElementById('eliminarEventoBtn');

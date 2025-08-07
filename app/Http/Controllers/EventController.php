@@ -10,17 +10,11 @@ use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $medicos = \App\Models\Medico::all();
@@ -146,9 +140,6 @@ class EventController extends Controller
             ->with('icono', 'success');
     }
 
-    /**
-     * Función auxiliar para limpiar horarios disponibles existentes
-     */
     public function limpiarHorariosDisponibles(Request $request)
     {
         $request->validate([
@@ -171,26 +162,17 @@ class EventController extends Controller
             ->with('icono', 'success');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $evento = Event::with(['pacientes', 'medicos', 'consultorios', 'practicas'])->findOrFail($id);
         return response()->json($evento);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Event $event)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $evento = Event::findOrFail($id);
@@ -210,9 +192,6 @@ class EventController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Event $event)
     {
         try {

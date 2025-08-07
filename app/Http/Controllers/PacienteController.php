@@ -6,6 +6,7 @@ use App\Models\Paciente;
 use App\Models\ObraSocial;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PacienteController extends Controller
 {
@@ -128,17 +129,33 @@ class PacienteController extends Controller
             ->with('icono', 'success');
     }
 
-    /**
-     * Buscar paciente por número de documento
-     */
     public function buscarPorDocumento($documento)
     {
         try {
+            // Validar que el documento no esté vacío
+            if (empty($documento)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Documento requerido'
+                ], 400);
+            }
+
+            // Buscar paciente con la obra social relacionada
             $paciente = Paciente::with('obraSocial')
                 ->where('num_documento', $documento)
                 ->first();
 
             if ($paciente) {
+                // Determinar el nombre de la obra social
+                $obraSocialNombre = 'Sin obra social';
+                if ($paciente->obraSocial) {
+                    $obraSocialNombre = $paciente->obraSocial->nombre;
+                } elseif ($paciente->obra_social_id) {
+                    // Si hay obra_social_id pero no se carga la relación, buscar directamente
+                    $obraSocial = \App\Models\Obrasocial::find($paciente->obra_social_id);
+                    $obraSocialNombre = $obraSocial ? $obraSocial->nombre : 'Sin obra social';
+                }
+
                 return response()->json([
                     'success' => true,
                     'paciente' => [
@@ -146,21 +163,22 @@ class PacienteController extends Controller
                         'apel_nombres' => $paciente->apel_nombres,
                         'tipo_documento' => $paciente->tipo_documento,
                         'num_documento' => $paciente->num_documento,
-                        'obra_social' => $paciente->obraSocial->nombre ?? $paciente->obra_social ?? 'Sin obra social',
-                        'telefono' => $paciente->telefono,
-                        'email' => $paciente->email,
+                        'obra_social' => $obraSocialNombre,
+                        'telefono' => $paciente->telefono ?? '',
+                        'email' => $paciente->email ?? '',
                     ]
                 ]);
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Paciente no encontrado'
+                    'message' => 'Paciente no encontrado con documento: ' . $documento
                 ]);
             }
         } catch (\Exception $e) {
+            Log::error('Error al buscar paciente por documento ' . $documento . ': ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error al buscar paciente: ' . $e->getMessage()
+                'message' => 'Error interno del servidor'
             ], 500);
         }
     }
