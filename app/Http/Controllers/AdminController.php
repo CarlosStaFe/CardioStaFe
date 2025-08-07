@@ -12,6 +12,8 @@ use App\Models\Obrasocial;
 use App\Models\Medico;
 use App\Models\Horario;
 use App\Models\Event;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -69,6 +71,26 @@ class AdminController extends Controller
 
         if ($medico_id && $medico_id != '0') {
             $query->where('medico_id', $medico_id);
+        }
+
+        // Filtrar eventos reservados según el rol del usuario
+        $user = Auth::user();
+        $userRoles = $user->roles->pluck('name')->toArray();
+        
+        // Log para debugging
+        Log::info('Filtrado de eventos', [
+            'user_id' => $user->id,
+            'user_email' => $user->email,
+            'user_roles' => $userRoles,
+            'es_usuario_role' => in_array('usuario', $userRoles) && !in_array('admin', $userRoles)
+        ]);
+        
+        // Si el usuario tiene rol 'usuario', no mostrar eventos reservados
+        if (in_array('usuario', $userRoles) && !in_array('admin', $userRoles)) {
+            $query->where('title', '!=', '- Reservado');
+            Log::info('Aplicando filtro para rol usuario: ocultando eventos reservados');
+        } else {
+            Log::info('Usuario admin o con otros roles: mostrando todos los eventos');
         }
 
         $eventos = $query->select('id', 'title', 'description', 'color', 'start', 'end')->get();

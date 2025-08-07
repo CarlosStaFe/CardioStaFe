@@ -26,6 +26,23 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
+        // Log para debugging
+        Log::info('Método store llamado', [
+            'has_evento_id' => $request->has('evento_id'),
+            'has_documento' => $request->has('documento'),
+            'all_request' => $request->all()
+        ]);
+        
+        // Detectar si es una reserva individual (desde el modal) o creación masiva de horarios
+        if ($request->has('evento_id') && $request->has('documento')) {
+            // Es una reserva individual desde el modal
+            Log::info('Detectado como reserva individual');
+            return $this->reservarTurno($request);
+        }
+        
+        Log::info('Detectado como creación masiva');
+        
+        // Es creación masiva de horarios disponibles
         // Validar los datos recibidos
         $request->validate([
             'fecha_inicio' => 'required|date|after_or_equal:today',
@@ -138,6 +155,98 @@ class EventController extends Controller
         return redirect()->route('admin.index')
             ->with('mensaje', "Se crearon {$eventosCreados} horarios disponibles exitosamente.")
             ->with('icono', 'success');
+    }
+
+    /**
+     * Reservar un turno individual (desde el modal)
+     */
+    private function reservarTurno(Request $request)
+    {
+        Log::info('Iniciando reserva de turno', ['request_data' => $request->all()]);
+        
+        // Validar los datos de la reserva
+        $request->validate([
+            'evento_id' => 'required|exists:events,id',
+            'fecha_turno' => 'required|date',
+            'horario' => 'required',
+            'tipo' => 'required|string',
+            'documento' => 'required|string',
+            'nombre' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'telefono' => 'required|string|max:255',
+            'obra_social' => 'required|string|max:255',
+        ]);
+
+        try {
+            // Buscar el evento (horario disponible)
+            $evento = Event::findOrFail($request->evento_id);
+            Log::info('Evento encontrado', ['evento_id' => $evento->id, 'title' => $evento->title]);
+
+            // Verificar que el evento esté disponible
+            if ($evento->title !== '- Horario disponible') {
+                Log::warning('Evento no disponible', ['title' => $evento->title]);
+                return redirect()->route('admin.index')
+                    ->with('mensaje', 'Este horario ya no está disponible.')
+                    ->with('icono', 'error');
+            }
+
+            // Buscar la obra social por nombre una sola vez
+            $obraSocial = \App\Models\Obrasocial::where('nombre', $request->obra_social)->first();
+            $obraSocialId = $obraSocial ? $obraSocial->id : 1;
+            Log::info('Obra social encontrada', ['obra_social_id' => $obraSocialId]);
+
+            // Buscar o crear el paciente
+            $paciente = \App\Models\Paciente::where('num_documento', $request->documento)->first();
+            
+            if (!$paciente) {
+                // Crear nuevo paciente
+                $paciente = new \App\Models\Paciente();
+                $paciente->apel_nombres = strtoupper($request->nombre);
+                $paciente->tipo_documento = $request->tipo;
+                $paciente->num_documento = $request->documento;
+                $paciente->telefono = $request->telefono;
+                $paciente->email = $request->email;
+                $paciente->sexo = 'M';
+                $paciente->nacimiento = '1900-01-01';
+                $paciente->domicilio = 'No especificado';
+                $paciente->cod_postal_id = 1;
+                $paciente->obra_social_id = $obraSocialId;
+                $paciente->observacion = 'Paciente creado desde reserva de turno';
+                
+                $paciente->save();
+                Log::info('Nuevo paciente creado', ['paciente_id' => $paciente->id]);
+            } else {
+                Log::info('Paciente existente encontrado', ['paciente_id' => $paciente->id]);
+            }
+
+            // Actualizar el evento con los datos de la reserva
+            $evento->title = '- Reservado';
+            $evento->description = "Paciente: {$request->nombre}\nDocumento: {$request->documento}\nTeléfono: {$request->telefono}\nEmail: {$request->email}\nObra Social: {$request->obra_social}";
+            $evento->color = '#dc3545'; // Color rojo para reservado
+            $evento->paciente_id = $paciente->id;
+            $evento->obra_social_id = $obraSocialId;
+            
+            $evento->save();
+            
+            Log::info('Evento actualizado a reservado', [
+                'evento_id' => $evento->id,
+                'paciente_id' => $paciente->id,
+                'title' => $evento->title
+            ]);
+
+            return redirect()->route('admin.index')
+                ->with('mensaje', 'Turno reservado exitosamente para ' . $request->nombre)
+                ->with('icono', 'success');
+
+        } catch (\Exception $e) {
+            Log::error('Error al reservar turno: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+            return redirect()->route('admin.index')
+                ->with('mensaje', 'Error al reservar el turno: ' . $e->getMessage())
+                ->with('icono', 'error');
+        }
     }
 
     public function limpiarHorariosDisponibles(Request $request)

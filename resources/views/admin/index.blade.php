@@ -292,6 +292,13 @@
 
 <script>
 
+    // Variables globales del usuario
+    const userRoles = @json(Auth::user()->roles->pluck('name'));
+    const isUsuarioRole = userRoles.includes('usuario') && !userRoles.includes('admin');
+    
+    console.log('Roles del usuario:', userRoles);
+    console.log('Es usuario con rol "usuario" exclusivo:', isUsuarioRole);
+
     let calendar; // Variable global para el calendario
     let medicoSeleccionado = ''; // Variable global para el médico seleccionado
     let practicaSeleccionada = ''; // Variable global para la práctica seleccionada
@@ -413,10 +420,32 @@
         fetch(`{{ route('admin.eventos.filtrar') }}?${params.toString()}`)
             .then(response => response.json())
             .then(eventos => {
-                // Filtrar solo eventos con título "- Horario disponible"
-                const eventosDisponibles = eventos.filter(evento => 
-                    evento.title === '- Horario disponible'
-                );
+                console.log('Eventos recibidos del backend:', eventos);
+                console.log('Total eventos recibidos:', eventos.length);
+                
+                // Contar eventos por tipo
+                const disponibles = eventos.filter(e => e.title === '- Horario disponible').length;
+                const reservados = eventos.filter(e => e.title === '- Reservado').length;
+                console.log(`Eventos disponibles: ${disponibles}, Eventos reservados: ${reservados}`);
+                
+                // Mostrar eventos según el rol del usuario
+                let eventosParaMostrar;
+                
+                if (isUsuarioRole) {
+                    // Solo mostrar eventos disponibles para usuarios con rol 'usuario'
+                    eventosParaMostrar = eventos.filter(evento => 
+                        evento.title === '- Horario disponible'
+                    );
+                    console.log('Usuario con rol "usuario": mostrando solo eventos disponibles');
+                    console.log('Eventos filtrados para mostrar:', eventosParaMostrar.length);
+                } else {
+                    // Mostrar tanto eventos disponibles como reservados para admin y otros roles
+                    eventosParaMostrar = eventos.filter(evento => 
+                        evento.title === '- Horario disponible' || evento.title === '- Reservado'
+                    );
+                    console.log('Usuario admin: mostrando eventos disponibles y reservados');
+                    console.log('Eventos filtrados para mostrar:', eventosParaMostrar.length);
+                }
                 
                 // Restaurar el contenido del calendario
                 calendarioContainer.innerHTML = '<div class="col-md-12"><div id="calendar"></div></div>';
@@ -442,13 +471,13 @@
                         week: 'Semana',
                         day: 'Día'
                     },
-                    events: eventosDisponibles.map(evento => ({
+                    events: eventosParaMostrar.map(evento => ({
                         id: evento.id,
                         title: evento.title,
                         start: evento.start,
                         end: evento.end,
-                        backgroundColor: '#28a745', // Color de fondo verde
-                        borderColor: '#1e7e34',     // Color del borde
+                        backgroundColor: evento.title === '- Horario disponible' ? '#28a745' : '#dc3545', // Verde para disponible, rojo para reservado
+                        borderColor: evento.title === '- Horario disponible' ? '#1e7e34' : '#c82333',     // Borde acorde al estado
                         textColor: 'white',         // Color del texto
                         description: evento.description
                     })),
@@ -459,30 +488,57 @@
                     editable: true,
                     selectable: true,
                     selectAllow: function(selectInfo) {
-                        // Permitir selección solo en días que tengan eventos
+                        // Permitir selección solo en días que tengan eventos disponibles
                         const events = calendar.getEvents();
                         const selectedDate = selectInfo.start.toISOString().split('T')[0];
                         
-                        // Verificar si hay eventos en la fecha seleccionada
-                        const hasEvents = events.some(event => {
+                        // Verificar si hay eventos disponibles en la fecha seleccionada
+                        const hasAvailableEvents = events.some(event => {
                             const eventDate = event.start.toISOString().split('T')[0];
-                            return eventDate === selectedDate;
+                            return eventDate === selectedDate && event.title === '- Horario disponible';
                         });
                         
-                        return hasEvents;
+                        return hasAvailableEvents;
                     },
                     dayCellDidMount: function(info) {
-                        // Verificar si el día tiene eventos
+                        // Verificar si el día tiene eventos disponibles y reservados según el rol
                         const events = calendar.getEvents();
                         const cellDate = info.date.toISOString().split('T')[0];
                         
-                        const hasEvents = events.some(event => {
+                        const hasAvailableEvents = events.some(event => {
                             const eventDate = event.start.toISOString().split('T')[0];
-                            return eventDate === cellDate;
+                            return eventDate === cellDate && event.title === '- Horario disponible';
                         });
                         
-                        // Si no hay eventos, deshabilitar el día
-                        if (!hasEvents) {
+                        let hasReservedEvents = false;
+                        if (!isUsuarioRole) {
+                            // Solo verificar eventos reservados si no es usuario con rol 'usuarios'
+                            hasReservedEvents = events.some(event => {
+                                const eventDate = event.start.toISOString().split('T')[0];
+                                return eventDate === cellDate && event.title === '- Reservado';
+                            });
+                        }
+                        
+                        // Aplicar estilos según el estado del día
+                        if (hasAvailableEvents && hasReservedEvents) {
+                            // Día con turnos disponibles y reservados (solo para admin)
+                            info.el.style.backgroundColor = '#fff3cd';
+                            info.el.style.border = '2px solid #ffc107';
+                            info.el.title = 'Día con turnos disponibles y reservados';
+                        } else if (hasAvailableEvents) {
+                            // Día solo con turnos disponibles
+                            info.el.style.backgroundColor = '#d1f2eb';
+                            info.el.style.border = '2px solid #28a745';
+                            info.el.title = 'Día con turnos disponibles';
+                        } else if (hasReservedEvents && !isUsuarioRole) {
+                            // Día solo con turnos reservados (solo para admin)
+                            info.el.style.backgroundColor = '#f8d7da';
+                            info.el.style.border = '2px solid #dc3545';
+                            info.el.style.cursor = 'not-allowed';
+                            info.el.style.opacity = '0.8';
+                            info.el.title = 'Día con todos los turnos reservados';
+                        } else {
+                            // Día sin turnos (o solo reservados para usuarios con rol 'usuarios')
                             info.el.style.backgroundColor = '#f8f9fa';
                             info.el.style.color = '#6c757d';
                             info.el.style.cursor = 'not-allowed';
@@ -491,16 +547,16 @@
                         }
                     },
                     dateClick: function(info) {
-                        // Verificar si hay eventos en la fecha antes de abrir el modal
+                        // Verificar si hay eventos disponibles en la fecha antes de abrir el modal
                         const events = calendar.getEvents();
                         const clickedDate = info.dateStr;
                         
-                        const hasEvents = events.some(event => {
+                        const hasAvailableEvents = events.some(event => {
                             const eventDate = event.start.toISOString().split('T')[0];
-                            return eventDate === clickedDate;
+                            return eventDate === clickedDate && event.title === '- Horario disponible';
                         });
                         
-                        if (!hasEvents) {
+                        if (!hasAvailableEvents) {
                             alert('No hay horarios disponibles para esta fecha.');
                             return;
                         }
@@ -643,6 +699,12 @@
         fetch(`{{ url('admin/eventos') }}/${eventoId}`)
             .then(response => response.json())
             .then(evento => {
+                // Si es usuario con rol 'usuarios' y el evento está reservado, no permitir acceso
+                if (isUsuarioRole && evento.title === '- Reservado') {
+                    alert('No tiene permisos para ver este evento.');
+                    return;
+                }
+                
                 // Llenar el formulario con los datos del evento
                 document.getElementById('evento_id').value = evento.id;
                 document.getElementById('form_method').value = 'PUT';
@@ -663,15 +725,52 @@
                     document.getElementById('horario').value = horaFormateada;
                 }
                 
-                // Cambiar el título del modal y el texto del botón
-                const tituloModal = `<b>* Reservar Turno * <br> Dr. ${medicoSeleccionado} <br> ${practicaSeleccionada} <br> ${consultorioSeleccionado}</b>`;
-                document.getElementById('exampleModalLabel').innerHTML = tituloModal;
-                document.getElementById('guardarEventoBtn').textContent = 'Reservar';
+                // Verificar si el evento ya está reservado
+                if (evento.title === '- Reservado') {
+                    // Extraer datos del paciente de la descripción si está reservado
+                    if (evento.description) {
+                        const lines = evento.description.split('\n');
+                        lines.forEach(line => {
+                            if (line.startsWith('Paciente: ')) {
+                                document.getElementById('nombre').value = line.replace('Paciente: ', '').trim();
+                            } else if (line.startsWith('Documento: ')) {
+                                document.getElementById('documento').value = line.replace('Documento: ', '').trim();
+                            } else if (line.startsWith('Teléfono: ')) {
+                                document.getElementById('telefono').value = line.replace('Teléfono: ', '').trim();
+                            } else if (line.startsWith('Email: ')) {
+                                document.getElementById('email').value = line.replace('Email: ', '').trim();
+                            } else if (line.startsWith('Obra Social: ')) {
+                                const obraSocial = line.replace('Obra Social: ', '').trim();
+                                const select = document.getElementById('obra_social');
+                                for (let i = 0; i < select.options.length; i++) {
+                                    if (select.options[i].value === obraSocial) {
+                                        select.selectedIndex = i;
+                                        break;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Cambiar título del modal para turno reservado
+                    const tituloModal = `<b>* Turno Reservado * <br> Dr. ${medicoSeleccionado} <br> ${practicaSeleccionada} <br> ${consultorioSeleccionado}</b>`;
+                    document.getElementById('exampleModalLabel').innerHTML = tituloModal;
+                    document.getElementById('guardarEventoBtn').textContent = 'Ver Datos';
+                    document.getElementById('guardarEventoBtn').disabled = true;
+                } else {
+                    // Cambiar el título del modal y el texto del botón para reserva
+                    const tituloModal = `<b>* Reservar Turno * <br> Dr. ${medicoSeleccionado} <br> ${practicaSeleccionada} <br> ${consultorioSeleccionado}</b>`;
+                    document.getElementById('exampleModalLabel').innerHTML = tituloModal;
+                    document.getElementById('guardarEventoBtn').textContent = 'Reservar';
+                    document.getElementById('guardarEventoBtn').disabled = false;
+                }
                 
-                // Mostrar el botón eliminar solo si existe el botón (el usuario tiene permisos)
+                // Mostrar el botón eliminar solo si existe el botón (el usuario tiene permisos) y no es rol 'usuarios'
                 const eliminarBtn = document.getElementById('eliminarEventoBtn');
-                if (eliminarBtn) {
+                if (eliminarBtn && !isUsuarioRole) {
                     eliminarBtn.style.display = 'inline-block';
+                } else if (eliminarBtn) {
+                    eliminarBtn.style.display = 'none';
                 }
                 
                 // Cambiar la acción del formulario
@@ -736,6 +835,7 @@
         // Restaurar el título del modal y el texto del botón
         document.getElementById('exampleModalLabel').innerHTML = '<b>Reservar Turno</b>';
         document.getElementById('guardarEventoBtn').textContent = 'Reservar';
+        document.getElementById('guardarEventoBtn').disabled = false;
         
         // Ocultar el botón eliminar
         const eliminarBtn = document.getElementById('eliminarEventoBtn');
@@ -756,40 +856,112 @@
     //***** FUNCIÓN PARA RESERVAR TURNO *****/
     function reservarTurno() {
         const eventoId = document.getElementById('evento_id').value;
-        const isEditing = eventoId !== '';
-        const form = document.getElementById('eventoForm');
+        const documento = document.getElementById('documento').value;
+        const nombre = document.getElementById('nombre').value;
+        const email = document.getElementById('email').value;
+        const telefono = document.getElementById('telefono').value;
+        const obraSocial = document.getElementById('obra_social').value;
+        const tipo = document.getElementById('tipo').value;
         
-        if (isEditing) {
-            // Actualizar evento existente
-            const formData = new FormData(form);
-            formData.append('_method', 'PUT');
-            fetch(`{{ url("admin/eventos") }}/${eventoId}`, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Evento actualizado correctamente');
-                    var modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
-                    modal.hide();
-                    // Recargar el calendario
-                    filtrarCalendario();
-                } else {
-                    alert('Error al actualizar el evento');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al actualizar el evento');
-            });
-        } else {
-            // Crear nuevo evento - enviar el formulario normalmente
-            form.submit();
+        console.log('Datos a enviar:', {
+            evento_id: eventoId,
+            documento: documento,
+            nombre: nombre,
+            email: email,
+            telefono: telefono,
+            obra_social: obraSocial,
+            tipo: tipo
+        });
+        
+        // Validar campos requeridos
+        if (!documento || !nombre || !email || !telefono || !obraSocial) {
+            alert('Por favor complete todos los campos requeridos.');
+            return;
         }
+        
+        if (!eventoId) {
+            alert('No hay un turno seleccionado para reservar.');
+            return;
+        }
+        
+        // Preparar datos para la reserva
+        const formData = new FormData();
+        formData.append('evento_id', eventoId);
+        formData.append('fecha_turno', document.getElementById('fecha_turno').value);
+        formData.append('horario', document.getElementById('horario').value);
+        formData.append('tipo', tipo);
+        formData.append('documento', documento);
+        formData.append('nombre', nombre);
+        formData.append('email', email);
+        formData.append('telefono', telefono);
+        formData.append('obra_social', obraSocial);
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+        
+        // Mostrar indicador de carga
+        document.getElementById('guardarEventoBtn').disabled = true;
+        document.getElementById('guardarEventoBtn').textContent = 'Reservando...';
+        
+        // Enviar solicitud de reserva
+        fetch('{{ url("admin/eventos/create") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response redirected:', response.redirected);
+            
+            if (response.redirected) {
+                // Si hay redirección, seguirla
+                console.log('Redirección detectada a:', response.url);
+                window.location.href = response.url;
+                return;
+            }
+            
+            // Intentar parsear como JSON
+            return response.text().then(text => {
+                console.log('Response text:', text);
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    // Si no es JSON válido, probablemente sea una redirección HTML
+                    console.log('No es JSON, probablemente redirección HTML');
+                    window.location.reload();
+                    return null;
+                }
+            });
+        })
+        .then(data => {
+            if (!data) return; // Ya se procesó como redirección
+            
+            console.log('Response data:', data);
+            if (data && data.success) {
+                alert('Turno reservado correctamente');
+                var modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+                modal.hide();
+                // Recargar el calendario
+                filtrarCalendario();
+            } else if (data && data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                // Si llegamos aquí, algo salió mal
+                console.log('Respuesta inesperada, recargando página');
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error en fetch:', error);
+            alert('Error de conexión. La página se recargará.');
+            window.location.reload();
+        })
+        .finally(() => {
+            // Restaurar el botón
+            document.getElementById('guardarEventoBtn').disabled = false;
+            document.getElementById('guardarEventoBtn').textContent = 'Reservar';
+        });
     }
 
     //***** FUNCIÓN PARA ELIMINAR EVENTO *****/
