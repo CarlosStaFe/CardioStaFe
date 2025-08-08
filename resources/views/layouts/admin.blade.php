@@ -25,6 +25,9 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
     <!-- Full Calendar -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
     <script src="{{url('fullcalendar/es.global.js')}}"></script>
@@ -276,21 +279,15 @@
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="{{url('admin/horarios/create')}}" class="nav-link active">
-                                            <i class="fa-regular fa-clock nav-icon"></i>
-                                            <p>Creación de Horarios</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{url('admin/horarios')}}" class="nav-link active">
-                                            <i class="fa-solid fa-table-cells nav-icon"></i>
-                                            <p>Listado de Horarios</p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
                                         <a href="{{ route('admin.eventos.generar') }}" class="nav-link active">
                                             <i class="fa-solid fa-calendar-plus nav-icon"></i>
-                                            <p>Generar Horarios Disponibles</p>
+                                            <p>Generar Disponibilidad</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{url('admin/eventos')}}" class="nav-link active">
+                                            <i class="fa-solid fa-table-cells nav-icon"></i>
+                                            <p>Listado de Horarios</p>
                                         </a>
                                     </li>
                                 </ul>
@@ -360,6 +357,8 @@
 
     <!-- Bootstrap 5 JS + Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- DataTables Bootstrap 5 & Plugins -->
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>

@@ -11,33 +11,33 @@ class Event extends Model
 
     protected $fillable = ['title', 'description', 'color', 'start', 'end', 'user_id', 'obra_social_id', 'paciente_id', 'medico_id', 'consultorio_id', 'practica_id'];
 
-    public function users()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function obrasociales()
+    public function obrasocial()
     {
-        return $this->belongsTo(Obrasocial::class);
+        return $this->belongsTo(Obrasocial::class, 'obra_social_id');
     }
 
-    public function pacientes()
+    public function paciente()
     {
-        return $this->belongsTo(Paciente::class);
+        return $this->belongsTo(Paciente::class, 'paciente_id');
     }
 
-    public function medicos()
+    public function medico()
     {
-        return $this->belongsTo(Medico::class);
+        return $this->belongsTo(Medico::class, 'medico_id');
     }
 
-    public function consultorios()
+    public function consultorio()
     {
-        return $this->belongsTo(Consultorio::class);
+        return $this->belongsTo(Consultorio::class, 'consultorio_id');
     }
 
-    public function practicas()
+    public function practica()
     {
-        return $this->belongsTo(Practica::class);
+        return $this->belongsTo(Practica::class, 'practica_id');
     }
 }

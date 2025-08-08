@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\SecretariaController;
 use App\Http\Controllers\PacienteController;
@@ -9,7 +10,7 @@ use App\Http\Controllers\ConsultorioController;
 use App\Http\Controllers\PracticaController;
 use App\Http\Controllers\ObrasocialController;
 use App\Http\Controllers\MedicoController;
-use App\Http\Controllers\HorarioController;
+use App\Http\Controllers\EventController;
 
 use App\Http\Controllers\LocalidadController;
 
@@ -96,23 +97,27 @@ Route::put('/admin/medicos/{id}', [MedicoController::class, 'update'])->name('ad
 Route::get('/admin/medicos/{id}/confirm-delete', [MedicoController::class, 'confirmDelete'])->name('admin.medicos.confirmDelete')->middleware(['auth', 'can:admin.medicos.confirmDelete']);
 Route::delete('/admin/medicos/{id}', [MedicoController::class, 'destroy'])->name('admin.medicos.destroy')->middleware(['auth', 'can:admin.medicos.destroy']);
 
-//RUTA PARA EL ADMIN - EVENTOS
-Route::get('/admin/eventos/generar-horarios', [App\Http\Controllers\EventController::class, 'create'])->name('admin.eventos.generar')->middleware('auth');
-Route::post('/admin/eventos/create', [App\Http\Controllers\EventController::class, 'store'])->name('admin.eventos.create');
-Route::get('/admin/eventos/filtrar', [App\Http\Controllers\AdminController::class, 'filtrarEventos'])->name('admin.eventos.filtrar')->middleware('auth');
-Route::get('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'show'])->name('admin.eventos.show')->middleware('auth');
-Route::put('/admin/eventos/{id}', [App\Http\Controllers\EventController::class, 'update'])->name('admin.eventos.update')->middleware('auth');
-Route::delete('/admin/eventos/{event}', [App\Http\Controllers\EventController::class, 'destroy'])->name('admin.eventos.destroy')->middleware(['auth', 'can:admin.eventos.destroy']);
-
 //RUTA PARA EL ADMIN - HORARIOS
-Route::get('/admin/horarios', [HorarioController::class, 'index'])->name('admin.horarios.index')->middleware(['auth', 'can:admin.horarios.index']);
-Route::get('/admin/horarios/create', [HorarioController::class, 'create'])->name('admin.horarios.create')->middleware(['auth', 'can:admin.horarios.create']);
-Route::post('/admin/horarios/create', [HorarioController::class, 'store'])->name('admin.horarios.store')->middleware(['auth', 'can:admin.horarios.store']);
-Route::get('/admin/horarios/{id}', [HorarioController::class, 'show'])->name('admin.horarios.show')->middleware(['auth', 'can:admin.horarios.show']);
-Route::get('/admin/horarios/{id}/edit', [HorarioController::class, 'edit'])->name('admin.horarios.edit')->middleware(['auth', 'can:admin.horarios.edit']);
-Route::put('/admin/horarios/{id}', [HorarioController::class, 'update'])->name('admin.horarios.update')->middleware(['auth', 'can:admin.horarios.update']);
-Route::get('/admin/horarios/{id}/confirm-delete', [HorarioController::class, 'confirmDelete'])->name('admin.horarios.confirmDelete')->middleware(['auth', 'can:admin.horarios.confirmDelete']);
-Route::delete('/admin/horarios/{id}', [HorarioController::class, 'destroy'])->name('admin.horarios.destroy')->middleware(['auth', 'can:admin.horarios.destroy']);
+//Route::get('/admin/horarios', [HorarioController::class, 'index'])->name('admin.horarios.index')->middleware(['auth', 'can:admin.horarios.index']);
+//Route::get('/admin/horarios/create', [HorarioController::class, 'create'])->name('admin.horarios.create')->middleware(['auth', 'can:admin.horarios.create']);
+//Route::post('/admin/horarios/create', [HorarioController::class, 'store'])->name('admin.horarios.store')->middleware(['auth', 'can:admin.horarios.store']);
+//Route::get('/admin/horarios/{id}', [HorarioController::class, 'show'])->name('admin.horarios.show')->middleware(['auth', 'can:admin.horarios.show']);
+//Route::get('/admin/horarios/{id}/edit', [HorarioController::class, 'edit'])->name('admin.horarios.edit')->middleware(['auth', 'can:admin.horarios.edit']);
+//Route::put('/admin/horarios/{id}', [HorarioController::class, 'update'])->name('admin.horarios.update')->middleware(['auth', 'can:admin.horarios.update']);
+//Route::get('/admin/horarios/{id}/confirm-delete', [HorarioController::class, 'confirmDelete'])->name('admin.horarios.confirmDelete')->middleware(['auth', 'can:admin.horarios.//confirmDelete']);
+//Route::delete('/admin/horarios/{id}', [HorarioController::class, 'destroy'])->name('admin.horarios.destroy')->middleware(['auth', 'can:admin.horarios.destroy']);
+
+//RUTA PARA EL ADMIN - EVENTOS
+Route::get('/admin/eventos', [EventController::class, 'index'])->name('admin.horarios.index')->middleware(['auth', 'can:admin.horarios.index']);
+Route::get('/admin/eventos/generar-horarios', [EventController::class, 'create'])->name('admin.eventos.generar')->middleware('auth');
+Route::post('/admin/eventos/create', [EventController::class, 'store'])->name('admin.eventos.create');
+Route::get('/admin/eventos/filtrar', [AdminController::class, 'filtrarEventos'])->name('admin.eventos.filtrar')->middleware('auth');
+Route::get('/admin/eventos/{id}', [EventController::class, 'show'])->name('admin.eventos.show')->middleware('auth');
+Route::get('/admin/eventos/{id}/edit', [EventController::class, 'edit'])->name('admin.eventos.edit')->middleware('auth');
+Route::get('/admin/eventos/{id}/confirm-delete', [EventController::class, 'confirmDelete'])->name('admin.eventos.confirm-delete')->middleware('auth');
+Route::post('/admin/eventos/{id}/cambiar-estado', [EventController::class, 'cambiarEstado'])->name('admin.eventos.cambiar-estado')->middleware('auth');
+Route::put('/admin/eventos/{id}', [EventController::class, 'update'])->name('admin.eventos.update')->middleware('auth');
+Route::delete('/admin/eventos/{event}', [EventController::class, 'destroy'])->name('admin.eventos.destroy')->middleware(['auth', 'can:admin.eventos.destroy']);
 
 //RUTA PARA BUSCAR LAS LOCALIDADES SEGÚN LA PROVINCIA Y LA LOCALIDAD
 Route::get('/admin/localidades/{idProv}', [LocalidadController::class, 'getLocalidades']);

@@ -12,7 +12,8 @@ class EventController extends Controller
 {
     public function index()
     {
-        //
+        $eventos = Event::with('user')->get();
+        return view('admin.eventos.index', compact('eventos'));
     }
 
     public function create()
@@ -273,35 +274,50 @@ class EventController extends Controller
 
     public function show($id)
     {
-        $evento = Event::with(['pacientes', 'medicos', 'consultorios', 'practicas'])->findOrFail($id);
-        return response()->json($evento);
+        $evento = Event::with('user')->findOrFail($id);
+        return view('admin.eventos.show', compact('evento'));
     }
 
-    public function edit(Event $event)
+    public function edit($id)
     {
-        //
+        $evento = Event::findOrFail($id);
+        return view('admin.eventos.edit', compact('evento'));
     }
 
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'start' => 'required|date',
+            'end' => 'nullable|date|after_or_equal:start',
+            'description' => 'nullable|string',
+            'color' => 'nullable|string'
+        ]);
+
         $evento = Event::findOrFail($id);
         
-        $evento->title = $request->title ?? $evento->title;
-        $evento->description = $request->description ?? $evento->description;
-        $evento->start = $request->fecha_turno ?? $evento->start;
-        $evento->end = $request->end ?? $evento->end;
+        $evento->title = $request->title;
+        $evento->description = $request->description;
+        $evento->start = $request->start;
+        $evento->end = $request->end;
         $evento->color = $request->color ?? $evento->color;
         
         $evento->save();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Evento actualizado correctamente',
-            'evento' => $evento
-        ]);
+        // Si es una request AJAX, devolver JSON
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Evento actualizado correctamente',
+                'evento' => $evento
+            ]);
+        }
+
+        // Si es una request web, redirigir con mensaje
+        return redirect()->route('admin.horarios.index')->with('success', 'Evento actualizado correctamente');
     }
 
-    public function destroy(Event $event)
+    public function destroy(Request $request, Event $event)
     {
         try {
             // Log para debugging
@@ -310,10 +326,15 @@ class EventController extends Controller
             // Verificar que el evento existe
             if (!$event || !$event->exists) {
                 Log::warning('Evento no encontrado', ['event_id' => $event->id ?? 'null']);
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Evento no encontrado'
-                ], 404);
+                
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Evento no encontrado'
+                    ], 404);
+                }
+                
+                return redirect()->route('admin.horarios.index')->with('error', 'Evento no encontrado');
             }
 
             // Eliminar el evento
@@ -321,16 +342,26 @@ class EventController extends Controller
             
             if ($deleted) {
                 Log::info('Evento eliminado exitosamente', ['event_id' => $event->id]);
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Evento eliminado correctamente'
-                ]);
+                
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Evento eliminado correctamente'
+                    ]);
+                }
+                
+                return redirect()->route('admin.horarios.index')->with('success', 'Evento eliminado correctamente');
             } else {
                 Log::error('Error al eliminar evento - delete() retornó false', ['event_id' => $event->id]);
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error al eliminar el evento'
-                ], 500);
+                
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Error al eliminar el evento'
+                    ], 500);
+                }
+                
+                return redirect()->route('admin.horarios.index')->with('error', 'Error al eliminar el evento');
             }
             
         } catch (\Exception $e) {
@@ -340,9 +371,68 @@ class EventController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al eliminar el evento: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()->route('admin.horarios.index')->with('error', 'Error al eliminar el evento: ' . $e->getMessage());
+        }
+    }
+
+    public function confirmDelete($id)
+    {
+        $evento = Event::findOrFail($id);
+        return view('admin.eventos.confirm-delete', compact('evento'));
+    }
+
+    public function cambiarEstado(Request $request, $id)
+    {
+        $request->validate([
+            'nuevo_estado' => 'required|string|in:- En Espera,- Atendido'
+        ]);
+
+        try {
+            $evento = Event::findOrFail($id);
+            
+            // Verificar que el cambio de estado sea válido
+            $estadosValidos = ['- En Espera', '- Atendido'];
+            if (!in_array($request->nuevo_estado, $estadosValidos)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Estado no válido'
+                ], 400);
+            }
+
+            // Cambiar el estado
+            $evento->title = $request->nuevo_estado;
+            $evento->save();
+
+            Log::info('Estado de evento cambiado', [
+                'event_id' => $evento->id,
+                'estado_anterior' => $evento->getOriginal('title'),
+                'estado_nuevo' => $request->nuevo_estado,
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Estado cambiado correctamente',
+                'nuevo_estado' => $request->nuevo_estado
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error al cambiar estado del evento', [
+                'event_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error al eliminar el evento: ' . $e->getMessage()
+                'message' => 'Error al cambiar el estado: ' . $e->getMessage()
             ], 500);
         }
     }
