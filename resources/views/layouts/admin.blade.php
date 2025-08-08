@@ -28,6 +28,8 @@
     <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <!-- Custom Select2 CSS -->
+    <link rel="stylesheet" href="{{url('assets/css/custom-select2.css')}}">
     <!-- Full Calendar -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
     <script src="{{url('fullcalendar/es.global.js')}}"></script>
@@ -278,12 +280,14 @@
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.eventos.generar') }}" class="nav-link active">
-                                            <i class="fa-solid fa-calendar-plus nav-icon"></i>
-                                            <p>Generar Disponibilidad</p>
-                                        </a>
-                                    </li>
+                                    @can('admin.eventos.create')
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.eventos.generar') }}" class="nav-link active">
+                                                <i class="fa-solid fa-calendar-plus nav-icon"></i>
+                                                <p>Generar Disponibilidad</p>
+                                            </a>
+                                        </li>
+                                    @endcan
                                     <li class="nav-item">
                                         <a href="{{url('admin/eventos')}}" class="nav-link active">
                                             <i class="fa-solid fa-table-cells nav-icon"></i>

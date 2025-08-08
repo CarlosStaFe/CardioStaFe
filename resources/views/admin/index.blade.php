@@ -119,13 +119,13 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-primary">
                 <div class="inner">
-                    <h3>{{$total_horarios}}</h3>
-                    <p>Horarios</p>
+                    <h3>{{$total_eventos}}</h3>
+                    <p>Eventos</p>
                 </div>
                 <div class="icon">
                     <i class="fas fa-solid fa-clock"></i>
                 </div>
-                <a href="{{url('admin/horarios')}}" class="small-box-footer">Más información <i class="fas fa-solid fa-clock"></i></a>
+                <a href="{{url('admin/eventos')}}" class="small-box-footer">Más información <i class="fas fa-solid fa-clock"></i></a>
             </div>
         </div>
     @endcan

@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Consultorio;
+use App\Models\Practica;
+use App\Models\Medico;
+use App\Models\Obrasocial;
+use App\Models\Paciente;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,15 +17,19 @@ class EventController extends Controller
 {
     public function index()
     {
-        $eventos = Event::with('user')->get();
-        return view('admin.eventos.index', compact('eventos'));
+        $eventos = Event::with(['user', 'consultorio', 'practica', 'medico'])->get();
+        $consultorios = Consultorio::all();
+        $practicas = Practica::all();
+        $medicos = Medico::all();
+        
+        return view('admin.eventos.index', compact('eventos', 'consultorios', 'practicas', 'medicos'));
     }
 
     public function create()
     {
-        $medicos = \App\Models\Medico::all();
-        $consultorios = \App\Models\Consultorio::all();
-        $practicas = \App\Models\Practica::all();
+        $medicos = Medico::all();
+        $consultorios = Consultorio::all();
+        $practicas = Practica::all();
         
         return view('admin.eventos.create', compact('medicos', 'consultorios', 'practicas'));
     }
@@ -192,12 +201,12 @@ class EventController extends Controller
             }
 
             // Buscar la obra social por nombre una sola vez
-            $obraSocial = \App\Models\Obrasocial::where('nombre', $request->obra_social)->first();
+            $obraSocial = Obrasocial::where('nombre', $request->obra_social)->first();
             $obraSocialId = $obraSocial ? $obraSocial->id : 1;
             Log::info('Obra social encontrada', ['obra_social_id' => $obraSocialId]);
 
             // Buscar o crear el paciente
-            $paciente = \App\Models\Paciente::where('num_documento', $request->documento)->first();
+            $paciente = Paciente::where('num_documento', $request->documento)->first();
             
             if (!$paciente) {
                 // Crear nuevo paciente
@@ -435,5 +444,38 @@ class EventController extends Controller
                 'message' => 'Error al cambiar el estado: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function filtrarEventos(Request $request)
+    {
+        $query = Event::with(['user', 'consultorio', 'practica', 'medico']);
+
+        if ($request->has('consultorio_id') && $request->consultorio_id) {
+            $query->where('consultorio_id', $request->consultorio_id);
+        }
+
+        if ($request->has('practica_id') && $request->practica_id) {
+            $query->where('practica_id', $request->practica_id);
+        }
+
+        if ($request->has('medico_id') && $request->medico_id) {
+            $query->where('medico_id', $request->medico_id);
+        }
+
+        if ($request->has('estado') && $request->estado) {
+            if ($request->estado === 'Disponible') {
+                $query->whereNotIn('title', ['- Reservado', '- En Espera', '- Atendido']);
+            } else {
+                $query->where('title', $request->estado);
+            }
+        }
+
+        $eventos = $query->get();
+
+        return response()->json([
+            'success' => true,
+            'eventos' => $eventos,
+            'count' => $eventos->count()
+        ]);
     }
 }

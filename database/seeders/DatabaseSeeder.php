@@ -122,23 +122,23 @@ class DatabaseSeeder extends Seeder
         Permission::create(['name' => 'admin.medicos.destroy'])->syncRoles([$admin,$secretaria]);
 
         //RUTA PARA EL ADMIN - HORARIOS
-        Permission::create(['name' => 'admin.horarios.index'])->syncRoles([$admin,$secretaria]);
-        Permission::create(['name' => 'admin.horarios.create'])->syncRoles([$admin,$secretaria]);
-        Permission::create(['name' => 'admin.horarios.store'])->syncRoles([$admin,$secretaria]);
-        Permission::create(['name' => 'admin.horarios.show'])->syncRoles([$admin,$secretaria]);
-        Permission::create(['name' => 'admin.horarios.edit'])->syncRoles([$admin,$secretaria]);
-        Permission::create(['name' => 'admin.horarios.update'])->syncRoles([$admin,$secretaria]);
-        Permission::create(['name' => 'admin.horarios.confirmDelete'])->syncRoles([$admin,$secretaria]);
-        Permission::create(['name' => 'admin.horarios.destroy'])->syncRoles([$admin,$secretaria]);
+        //Permission::create(['name' => 'admin.horarios.index'])->syncRoles([$admin,$secretaria,$medico]);
+        //Permission::create(['name' => 'admin.horarios.create'])->syncRoles([$admin,$secretaria,$medico]);
+        //Permission::create(['name' => 'admin.horarios.store'])->syncRoles([$admin,$secretaria,$medico]);
+        //Permission::create(['name' => 'admin.horarios.show'])->syncRoles([$admin,$secretaria,$medico]);
+        //Permission::create(['name' => 'admin.horarios.edit'])->syncRoles([$admin,$secretaria,$medico]);
+        //Permission::create(['name' => 'admin.horarios.update'])->syncRoles([$admin,$secretaria,$medico]);
+        //Permission::create(['name' => 'admin.horarios.confirmDelete'])->syncRoles([$admin,$secretaria,$medico]);
+        //Permission::create(['name' => 'admin.horarios.destroy'])->syncRoles([$admin,$secretaria,$medico]);
 
         //RUTA PARA EL ADMIN - EVENTOS
-        Permission::create(['name' => 'admin.eventos.index'])->syncRoles([$admin,$secretaria]);
-        Permission::create(['name' => 'admin.eventos.create'])->syncRoles([$admin,$secretaria]);
-        Permission::create(['name' => 'admin.eventos.store'])->syncRoles([$admin,$secretaria]);
-        Permission::create(['name' => 'admin.eventos.show'])->syncRoles([$admin,$secretaria]);
-        Permission::create(['name' => 'admin.eventos.edit'])->syncRoles([$admin,$secretaria]);
-        Permission::create(['name' => 'admin.eventos.update'])->syncRoles([$admin,$secretaria]);
-        Permission::create(['name' => 'admin.eventos.destroy'])->syncRoles([$admin,$secretaria]);
+        Permission::create(['name' => 'admin.eventos.index'])->syncRoles([$admin,$secretaria,$medico]);
+        Permission::create(['name' => 'admin.eventos.create'])->syncRoles([$admin,$secretaria,$medico]);
+        Permission::create(['name' => 'admin.eventos.store'])->syncRoles([$admin,$secretaria,$medico]);
+        Permission::create(['name' => 'admin.eventos.show'])->syncRoles([$admin,$secretaria,$medico]);
+        Permission::create(['name' => 'admin.eventos.edit'])->syncRoles([$admin,$secretaria,$medico]);
+        Permission::create(['name' => 'admin.eventos.update'])->syncRoles([$admin,$secretaria,$medico]);
+        Permission::create(['name' => 'admin.eventos.destroy'])->syncRoles([$admin,$secretaria,$medico]);
 
         $this->call([
             ConsultoriosSeeder::class,
