@@ -14,7 +14,7 @@
             <form action="{{ route('admin.eventos.create') }}" method="POST">
                 @csrf
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="medico_id">Médico <b>*</b></label>
                             <select name="medico_id" id="medico_id" class="form-control select2" required>
@@ -28,7 +28,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="consultorio_id">Consultorio <b>*</b></label>
                             <select name="consultorio_id" id="consultorio_id" class="form-control select2" required>
@@ -42,10 +42,7 @@
                             @enderror
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="practica_id">Práctica <b>*</b></label>
                             <select name="practica_id" id="practica_id" class="form-control select2" required>
@@ -59,7 +56,9 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="rango">Duración de cada turno (minutos) <b>*</b></label>
                             <select name="rango" id="rango" class="form-control" required>
@@ -75,10 +74,7 @@
                             @enderror
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label for="fecha_inicio">Fecha de inicio <b>*</b></label>
                             <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" 
@@ -88,7 +84,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label for="fecha_fin">Fecha de fin <b>*</b></label>
                             <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" 
@@ -98,10 +94,7 @@
                             @enderror
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label for="hora_inicio">Hora de inicio <b>*</b></label>
                             <input type="time" name="hora_inicio" id="hora_inicio" class="form-control" 
@@ -111,7 +104,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label for="hora_fin">Hora de fin <b>*</b></label>
                             <input type="time" name="hora_fin" id="hora_fin" class="form-control" 
@@ -121,6 +114,14 @@
                             @enderror
                         </div>
                     </div>
+
+
+                </div>
+
+                <div class="row">
+                </div>
+
+                <div class="row">
                 </div>
 
                 <div class="row">
