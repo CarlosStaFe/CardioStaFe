@@ -49,13 +49,13 @@ Route::delete('/admin/secretarias/{id}', [SecretariaController::class, 'destroy'
 //RUTA PARA EL ADMIN - PACIENTES
 Route::get('/admin/pacientes', [PacienteController::class, 'index'])->name('admin.pacientes.index')->middleware(['auth', 'can:admin.pacientes.index']);
 Route::get('/admin/pacientes/create', [PacienteController::class, 'create'])->name('admin.pacientes.create')->middleware(['auth', 'can:admin.pacientes.create']);
+Route::get('/admin/pacientes/buscar', [PacienteController::class, 'buscarPorDocumento'])->name('admin.pacientes.buscar')->middleware('auth');
 Route::post('/admin/pacientes/create', [PacienteController::class, 'store'])->name('admin.pacientes.store')->middleware(['auth', 'can:admin.pacientes.store']);
 Route::get('/admin/pacientes/{id}', [PacienteController::class, 'show'])->name('admin.pacientes.show')->middleware(['auth', 'can:admin.pacientes.show']);
 Route::get('/admin/pacientes/{id}/edit', [PacienteController::class, 'edit'])->name('admin.pacientes.edit')->middleware(['auth', 'can:admin.pacientes.edit']);
 Route::put('/admin/pacientes/{id}', [PacienteController::class, 'update'])->name('admin.pacientes.update')->middleware(['auth', 'can:admin.pacientes.update']);
 Route::get('/admin/pacientes/{id}/confirm-delete', [PacienteController::class, 'confirmDelete'])->name('admin.pacientes.confirmDelete')->middleware(['auth', 'can:admin.pacientes.confirmDelete']);
 Route::delete('/admin/pacientes/{id}', [PacienteController::class, 'destroy'])->name('admin.pacientes.destroy')->middleware(['auth', 'can:admin.pacientes.destroy']);
-Route::get('/admin/pacientes/buscar/{documento}', [PacienteController::class, 'buscarPorDocumento'])->name('admin.pacientes.buscar')->middleware('auth');
 
 //RUTA PARA EL ADMIN - CONSULTORIOS
 Route::get('/admin/consultorios', [ConsultorioController::class, 'index'])->name('admin.consultorios.index')->middleware(['auth', 'can:admin.consultorios.index']);
@@ -96,16 +96,6 @@ Route::get('/admin/medicos/{id}/edit', [MedicoController::class, 'edit'])->name(
 Route::put('/admin/medicos/{id}', [MedicoController::class, 'update'])->name('admin.medicos.update')->middleware(['auth', 'can:admin.medicos.update']);
 Route::get('/admin/medicos/{id}/confirm-delete', [MedicoController::class, 'confirmDelete'])->name('admin.medicos.confirmDelete')->middleware(['auth', 'can:admin.medicos.confirmDelete']);
 Route::delete('/admin/medicos/{id}', [MedicoController::class, 'destroy'])->name('admin.medicos.destroy')->middleware(['auth', 'can:admin.medicos.destroy']);
-
-//RUTA PARA EL ADMIN - HORARIOS
-//Route::get('/admin/horarios', [HorarioController::class, 'index'])->name('admin.horarios.index')->middleware(['auth', 'can:admin.horarios.index']);
-//Route::get('/admin/horarios/create', [HorarioController::class, 'create'])->name('admin.horarios.create')->middleware(['auth', 'can:admin.horarios.create']);
-//Route::post('/admin/horarios/create', [HorarioController::class, 'store'])->name('admin.horarios.store')->middleware(['auth', 'can:admin.horarios.store']);
-//Route::get('/admin/horarios/{id}', [HorarioController::class, 'show'])->name('admin.horarios.show')->middleware(['auth', 'can:admin.horarios.show']);
-//Route::get('/admin/horarios/{id}/edit', [HorarioController::class, 'edit'])->name('admin.horarios.edit')->middleware(['auth', 'can:admin.horarios.edit']);
-//Route::put('/admin/horarios/{id}', [HorarioController::class, 'update'])->name('admin.horarios.update')->middleware(['auth', 'can:admin.horarios.update']);
-//Route::get('/admin/horarios/{id}/confirm-delete', [HorarioController::class, 'confirmDelete'])->name('admin.horarios.confirmDelete')->middleware(['auth', 'can:admin.horarios.//confirmDelete']);
-//Route::delete('/admin/horarios/{id}', [HorarioController::class, 'destroy'])->name('admin.horarios.destroy')->middleware(['auth', 'can:admin.horarios.destroy']);
 
 //RUTA PARA EL ADMIN - EVENTOS
 Route::get('/admin/eventos', [EventController::class, 'index'])->name('admin.eventos.index')->middleware(['auth', 'can:admin.eventos.index']);

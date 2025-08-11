@@ -63,8 +63,7 @@ class PacienteController extends Controller
 
     public function show($id)
     {
-        $paciente = Paciente::with('localidad')->findOrFail($id);
-        $paciente = Paciente::with('obrasociales')->findOrFail($id);
+        $paciente = Paciente::with(['localidad', 'obraSocial'])->findOrFail($id);
         return view('admin.pacientes.show', compact('paciente'));
     }
 
@@ -129,21 +128,52 @@ class PacienteController extends Controller
             ->with('icono', 'success');
     }
 
-    public function buscarPorDocumento($documento)
+    public function buscarPorDocumento(Request $request)
     {
         try {
+            $documento = $request->get('documento');
+            $tipo = $request->get('tipo', 'DNI');
+            
             // Validar que el documento no esté vacío
             if (empty($documento)) {
                 return response()->json([
-                    'success' => false,
+                    'encontrado' => false,
                     'message' => 'Documento requerido'
-                ], 400);
+                ]);
             }
 
-            // Buscar paciente con la obra social relacionada
+            // Limpiar el documento de espacios, puntos y guiones
+            $documentoLimpio = preg_replace('/[.\-\s]/', '', trim($documento));
+            
+            Log::info('Buscando paciente', [
+                'documento_original' => $documento,
+                'documento_limpio' => $documentoLimpio,
+                'tipo' => $tipo
+            ]);
+
+            // Buscar paciente con múltiples criterios de búsqueda
             $paciente = Paciente::with('obraSocial')
-                ->where('num_documento', $documento)
+                ->where(function($query) use ($documentoLimpio, $documento) {
+                    // Buscar por documento limpio o documento original
+                    $query->where('num_documento', $documentoLimpio)
+                          ->orWhere('num_documento', $documento);
+                })
+                ->where('tipo_documento', $tipo)
                 ->first();
+
+            // Si no encuentra con el tipo específico, buscar sin tipo
+            if (!$paciente) {
+                $paciente = Paciente::with('obraSocial')
+                    ->where(function($query) use ($documentoLimpio, $documento) {
+                        $query->where('num_documento', $documentoLimpio)
+                              ->orWhere('num_documento', $documento);
+                    })
+                    ->first();
+                    
+                Log::info('Búsqueda sin tipo específico', [
+                    'encontrado' => $paciente ? 'sí' : 'no'
+                ]);
+            }
 
             if ($paciente) {
                 // Determinar el nombre de la obra social
@@ -156,8 +186,14 @@ class PacienteController extends Controller
                     $obraSocialNombre = $obraSocial ? $obraSocial->nombre : 'Sin obra social';
                 }
 
+                Log::info('Paciente encontrado', [
+                    'id' => $paciente->id,
+                    'documento' => $paciente->num_documento,
+                    'tipo' => $paciente->tipo_documento
+                ]);
+
                 return response()->json([
-                    'success' => true,
+                    'encontrado' => true,
                     'paciente' => [
                         'id' => $paciente->id,
                         'apel_nombres' => $paciente->apel_nombres,
@@ -169,15 +205,20 @@ class PacienteController extends Controller
                     ]
                 ]);
             } else {
+                Log::info('Paciente no encontrado', [
+                    'documento_buscado' => $documentoLimpio,
+                    'tipo_buscado' => $tipo
+                ]);
+                
                 return response()->json([
-                    'success' => false,
+                    'encontrado' => false,
                     'message' => 'Paciente no encontrado con documento: ' . $documento
                 ]);
             }
         } catch (\Exception $e) {
-            Log::error('Error al buscar paciente por documento ' . $documento . ': ' . $e->getMessage());
+            Log::error('Error al buscar paciente por documento: ' . $e->getMessage());
             return response()->json([
-                'success' => false,
+                'encontrado' => false,
                 'message' => 'Error interno del servidor'
             ], 500);
         }

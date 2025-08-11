@@ -28,9 +28,9 @@ class EventController extends Controller
 
     public function create()
     {
-        $medicos = \App\Models\Medico::all();
-        $consultorios = \App\Models\Consultorio::all();
-        $practicas = \App\Models\Practica::all();
+        $medicos = Medico::all();
+        $consultorios = Consultorio::all();
+        $practicas = Practica::all();
         
         return view('admin.eventos.create', compact('medicos', 'consultorios', 'practicas'));
     }
@@ -202,7 +202,7 @@ class EventController extends Controller
             }
 
             // Buscar la obra social por nombre una sola vez
-            $obraSocial = \App\Models\Obrasocial::where('nombre', $request->obra_social)->first();
+            $obraSocial = Obrasocial::where('nombre', $request->obra_social)->first();
             $obraSocialId = $obraSocial ? $obraSocial->id : 1;
             Log::info('Obra social encontrada', ['obra_social_id' => $obraSocialId]);
 
@@ -211,7 +211,7 @@ class EventController extends Controller
             
             if (!$paciente) {
                 // Crear nuevo paciente
-                $paciente = new \App\Models\Paciente();
+                $paciente = new Paciente();
                 $paciente->apel_nombres = strtoupper($request->nombre);
                 $paciente->tipo_documento = $request->tipo;
                 $paciente->num_documento = $request->documento;
@@ -284,7 +284,27 @@ class EventController extends Controller
 
     public function show($id)
     {
-        $evento = Event::with('user')->findOrFail($id);
+        $evento = Event::with(['user', 'consultorio', 'medico', 'practica'])->findOrFail($id);
+        
+        // Si es una request AJAX, devolver JSON
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'evento' => [
+                    'id' => $evento->id,
+                    'title' => $evento->title,
+                    'description' => $evento->description,
+                    'start' => $evento->start,
+                    'end' => $evento->end,
+                    'color' => $evento->color,
+                    'consultorio' => $evento->consultorio ? $evento->consultorio->nombre : '',
+                    'medico' => $evento->medico ? $evento->medico->nombres . ' ' . $evento->medico->apellidos : '',
+                    'practica' => $evento->practica ? $evento->practica->nombre : '',
+                    'user' => $evento->user ? $evento->user->name : ''
+                ]
+            ]);
+        }
+        
         return view('admin.eventos.show', compact('evento'));
     }
 

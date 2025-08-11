@@ -172,10 +172,11 @@
                     <button type="button" class="btn btn-primary ml-3 mr-2" id="buscarTurnoBtn" onclick="filtrarCalendario()">
                         Buscar Turno
                     </button>
-                    <button type="button" class="btn btn-secondary" id="limpiarFiltrosBtn" onclick="limpiarFiltros()">
-                        Limpiar
-                    </button>
                 </div>
+            </div>
+
+            <div class="card-body">
+                <div id="calendar"></div>
             </div>
 
             <!-- ***** FORMULARIO DE RESERVA (MODAL) ***** -->
@@ -272,7 +273,6 @@
                                 @can('admin.eventos.destroy')
                                     <button type="button" class="btn btn-danger" id="eliminarEventoBtn" onclick="eliminarEvento()" style="display: none;">Eliminar</button>
                                 @endcan
-                                <button type="button" class="btn btn-warning" onclick="limpiarDatosPaciente()">Limpiar</button>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                                 <button type="submit" class="btn btn-primary" id="guardarEventoBtn">Reservar</button>
                             </div>
@@ -290,34 +290,305 @@
     </div>
 </div>
 
-<!-- Scripts JavaScript -->
-<script src="{{ asset('assets/js/app-config.js') }}"></script>
-<script src="{{ asset('assets/js/calendar-config.js') }}"></script>
-<script src="{{ asset('assets/js/event-filters.js') }}"></script>
-<script src="{{ asset('assets/js/patient-search.js') }}"></script>
-<script src="{{ asset('assets/js/appointment-management.js') }}"></script>
-<script src="{{ asset('assets/js/form-utils.js') }}"></script>
+<style>
+    .is-warning {
+        border-color: #ffc107 !important;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25) !important;
+    }
+    
+    .text-warning {
+        color: #856404 !important;
+    }
+    
+    #documento-mensaje {
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+    }
+    
+    .form-control.is-valid {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+    }
+    
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+</style>
 
 <script>
-    // Inicializar variables globales al cargar la página
-    document.addEventListener('DOMContentLoaded', function() {
-        // Configuración inicial de la aplicación
-        const config = {
-            userRoles: @json(Auth::user()->roles->pluck('name')),
-            isUsuarioRole: @json(Auth::user()->roles->pluck('name')).includes('usuario') && !@json(Auth::user()->roles->pluck('name')).includes('admin'),
-            emailUsuario: '{{ Auth::user()->email }}',
-            fechaHoy: '<?php echo date('Y-m-d'); ?>',
-            horaActual: '<?php echo date('H:i'); ?>',
-            rutaFiltrarEventos: '{{ route('admin.eventos.filtrar') }}',
-            rutaBuscarPaciente: '{{ url('admin/pacientes/buscar') }}',
-            rutaEventos: '{{ url("admin/eventos") }}',
-            rutaCrearEvento: '{{ url("admin/eventos/create") }}'
-        };
-        
-        // Inicializar la aplicación
-        inicializarVariablesGlobales(config);
-        inicializarAplicacion();
+    // Manejo global de errores para detectar problemas de extensiones
+    window.addEventListener('error', function(e) {
+        console.warn('Error detectado:', e.message);
+        // No mostrar alerta para errores de extensiones
+        if (e.message && e.message.includes('listener indicated an asynchronous response')) {
+            console.warn('Error relacionado con extensiones del navegador - ignorado');
+            return false;
+        }
     });
+
+    // Función auxiliar para manejar fetch de manera segura
+    function safeFetch(url, options = {}) {
+        return fetch(url, {
+            ...options,
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                ...options.headers
+            }
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        }).catch(error => {
+            console.error('Error en fetch:', error);
+            throw error;
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar el calendario
+        var calendarEl = document.getElementById('calendar');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es',
+            weekends: false,
+            slotMinTime: '08:00:00',
+            slotMaxTime: '20:00:00',
+            dayMaxEvents: 3,
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: ''
+            },
+            buttonText: {
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día'
+            },
+            eventClick: function(info) {
+                // Manejar clic en evento
+                var evento = info.event;
+                
+                if (evento.title === '- Horario disponible') {
+                    // Es un horario disponible, abrir modal para reservar
+                    document.getElementById('evento_id').value = evento.id;
+                    document.getElementById('fecha_turno').value = evento.start.toISOString().split('T')[0];
+                    document.getElementById('horario').value = evento.start.toTimeString().slice(0, 5);
+                    
+                    // Limpiar formulario
+                    limpiarFormularioReserva();
+                    
+                    // Mostrar modal
+                    var modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+                    modal.show();
+                } else if (evento.title === '- Reservado') {
+                    // Es un turno reservado, mostrar información
+                    alert('Turno reservado\n\nInformación:\n' + (evento.extendedProps.description || 'Sin detalles adicionales'));
+                } else {
+                    console.log('Evento:', evento.title);
+                }
+            }
+        });
+        calendar.render();
+        
+        // Establecer DNI como tipo por defecto al cargar la página
+        document.getElementById('tipo').value = 'DNI';
+    });
+
+    function limpiarFormularioReserva() {
+        document.getElementById('tipo').value = 'DNI';
+        document.getElementById('documento').value = '';
+        document.getElementById('nombre').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('telefono').value = '';
+        document.getElementById('obra_social').value = '';
+        
+        // Limpiar mensaje de documento
+        var mensaje = document.getElementById('documento-mensaje');
+        if (mensaje) {
+            mensaje.textContent = '';
+            mensaje.className = 'form-text text-muted';
+        }
+        
+        // Limpiar clases de validación
+        var campos = document.querySelectorAll('#exampleModal input, #exampleModal select');
+        campos.forEach(function(campo) {
+            campo.classList.remove('is-valid', 'is-invalid');
+        });
+    }
+
+    function filtrarCalendario() {
+        var consultorio = document.getElementById('consultorio').value;
+        var practica = document.getElementById('practica').value;
+        var medico = document.getElementById('medico').value;
+
+        if (consultorio == 0 && practica == 0 && medico == 0) {
+            alert('Por favor, seleccione un consultorio, una práctica o un médico para filtrar el calendario.');
+            return;
+        }
+
+        // Mostrar el contenedor del calendario
+        document.getElementById('calendario-container').style.display = 'block';
+
+        // Construir URL con parámetros
+        var url = '{{ url("admin/eventos/filtrar") }}';
+        var params = [];
+        
+        if (consultorio != 0) params.push('consultorio_id=' + consultorio);
+        if (practica != 0) params.push('practica_id=' + practica);
+        if (medico != 0) params.push('medico_id=' + medico);
+        
+        if (params.length > 0) {
+            url += '?' + params.join('&');
+        }
+
+        // Cargar eventos filtrados desde el servidor usando safeFetch
+        safeFetch(url)
+        .then(eventos => {
+            // Limpiar eventos actuales
+            calendar.removeAllEvents();
+            
+            // Agregar nuevos eventos
+            if (eventos && eventos.length > 0) {
+                eventos.forEach(function(evento) {
+                    calendar.addEvent({
+                        id: evento.id,
+                        title: evento.title,
+                        start: evento.start,
+                        end: evento.end,
+                        color: evento.color,
+                        description: evento.description,
+                        extendedProps: {
+                            consultorio_id: evento.consultorio_id,
+                            practica_id: evento.practica_id,
+                            medico_id: evento.medico_id
+                        }
+                    });
+                });
+                console.log('Se cargaron ' + eventos.length + ' eventos en el calendario.');
+            } else {
+                alert('No se encontraron eventos con los filtros seleccionados.');
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar eventos:', error);
+            alert('Error al cargar los eventos. Por favor, inténtelo nuevamente.');
+        });
+    }
+
+    function buscarPaciente() {
+        var documento = document.getElementById('documento').value.trim();
+        var tipo = document.getElementById('tipo').value;
+        
+        if (!documento) {
+            return;
+        }
+        
+        // Limpiar el documento de puntos, guiones y espacios extra
+        var documentoLimpio = documento.replace(/[.\-\s]/g, '');
+        
+        // Mostrar indicador de búsqueda
+        var mensaje = document.getElementById('documento-mensaje');
+        if (mensaje) {
+            mensaje.textContent = 'Buscando paciente...';
+            mensaje.className = 'form-text text-info';
+        }
+        
+        var url = '{{ url("admin/pacientes/buscar") }}?documento=' + encodeURIComponent(documentoLimpio) + '&tipo=' + encodeURIComponent(tipo);
+        
+        safeFetch(url)
+        .then(data => {
+            var mensaje = document.getElementById('documento-mensaje');
+            var documentoInput = document.getElementById('documento');
+            
+            if (data.encontrado) {
+                // Paciente encontrado, llenar datos
+                document.getElementById('nombre').value = data.paciente.apel_nombres || '';
+                document.getElementById('email').value = data.paciente.email || '';
+                document.getElementById('telefono').value = data.paciente.telefono || '';
+                document.getElementById('obra_social').value = data.paciente.obra_social || '';
+                
+                // Actualizar el tipo si es diferente
+                if (data.paciente.tipo_documento && data.paciente.tipo_documento !== tipo) {
+                    document.getElementById('tipo').value = data.paciente.tipo_documento;
+                }
+                
+                if (mensaje) {
+                    mensaje.textContent = '✓ Paciente encontrado: ' + data.paciente.apel_nombres;
+                    mensaje.className = 'form-text text-success';
+                }
+                documentoInput.classList.remove('is-invalid', 'is-warning');
+                documentoInput.classList.add('is-valid');
+            } else {
+                // Paciente no encontrado, limpiar campos excepto documento y tipo
+                document.getElementById('nombre').value = '';
+                document.getElementById('email').value = '';
+                document.getElementById('telefono').value = '';
+                document.getElementById('obra_social').selectedIndex = 0; // Resetear select
+                
+                if (mensaje) {
+                    mensaje.textContent = 'ℹ Paciente no encontrado. Complete los datos para crear uno nuevo.';
+                    mensaje.className = 'form-text text-warning';
+                }
+                documentoInput.classList.remove('is-invalid', 'is-valid');
+                documentoInput.classList.add('is-warning');
+                
+                // Enfocar el campo nombre para continuar
+                document.getElementById('nombre').focus();
+            }
+        })
+        .catch(error => {
+            console.error('Error al buscar paciente:', error);
+            var mensaje = document.getElementById('documento-mensaje');
+            if (mensaje) {
+                mensaje.textContent = '✗ Error al buscar el paciente. Intente nuevamente.';
+                mensaje.className = 'form-text text-danger';
+            }
+            document.getElementById('documento').classList.add('is-invalid');
+        });
+    }
+
+    function eliminarEvento() {
+        if (!confirm('¿Está seguro de que desea eliminar este evento?')) {
+            return;
+        }
+        
+        var eventoId = document.getElementById('evento_id').value;
+        if (!eventoId) {
+            alert('No se pudo identificar el evento a eliminar');
+            return;
+        }
+        
+        safeFetch('{{ url("admin/eventos") }}/' + eventoId, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(data => {
+            if (data.success) {
+                // Cerrar modal
+                var modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Recargar eventos en el calendario
+                filtrarCalendario();
+                
+                alert('Evento eliminado exitosamente');
+            } else {
+                alert('Error al eliminar el evento: ' + (data.message || 'Error desconocido'));
+            }
+        })
+        .catch(error => {
+            console.error('Error al eliminar evento:', error);
+            alert('Error al eliminar el evento. Por favor, inténtelo nuevamente.');
+        });
+    }
 </script>
 
 @endsection
