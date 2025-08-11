@@ -3,17 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Consultorio;
+use App\Models\Practica;
+use App\Models\Medico;
+use App\Models\Obrasocial;
+use App\Models\Paciente;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class EventController extends Controller
 {
     public function index()
     {
-        $eventos = Event::with('user')->get();
-        return view('admin.eventos.index', compact('eventos'));
+        $eventos = Event::with(['user', 'consultorio', 'practica', 'medico'])->get();
+        $consultorios = Consultorio::all();
+        $practicas = Practica::all();
+        $medicos = Medico::all();
+        
+        return view('admin.eventos.index', compact('eventos', 'consultorios', 'practicas', 'medicos'));
     }
 
     public function create()
@@ -435,5 +445,72 @@ class EventController extends Controller
                 'message' => 'Error al cambiar el estado: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function pdf(Request $request)
+    {
+        // Construir query con relaciones
+        $query = Event::with(['user', 'consultorio', 'practica', 'medico']);
+        
+        // Obtener filtros del request
+        $filtros = [];
+        
+        // Filtro por consultorio
+        if ($request->filled('consultorio_id')) {
+            $consultorio = Consultorio::find($request->consultorio_id);
+            if ($consultorio) {
+                $query->where('consultorio_id', $request->consultorio_id);
+                $filtros['consultorio'] = $consultorio->nombre;
+            }
+        }
+        
+        // Filtro por médico
+        if ($request->filled('medico_id')) {
+            $medico = Medico::find($request->medico_id);
+            if ($medico) {
+                $query->where('medico_id', $request->medico_id);
+                $filtros['medico'] = $medico->apel_nombres;
+            }
+        }
+        
+        // Filtro por fecha desde
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('start', '>=', $request->fecha_desde);
+            $filtros['fecha_desde'] = $request->fecha_desde;
+        }
+        
+        // Filtro por fecha hasta
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('start', '<=', $request->fecha_hasta);
+            $filtros['fecha_hasta'] = $request->fecha_hasta;
+        }
+        
+        // Filtro por estado
+        if ($request->filled('estado')) {
+            if ($request->estado === '- Horario Disponible') {
+                $query->whereNotIn('title', ['- Reservado', '- En Espera', '- Atendido']);
+            } else {
+                $query->where('title', $request->estado);
+            }
+            $filtros['estado'] = $request->estado;
+        }
+        
+        // Obtener los eventos filtrados
+        $eventos = $query->orderBy('start', 'asc')->get();
+        
+        // Datos adicionales para el PDF
+        $fecha_generacion = now()->format('d/m/Y H:i');
+        $usuario = Auth::user()->email;
+        
+        // Generar el PDF
+        $pdf = Pdf::loadView('admin.eventos.pdf', compact('eventos', 'filtros', 'fecha_generacion', 'usuario'));
+        
+        // Configurar el PDF
+        $pdf->setPaper('A4', 'landscape');
+        
+        // Generar nombre del archivo
+        $filename = 'reporte_eventos_' . date('Y-m-d_H-i-s') . '.pdf';
+        
+        return $pdf->download($filename);
     }
 }

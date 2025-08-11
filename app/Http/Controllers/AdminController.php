@@ -10,7 +10,6 @@ use App\Models\Consultorio;
 use App\Models\Practica;
 use App\Models\Obrasocial;
 use App\Models\Medico;
-use App\Models\Horario;
 use App\Models\Event;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -27,7 +26,7 @@ class AdminController extends Controller
         $total_obras = Obrasocial::count();
         $total_medicos = Medico::count();
         $total_obras_sociales = Obrasocial::count();
-        $total_horarios = Horario::count();
+        $total_eventos = Event::count();
 
         $consultorios = Consultorio::all();
         $practicas = Practica::all();
@@ -44,7 +43,7 @@ class AdminController extends Controller
             'total_obras',
             'total_medicos',
             'total_obras_sociales',
-            'total_horarios',
+            'total_eventos',
             'consultorios',
             'practicas',
             'medicos',

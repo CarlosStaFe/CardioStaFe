@@ -268,7 +268,7 @@
                             </li>
                         @endcan
 
-                        @can('admin.horarios.index')
+                        @can('admin.eventos.index')
                             <li class="nav-item">
                                 <a href="#" class="nav-link active">
                                     <i class="nav-icon fas fa-solid fa-clock"></i>
@@ -278,16 +278,18 @@
                                     </p>
                                 </a>
                                 <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.eventos.generar') }}" class="nav-link active">
-                                            <i class="fa-solid fa-calendar-plus nav-icon"></i>
-                                            <p>Generar Disponibilidad</p>
-                                        </a>
-                                    </li>
+                                    @can('admin.eventos.create')
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.eventos.generar') }}" class="nav-link active">
+                                                <i class="fa-solid fa-calendar-plus nav-icon"></i>
+                                                <p>Generar Disponibilidad</p>
+                                            </a>
+                                        </li>
+                                    @endcan
                                     <li class="nav-item">
                                         <a href="{{url('admin/eventos')}}" class="nav-link active">
                                             <i class="fa-solid fa-table-cells nav-icon"></i>
-                                            <p>Listado de Horarios</p>
+                                            <p>Agenda de Horarios</p>
                                         </a>
                                     </li>
                                 </ul>
