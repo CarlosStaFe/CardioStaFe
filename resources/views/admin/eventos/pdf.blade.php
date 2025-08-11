@@ -85,13 +85,15 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>REPORTE DE EVENTOS</h1>
-        <p>Sistema de Gestión de Citas Médicas</p>
+    <div class="header" style="display: flex; align-items: center; justify-content: flex-start;">
+        <img src="{{ public_path('assets/img/LogoCompleto.jpg') }}" alt="Logo" style="height: 60px; margin-right: 20px;">
+        <div style="flex: 1; text-align: left;">
+            <h2 style="margin: 0;">REPORTE DE HORARIOS Y RESERVAS</h2>
+        </div>
     </div>
 
     <div class="info">
-        <p><strong>Generado por:</strong> {{ $usuario }}</p>
+        <!--<p><strong>Generado por:</strong> {{ $usuario }}</p>-->
         <p><strong>Fecha de generación:</strong> {{ $fecha_generacion }}</p>
     </div>
 
@@ -129,8 +131,7 @@
                 <th>Médico</th>
                 <th>Práctica</th>
                 <th>Estado</th>
-                <th>Paciente</th>
-                <th>Creado por</th>
+                <th>Descripción</th>
             </tr>
         </thead>
         <tbody>
@@ -154,12 +155,11 @@
                         @endphp
                         <span class="{{ $claseEstado }}">{{ $evento->title }}</span>
                     </td>
-                    <td>{{ $evento->user->name ?? 'Sin asignar' }}</td>
-                    <td>{{ $evento->user->email ?? 'Sistema' }}</td>
+                    <td>{{ $evento->description ?? 'Sin descripción' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" style="text-align: center; color: #666; font-style: italic;">
+                    <td colspan="7" style="text-align: center; color: #666; font-style: italic;">
                         No se encontraron eventos con los filtros aplicados
                     </td>
                 </tr>
@@ -168,8 +168,8 @@
     </table>
 
     <div class="footer">
-        <p>Documento generado automáticamente por el Sistema de Gestión de Citas Médicas</p>
-        <p>{{ now()->format('d/m/Y H:i:s') }}</p>
+        <!--<p>Documento generado automáticamente por el Sistema de Gestión de Citas Médicas</p>-->
+        <!--<p>{{ now()->format('d/m/Y H:i:s') }}</p>-->
     </div>
 </body>
 </html>

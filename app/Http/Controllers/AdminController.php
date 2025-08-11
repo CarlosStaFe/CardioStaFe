@@ -26,7 +26,7 @@ class AdminController extends Controller
         $total_obras = Obrasocial::count();
         $total_medicos = Medico::count();
         $total_obras_sociales = Obrasocial::count();
-        $total_eventos = Event::count();
+        $total_reservas = Event::where('title', '- Reservado')->count();
 
         $consultorios = Consultorio::all();
         $practicas = Practica::all();
@@ -43,7 +43,7 @@ class AdminController extends Controller
             'total_obras',
             'total_medicos',
             'total_obras_sociales',
-            'total_eventos',
+            'total_reservas',
             'consultorios',
             'practicas',
             'medicos',

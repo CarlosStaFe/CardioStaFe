@@ -119,8 +119,8 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-primary">
                 <div class="inner">
-                    <h3>{{$total_eventos}}</h3>
-                    <p>Eventos</p>
+                    <h3>{{$total_reservas}}</h3>
+                    <p>Reservas</p>
                 </div>
                 <div class="icon">
                     <i class="fas fa-solid fa-clock"></i>
@@ -440,7 +440,7 @@
         if (consultorio != 0) params.push('consultorio_id=' + consultorio);
         if (practica != 0) params.push('practica_id=' + practica);
         if (medico != 0) params.push('medico_id=' + medico);
-        
+
         if (params.length > 0) {
             url += '?' + params.join('&');
         }
@@ -451,24 +451,33 @@
             // Limpiar eventos actuales
             calendar.removeAllEvents();
             
-            // Agregar nuevos eventos
+            // Agregar nuevos eventos - Solo mostrar horarios disponibles
             if (eventos && eventos.length > 0) {
+                var horariosDisponiblesMostrados = 0;
                 eventos.forEach(function(evento) {
-                    calendar.addEvent({
-                        id: evento.id,
-                        title: evento.title,
-                        start: evento.start,
-                        end: evento.end,
-                        color: evento.color,
-                        description: evento.description,
-                        extendedProps: {
-                            consultorio_id: evento.consultorio_id,
-                            practica_id: evento.practica_id,
-                            medico_id: evento.medico_id
-                        }
-                    });
+                    // Filtrar solo los eventos con title "- Horario disponible"
+                    if (evento.title === '- Horario disponible') {
+                        calendar.addEvent({
+                            id: evento.id,
+                            title: evento.title,
+                            start: evento.start,
+                            end: evento.end,
+                            color: evento.color,
+                            description: evento.description,
+                            extendedProps: {
+                                consultorio_id: evento.consultorio_id,
+                                practica_id: evento.practica_id,
+                                medico_id: evento.medico_id
+                            }
+                        });
+                        horariosDisponiblesMostrados++;
+                    }
                 });
-                console.log('Se cargaron ' + eventos.length + ' eventos en el calendario.');
+                console.log('Se cargaron ' + horariosDisponiblesMostrados + ' horarios disponibles en el calendario.');
+                
+                if (horariosDisponiblesMostrados === 0) {
+                    alert('No se encontraron horarios disponibles con los filtros seleccionados.');
+                }
             } else {
                 alert('No se encontraron eventos con los filtros seleccionados.');
             }

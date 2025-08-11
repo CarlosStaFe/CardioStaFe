@@ -531,6 +531,7 @@ class EventController extends Controller
         // Generar nombre del archivo
         $filename = 'reporte_eventos_' . date('Y-m-d_H-i-s') . '.pdf';
         
-        return $pdf->download($filename);
+        //return $pdf->download($filename);
+        return $pdf->stream($filename);
     }
 }

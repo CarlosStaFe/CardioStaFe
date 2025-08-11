@@ -538,6 +538,7 @@
         
         // Abrir el PDF en una nueva ventana/pestaña
         window.open(url, '_blank');
+        
     }
 </script>
 
