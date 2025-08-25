@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Obrasocial;
+use App\Models\Practica;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class ObrasocialController extends Controller
 {
-    public function index() //strtoupper($request->apel_nombres);
+    public function index()
     {
         $obrasociales = Obrasocial::all();
         return view('admin.obrasociales.index', compact('obrasociales'));
@@ -16,23 +17,21 @@ class ObrasocialController extends Controller
 
     public function create()
     {
-        return view('admin.obrasociales.create');
+        $practicas = Practica::all();
+        return view('admin.obrasociales.create', compact('practicas'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'telefono' => 'string|max:255',
-            'contacto' => 'string|max:255',
-            'email' => 'string|max:255',
             'activo' => 'nullable|boolean',
             'documentacion' => 'string|max:255',
-            'observacion' => 'string|max:255',
         ]);
 
         $obrasocial = new Obrasocial();
         $obrasocial->nombre = strtoupper($request->nombre);
+        $obrasocial->practica_id = $request->practica_id;
         $obrasocial->telefono = $request->telefono;
         $obrasocial->contacto = $request->contacto;
         $obrasocial->email = $request->email;
@@ -55,7 +54,8 @@ class ObrasocialController extends Controller
     public function edit($id)
     {
         $obrasocial = Obrasocial::findOrFail($id);
-        return view('admin.obrasociales.edit', compact('obrasocial'));
+        $practicas = Practica::all();
+        return view('admin.obrasociales.edit', compact('obrasocial', 'practicas'));
     }
 
     public function update(Request $request, $id)
@@ -64,10 +64,10 @@ class ObrasocialController extends Controller
 
         $request->validate([
             'nombre' => 'string|max:255',
-            'observacion' => 'string|max:255',
         ]);
 
         $obrasocial->nombre = strtoupper($request->nombre);
+        $obrasocial->practica_id = $request->practica_id;
         $obrasocial->telefono = $request->telefono;
         $obrasocial->contacto = $request->contacto;
         $obrasocial->email = $request->email;

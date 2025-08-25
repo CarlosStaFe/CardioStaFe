@@ -21,7 +21,7 @@
                     <tr>
                         <th style="text-align: center; width: 5%;">#</th>
                         <th style="text-align: center; width: 34%;">NOMBRE</th>
-                        <th style="text-align: center; width: 20%;">PLAN</th>
+                        <th style="text-align: center; width: 20%;">PRÁCTICA</th>
                         <th style="text-align: center; width: 25%;">E-MAIL</th>
                         <th style="text-align: center; width: 5%;">ACT.</th>
                         <th style="text-align: center; width: 11%;">ACCIONES</th>
@@ -33,7 +33,13 @@
                     <tr>
                         <td style="text-align: right;">{{ $linea++ }}</td>
                         <td>{{ strtoupper($obrasocial->nombre) }}</td>
-                        <td>{{ $obrasocial->plan }}</td>
+                        <td>
+                            @if($obrasocial->practica)
+                                {{ $obrasocial->practica->nombre }}
+                            @else
+                                <span class="text-muted">Sin práctica</span>
+                            @endif
+                        </td>
                         <td>{{ $obrasocial->email }}</td>
                         <td style="text-align: center;">{{ $obrasocial->activo }}</td>
                         <td>

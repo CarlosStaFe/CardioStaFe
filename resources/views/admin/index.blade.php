@@ -356,7 +356,7 @@
             weekends: false,
             slotMinTime: '08:00:00',
             slotMaxTime: '20:00:00',
-            dayMaxEvents: 3,
+            // dayMaxEvents: 3,
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
@@ -450,13 +450,52 @@
         .then(eventos => {
             // Limpiar eventos actuales
             calendar.removeAllEvents();
-            
-            // Agregar nuevos eventos - Solo mostrar horarios disponibles
+
             if (eventos && eventos.length > 0) {
-                var horariosDisponiblesMostrados = 0;
-                eventos.forEach(function(evento) {
-                    // Filtrar solo los eventos con title "- Horario disponible"
-                    if (evento.title === '- Horario disponible') {
+                // Filtrar solo los eventos disponibles y futuros (no mostrar anteriores a hoy)
+                let hoy = new Date();
+                hoy.setHours(0,0,0,0);
+                let eventosDisponibles = eventos.filter(e => {
+                    if (e.title !== '- Horario disponible') return false;
+                    let fechaEvento = new Date(e.start);
+                    fechaEvento.setHours(0,0,0,0);
+                    return fechaEvento >= hoy;
+                });
+                // Ordenar por fecha y hora ascendente
+                eventosDisponibles.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+                // Agrupar y limitar a 3 por día de forma robusta
+                let eventosPorDia = {};
+                eventosDisponibles.forEach(evento => {
+                    // Obtener solo la fecha (YYYY-MM-DD) sin hora
+                    let fechaCompleta = evento.start || '';
+                    let fecha = '';
+                    if (fechaCompleta.includes('T')) {
+                        fecha = fechaCompleta.split('T')[0];
+                    } else if (fechaCompleta.length >= 10) {
+                        fecha = fechaCompleta.substring(0, 10);
+                    }
+                    if (!fecha) return;
+                    if (!eventosPorDia[fecha]) {
+                        eventosPorDia[fecha] = [];
+                    }
+                    eventosPorDia[fecha].push(evento);
+                });
+                // Limitar a solo 3 eventos por día
+                Object.keys(eventosPorDia).forEach(fecha => {
+                    if (eventosPorDia[fecha].length > 3) {
+                        eventosPorDia[fecha] = eventosPorDia[fecha].slice(0, 3);
+                    }
+                });
+                // Mostrar por consola el agrupamiento por día y cuántos se agregan
+                Object.keys(eventosPorDia).forEach(fecha => {
+                    console.log('Fecha:', fecha, 'Eventos agregados:', eventosPorDia[fecha].length, eventosPorDia[fecha]);
+                });
+
+                // Agregar al calendario solo los eventos seleccionados
+                let horariosDisponiblesMostrados = 0;
+                Object.values(eventosPorDia).forEach(arr => {
+                    arr.forEach(evento => {
                         calendar.addEvent({
                             id: evento.id,
                             title: evento.title,
@@ -471,10 +510,10 @@
                             }
                         });
                         horariosDisponiblesMostrados++;
-                    }
+                    });
                 });
-                console.log('Se cargaron ' + horariosDisponiblesMostrados + ' horarios disponibles en el calendario.');
-                
+                console.log('Total eventos agregados al calendario:', horariosDisponiblesMostrados);
+
                 if (horariosDisponiblesMostrados === 0) {
                     alert('No se encontraron horarios disponibles con los filtros seleccionados.');
                 }

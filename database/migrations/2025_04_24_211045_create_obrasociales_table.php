@@ -8,10 +8,13 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('obrasocials', function (Blueprint $table) {
+        Schema::create('obrasociales', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 70);
-            $table->string('plan', 50)->nullable();
+
+            $table->unsignedBigInteger('practica_id')->nullable();
+            $table->foreign('practica_id')->references('id')->on('practicas')->nullable();
+
             $table->string('telefono', 20)->nullable();
             $table->string('contacto', 50)->nullable();
             $table->string('email', 50)->nullable();
@@ -21,7 +24,7 @@ return new class extends Migration
             $table->timestamps();
         });
         
-        Schema::rename('obrasocials', 'obrasociales');
+        // Schema::rename('obrasociales', 'obrasociales');
     }
 
     /**
@@ -29,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('obrasocials');
+        Schema::dropIfExists('obrasociales');
     }
 };

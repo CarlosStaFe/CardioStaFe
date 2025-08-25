@@ -26,8 +26,14 @@
                         </div>
                         <div class="col-md-4 col-sm-12 position-relative">
                             <div class="form group">
-                                <label for="plan">Plan</label>
-                                <p>{{$obrasocial->plan}}</p>
+                                <label for="practica">Práctica</label>
+                                <p>
+                                    @if($obrasocial->practica)
+                                        {{$obrasocial->practica->nombre}}
+                                    @else
+                                        <span class="text-muted">Sin práctica</span>
+                                    @endif
+                                </p>
                             </div>
                         </div>
                         <div class="col-md-3 col-sm-12 position-relative">

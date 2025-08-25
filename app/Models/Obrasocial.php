@@ -12,7 +12,7 @@ class Obrasocial extends Model
     protected $table = 'obrasociales';
 
     protected $fillable = [
-        'nombre', 'plan', 'telefono', 'contacto', 'email', 'activo', 'documentacion', 'observacion'
+        'nombre', 'practica_id', 'telefono', 'contacto', 'email', 'activo', 'documentacion', 'observacion'
     ];
 
     public function pacientes()
@@ -25,4 +25,8 @@ class Obrasocial extends Model
         return $this->hasMany(Event::class, 'obra_social_id');
     }
 
+    public function practica()
+    {
+        return $this->belongsTo(Practica::class, 'practica_id');
+    }
 }

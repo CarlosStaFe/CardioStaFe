@@ -28,17 +28,26 @@
                     </div>
                     <div class="col-md-4 col-sm-12 position-relative">
                         <div class="form group">
-                            <label for="plan">Plan</label>
-                            <input type="text" class="form-control" value="{{$obrasocial->plan}}" id="plan" name="plan" placeholder="Plan Obra Social">
-                            @error('contacto')
+                            <label for="practica">Práctica</label>
+                            <select id="practica" class="form-control select2" style="width: 100%;" name="practica_id">
+                                @if($obrasocial->practica)
+                                    <option value="{{$obrasocial->practica->id}}">{{$obrasocial->practica->nombre}}</option>
+                                @else
+                                    <option value="">Sin práctica</option>
+                                @endif
+                                @foreach($practicas as $practica)
+                                    <option value="{{ $practica->id }}" {{ (old('practica_id', $obrasocial->practica_id) == $practica->id) ? 'selected' : '' }}>{{ $practica->nombre }}</option>
+                                @endforeach
+                            </select>
+                            @error('practica')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-12 position-relative">
                         <div class="form group">
-                            <label for="telefono">Teléfono</label><b>*</b>
-                            <input type="number" class="form-control" value="{{$obrasocial->telefono}}" id="telefono" name="telefono" placeholder="Teléfono" required>
+                            <label for="telefono">Teléfono</label>
+                            <input type="number" class="form-control" value="{{$obrasocial->telefono}}" id="telefono" name="telefono" placeholder="Teléfono">
                             @error('telefono')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
@@ -58,11 +67,8 @@
                     </div>
                     <div class="col-md-4 col-sm-12 position-relative">
                         <div class="form group">
-                            <label for="email">E-mail</label><b>*</b>
-                            <input type="email" class="form-control" value="{{$obrasocial->email}}" id="email" name="email" placeholder="Email" required>
-                            @error('email')
-                                <small style="color: red">{{$message}}</small>
-                            @enderror
+                            <label for="email">E-mail</label>
+                            <input type="email" class="form-control" value="{{$obrasocial->email}}" id="email" name="email" placeholder="Email" autocomplete="off">
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-12 position-relative">

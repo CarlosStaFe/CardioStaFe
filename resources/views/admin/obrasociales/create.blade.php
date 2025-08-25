@@ -27,9 +27,14 @@
                     </div>
                     <div class="col-md-4 col-sm-12 position-relative">
                         <div class="form group">
-                            <label for="plan">Plan</label>
-                            <input type="text" class="form-control" value="{{old('plan')}}" id="plan" name="plan" placeholder="Plan Obra Social">
-                            @error('nombre')
+                            <label for="practica">Práctica</label>
+                            <select id="practica" class="form-control select2" style="width: 100%;">
+                                <option value="0">Seleccione una práctica</option>
+                                @foreach($practicas as $practica)
+                                <option value="{{ $practica->id }}">{{ $practica->nombre }}</option>
+                                @endforeach
+                            </select>
+                            @error('practica')
                                 <small style="color: red">{{$message}}</small>
                             @enderror
                         </div>

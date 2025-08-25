@@ -44,9 +44,9 @@
 		<div class="topbar d-flex align-items-center">
 			<div class="container d-flex justify-content-center justify-content-md-between">
 				<div class="contact-info d-flex align-items-center">
-					<i class="bi bi-envelope d-flex align-items-center"><a href="mailto:secretaria@cardioinfantilstafe.com.ar">secretaria@cardioinfantilstafe.com.ar</a></i>
+					<i class="bi bi-envelope d-flex align-items-center"><a href="mailto:informecardioinfantil@gmail.com">informecardioinfantil@gmail.com</a></i>
 					<i class="bi bi-telephone d-flex align-items-center ms-4"><span>(0342) 4565514</span></i>
-					<i class="bi bi-whatsapp d-flex align-items-center ms-4"><span>+549 342 5482393</span></i>
+					{{-- <i class="bi bi-whatsapp d-flex align-items-center ms-4"><span>+549 342 5482393</span></i> --}}
 				</div>
 			</div>
 		</div><!-- End Top Bar -->
@@ -183,7 +183,7 @@
 							<i class="bi bi-envelope flex-shrink-0"></i>
 							<div>
 								<h3>Email</h3>
-								<p>secretaria@cardioinfantilstafe.com.ar</p>
+								<p>informecardioinfantil@gmail.com</p>
 							</div>
 						</div><!-- End Info Item -->
 
