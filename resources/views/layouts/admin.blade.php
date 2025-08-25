@@ -281,14 +281,14 @@
                                     @can('admin.eventos.create')
                                         <li class="nav-item">
                                             <a href="{{ route('admin.eventos.generar') }}" class="nav-link active">
-                                                <i class="fa-solid fa-calendar-plus nav-icon"></i>
+                                                <i class="bi bi-calendar-plus-fill nav-icon"></i>
                                                 <p>Generar Disponibilidad</p>
                                             </a>
                                         </li>
                                     @endcan
                                     <li class="nav-item">
                                         <a href="{{url('admin/eventos')}}" class="nav-link active">
-                                            <i class="fa-solid fa-table-cells nav-icon"></i>
+                                            <i class="bi bi-calendar2-week-fill nav-icon"></i>
                                             <p>Agenda de Horarios</p>
                                         </a>
                                     </li>
@@ -332,6 +332,7 @@
             </div>
         </aside>
 
+        <!-- SweetAlert -->
         @if((($message = Session::get('mensaje')) && ($icono = Session::get('icono'))))
             <script>
                 Swal.fire({

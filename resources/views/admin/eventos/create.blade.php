@@ -20,7 +20,7 @@
                             <select name="medico_id" id="medico_id" class="form-control select2" required>
                                 <option value="">Seleccione un médico</option>
                                 @foreach($medicos as $medico)
-                                <option value="{{ $medico->id }}">{{ $medico->apel_nombres }}</option>
+                                    <option value="{{ $medico->id }}">{{ $medico->apel_nombres }}</option>
                                 @endforeach
                             </select>
                             @error('medico_id')
@@ -34,7 +34,7 @@
                             <select name="consultorio_id" id="consultorio_id" class="form-control select2" required>
                                 <option value="">Seleccione un consultorio</option>
                                 @foreach($consultorios as $consultorio)
-                                <option value="{{ $consultorio->id }}">{{ $consultorio->nombre }}</option>
+                                    <option value="{{ $consultorio->id }}">{{ $consultorio->nombre }}</option>
                                 @endforeach
                             </select>
                             @error('consultorio_id')
@@ -48,7 +48,7 @@
                             <select name="practica_id" id="practica_id" class="form-control select2" required>
                                 <option value="">Seleccione una práctica</option>
                                 @foreach($practicas as $practica)
-                                <option value="{{ $practica->id }}">{{ $practica->nombre }}</option>
+                                   <option value="{{ $practica->id }}">{{ $practica->nombre }}</option>
                                 @endforeach
                             </select>
                             @error('practica_id')
