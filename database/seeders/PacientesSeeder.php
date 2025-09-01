@@ -20,20 +20,23 @@ class PacientesSeeder extends Seeder
         $chunks = array_chunk($pacientes, 500);
 
         foreach ($chunks as $chunk) {
-            $numero = 0;
+            $numero = 10000000;
             foreach ($chunk as $paciente) {
-                $num_documento = $paciente['NumeroDoc'] ?? '';
 
-                // Si ya existe en el lote, lo salta
-                //if (in_array($num_documento, $documentos)) {
-                //    continue;
-                //}
+
+                $num_documento = $paciente['NumeroDoc'] ?? '';
+                $num_documento = trim($num_documento);
+                if ($num_documento === '' || is_null($num_documento)) {
+                    $num_documento = $numero;
+                }
 
                 $nombre_obra = !empty(trim($paciente['ObraSocial'] ?? '')) ? trim($paciente['ObraSocial']) : 'NO TIENE';
                 $obra_social_id = DB::table('obrasociales')
                     ->where('nombre', $nombre_obra)
                     ->value('id');
 
+                $sexo = !empty(trim($paciente['Sexo'] ?? '')) ? trim($paciente['Sexo']) : 'M';
+                
                 // Verifica si el número de documento ya existe en la base de datos
                 if (DB::table('pacientes')->where('num_documento', $num_documento)->exists()) {
                     while (true) {
@@ -46,7 +49,7 @@ class PacientesSeeder extends Seeder
                             DB::table('pacientes')->insert([
                                 'apel_nombres'    => $paciente['ApelNombres'] ?? 'X',
                                 'nacimiento'      => $paciente['FechaNacim'] ?? '1900-01-01',
-                                'sexo'            => $paciente['Sexo'] ?? 'M',
+                                'sexo'            => $sexo,
                                 'tipo_documento'  => $paciente['TipoDoc'] ?? 'DNI',
                                 'num_documento'   => $numero,
                                 'domicilio'       => $paciente['Domicilio'] ?? '-',
@@ -64,7 +67,7 @@ class PacientesSeeder extends Seeder
                     DB::table('pacientes')->insert([
                         'apel_nombres'    => $paciente['ApelNombres'] ?? 'X',
                         'nacimiento'      => $paciente['FechaNacim'] ?? '1900-01-01',
-                        'sexo'            => $paciente['Sexo'] ?? 'M',
+                        'sexo'            => $sexo,
                         'tipo_documento'  => $paciente['TipoDoc'] ?? 'DNI',
                         'num_documento'   => $num_documento,
                         'domicilio'       => $paciente['Domicilio'] ?? '-',
