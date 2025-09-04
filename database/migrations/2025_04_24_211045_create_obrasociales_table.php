@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('contacto', 50)->nullable();
             $table->string('email', 50)->nullable();
             $table->boolean('activo')->default(true);
-            $table->string('documentacion', 100)->nullable();
-            $table->string('observacion', 100)->nullable();            
+            $table->string('documentacion', 255)->nullable();
+            $table->string('observacion', 255)->nullable();
             $table->timestamps();
         });
         
