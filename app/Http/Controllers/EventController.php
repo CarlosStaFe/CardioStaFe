@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
 
 class EventController extends Controller
 {
@@ -201,9 +202,11 @@ class EventController extends Controller
                     ->with('icono', 'error');
             }
 
-            // Buscar la obra social por nombre una sola vez
-            $obraSocial = Obrasocial::where('nombre', $request->obra_social)->first();
-            $obraSocialId = $obraSocial ? $obraSocial->id : 1;
+            // Tomar el id directamente del select
+            $obraSocialId = is_numeric($request->obra_social) ? (int)$request->obra_social : 1;
+            $obraSocial = Obrasocial::find($obraSocialId);
+            $presentar = $obraSocial ? $obraSocial->documentacion : '';
+
             Log::info('Obra social encontrada', ['obra_social_id' => $obraSocialId]);
 
             // Buscar o crear el paciente
@@ -236,8 +239,29 @@ class EventController extends Controller
             $evento->color = '#dc3545'; // Color rojo para reservado
             $evento->paciente_id = $paciente->id;
             $evento->obra_social_id = $obraSocialId;
-            
+            $email = $request->email;
+
             $evento->save();
+
+            // Enviar email con usuario y contraseña
+            Mail::send([], [], function ($message) use ($email, $request, $presentar, $evento, $obraSocial) {
+                $message->to($email)
+                    ->subject('Turno reservado - NO CONTESTAR ESTE MENSAJE')
+                    ->html(
+                        '<p>Su turno ha sido reservado.</p><br>' .
+                        '<p><b>Fecha:</b> ' . date('d/m/Y', strtotime($evento->start)) . '</p>' .
+                        '<p><b>Hora:</b> ' . date('H:i', strtotime($evento->start)) . '</p>' .
+                        '<p><b>Práctica:</b> ' . ($evento->practica ? $evento->practica->nombre : '') . '</p>' .
+                        '<p><b>Médico:</b> ' . ($evento->medico ? $evento->medico->apel_nombres : '') . '</p>' .
+                        '<p><b>Paciente:</b> ' . $request->nombre . '</p>' .
+                        '<p><b>Documento:</b> ' . $request->documento . '</p>' .
+                        '<p><b>Teléfono:</b> ' . $request->telefono . '</p>' .
+                        '<p><b>Email:</b> ' . $request->email . '</p>' .
+                        '<p><b>Obra Social:</b> ' . ($obraSocial ? $obraSocial->nombre : '') . '</p>' .
+                        '<p><b>Documentación requerida:</b> ' . $presentar . '</p>' .
+                        '<p>Link de la aplicación: <a href="' . env('APP_URL') . '">' . env('APP_URL') . '</a></p>'
+                    );
+            });
             
             Log::info('Evento actualizado a reservado', [
                 'evento_id' => $evento->id,

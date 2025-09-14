@@ -97,4 +97,10 @@ class ObrasocialController extends Controller
             ->with('mensaje', 'Obra Social eliminada con éxito.')
             ->with('icono', 'success');
     }
+
+    public function porPractica($id)
+    {
+        $obras_sociales = Obrasocial::where('practica_id', $id)->get();
+        return response()->json($obras_sociales);
+    }
 }

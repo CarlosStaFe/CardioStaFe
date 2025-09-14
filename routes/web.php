@@ -87,6 +87,9 @@ Route::put('/admin/obrasociales/{id}', [ObrasocialController::class, 'update'])-
 Route::get('/admin/obrasociales/{id}/confirm-delete', [ObrasocialController::class, 'confirmDelete'])->name('admin.obrasociales.confirmDelete')->middleware(['auth', 'can:admin.obrasociales.confirmDelete']);
 Route::delete('/admin/obrasociales/{id}', [ObrasocialController::class, 'destroy'])->name('admin.obrasociales.destroy')->middleware(['auth', 'can:admin.obrasociales.destroy']);
 
+// Ruta AJAX para obtener obras sociales por práctica
+Route::get('/admin/obrasociales/por-practica/{id}', [ObrasocialController::class, 'porPractica'])->middleware('auth');
+
 //RUTA PARA EL ADMIN - MEDICOS
 Route::get('/admin/medicos', [MedicoController::class, 'index'])->name('admin.medicos.index')->middleware(['auth', 'can:admin.medicos.index']);
 Route::get('/admin/medicos/create', [MedicoController::class, 'create'])->name('admin.medicos.create')->middleware(['auth', 'can:admin.medicos.create']);

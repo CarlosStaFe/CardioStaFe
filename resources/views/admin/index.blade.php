@@ -186,10 +186,15 @@
                 <input type="hidden" id="form_method" name="_method" value="">
                 <input type="hidden" id="title" name="title" value="">
                 <input type="hidden" id="description" name="description" value="">
+                <input type="hidden" id="id_practica" name="id_practica" value="practicaId">
                 <!-- Modal fuera del row para evitar problemas de anidamiento -->
                 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
+                            {{-- <div>
+                                <label for="id_practica" class="form-label">ID Práctica:</label>
+                                <span id="id_practica_text">{{ old('id_practica', $id_practica ?? '') }}</span>
+                            </div> --}}
                             <div class="modal-header">
                                 <h1 class="modal-title fs-5" id="exampleModalLabel"><b>Reservar Turno</b></h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -261,9 +266,7 @@
                                             <label for="obra_social">Obra Social</label><b>*</b>
                                             <select class="form-control" id="obra_social" name="obra_social" required>
                                                 <option value="" disabled selected>Seleccione una obra social</option>
-                                                @foreach($obras_sociales as $obra_social)
-                                                    <option value="{{ $obra_social->nombre }}">{{ $obra_social->nombre }}</option>
-                                                @endforeach
+                                                <!-- Las opciones se cargarán dinámicamente en JS usando obraSocialSelect -->
                                             </select>
                                         </div>
                                     </div>
@@ -377,10 +380,52 @@
                     document.getElementById('evento_id').value = evento.id;
                     document.getElementById('fecha_turno').value = evento.start.toISOString().split('T')[0];
                     document.getElementById('horario').value = evento.start.toTimeString().slice(0, 5);
-                    
+                    document.getElementById('id_practica').textContent = document.getElementById('practica').value;
+
+                    // Obtener el id de la práctica seleccionada
+                    var practicaId = document.getElementById('practica').value;
+
                     // Limpiar formulario
                     limpiarFormularioReserva();
                     
+                    // Cargar obras sociales por práctica vía AJAX
+                    var obrasSocialesSelect = document.getElementById('obra_social');
+                    obrasSocialesSelect.innerHTML = '<option value="">Cargando...</option>';
+                    // Elemento para mostrar el resultado de la consulta
+                    var debugObrasSociales = document.getElementById('debug-obras-sociales');
+                    if (!debugObrasSociales) {
+                        debugObrasSociales = document.createElement('div');
+                        debugObrasSociales.id = 'debug-obras-sociales';
+                        debugObrasSociales.style = 'font-size:12px;color:#555;margin-top:8px;white-space:pre-wrap;';
+                        obrasSocialesSelect.parentNode.appendChild(debugObrasSociales);
+                    }
+                    safeFetch('/admin/obrasociales/por-practica/' + practicaId)
+                        .then(function(data) {
+                            // Mostrar resultado en el modal para depuración
+                            //debugObrasSociales.textContent = 'AJAX resultado:\n' + JSON.stringify(data, null, 2);
+                            // Filtrar y poblar el select solo con las obras sociales que tengan el practica_id igual
+                            obrasSocialesSelect.innerHTML = '';
+                            if (Array.isArray(data) && data.length > 0) {
+                                data.forEach(function(os) {
+                                    if (os.practica_id == practicaId) {
+                                        var option = document.createElement('option');
+                                        option.value = os.id;
+                                        option.textContent = os.nombre;
+                                        obrasSocialesSelect.appendChild(option);
+                                    }
+                                });
+                                if (obrasSocialesSelect.options.length === 0) {
+                                    obrasSocialesSelect.innerHTML = '<option value="">No hay obras sociales para esta práctica</option>';
+                                }
+                            } else {
+                                obrasSocialesSelect.innerHTML = '<option value="">No hay obras sociales disponibles</option>';
+                            }
+                        })
+                        .catch(function(error) {
+                            debugObrasSociales.textContent = 'Error AJAX:\n' + error;
+                            obrasSocialesSelect.innerHTML = '<option value="">Error al cargar obras sociales</option>';
+                        });
+
                     // Mostrar modal
                     var modal = new bootstrap.Modal(document.getElementById('exampleModal'));
                     modal.show();
