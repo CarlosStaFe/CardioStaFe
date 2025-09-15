@@ -55,6 +55,19 @@
     </div>
 </div>
 
+@if(session('mensaje') && session('icono') == 'error')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '{{ session('mensaje') }}',
+                confirmButtonText: 'Aceptar'
+            });
+        });
+    </script>
+@endif
+
 <script>
     $(function() {
         $("#example1").DataTable({

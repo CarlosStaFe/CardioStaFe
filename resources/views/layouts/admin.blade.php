@@ -31,7 +31,7 @@
     <!-- Full Calendar -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
     <script src="{{url('fullcalendar/es.global.js')}}"></script>
-    
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 </head>
 
 <body class="hold-transition sidebar-mini">

@@ -90,12 +90,20 @@ class ObrasocialController extends Controller
     public function destroy($id)
     {
         $obrasocial = Obrasocial::findOrFail($id);
-        
-        $obrasocial->delete();
-
-        return redirect()->route('admin.obrasociales.index')
-            ->with('mensaje', 'Obra Social eliminada con éxito.')
-            ->with('icono', 'success');
+        try {
+            $obrasocial->delete();
+            return redirect()->route('admin.obrasociales.index')
+                ->with('mensaje', 'Obra Social eliminada con éxito.')
+                ->with('icono', 'success');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == 23000) {
+                // Error de restricción de clave foránea
+                return redirect()->route('admin.obrasociales.index')
+                    ->with('mensaje', 'No se puede eliminar la obra social porque está asociada a uno o más pacientes.')
+                    ->with('icono', 'error');
+            }
+            throw $e;
+        }
     }
 
     public function porPractica($id)
