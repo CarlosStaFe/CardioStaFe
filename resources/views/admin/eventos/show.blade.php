@@ -27,6 +27,8 @@
                                 <span class="badge bg-warning">En Espera</span>
                             @elseif($evento->title === '- Atendido')
                                 <span class="badge bg-secondary">Atendido</span>
+                            @elseif($evento->title === '- Suspendido')
+                                <span class="badge bg-danger">Suspendido</span>
                             @else
                                 <span class="badge bg-success">Disponible</span>
                             @endif

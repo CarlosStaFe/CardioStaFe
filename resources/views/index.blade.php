@@ -171,7 +171,7 @@
 							</div>
 						</div><!-- End Info Item -->
 
-						<div class="info-item d-flex" data-aos="fade-up" data-aos-delay="400">
+						{{-- <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="400">
 							<i class="bi bi-whatsapp flex-shrink-0"></i>
 							<div>
 								<h3>WhatsApp al</h3>
@@ -185,7 +185,7 @@
 								<h3>Email</h3>
 								<p>informecardioinfantil@gmail.com</p>
 							</div>
-						</div><!-- End Info Item -->
+						</div><!-- End Info Item --> --}}
 
 					</div>
 

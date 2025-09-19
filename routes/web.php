@@ -106,13 +106,17 @@ Route::get('/admin/eventos/generar-horarios', [EventController::class, 'create']
 Route::post('/admin/eventos/create', [EventController::class, 'store'])->name('admin.eventos.create');
 Route::get('/admin/eventos/pdf', [EventController::class, 'pdf'])->name('admin.eventos.pdf')->middleware(['auth', 'can:admin.eventos.index']);
 Route::get('/admin/eventos/filtrar', [AdminController::class, 'filtrarEventos'])->name('admin.eventos.filtrar')->middleware('auth');
-Route::get('/admin/eventos/{id}', [EventController::class, 'show'])->name('admin.eventos.show')->middleware('auth');
+Route::get('admin/eventos/buscar-reservado', [EventController::class, 'buscarReservado'])->name('admin.eventos.buscar-reservado')->middleware('auth');
 Route::get('/admin/eventos/{id}/edit', [EventController::class, 'edit'])->name('admin.eventos.edit')->middleware('auth');
 Route::get('/admin/eventos/{id}/confirm-delete', [EventController::class, 'confirmDelete'])->name('admin.eventos.confirm-delete')->middleware('auth');
 Route::post('/admin/eventos/{id}/cambiar-estado', [EventController::class, 'cambiarEstado'])->name('admin.eventos.cambiar-estado')->middleware('auth');
+Route::get('/admin/eventos/{id}', [EventController::class, 'show'])->name('admin.eventos.show')->middleware('auth');
 Route::put('/admin/eventos/{id}', [EventController::class, 'update'])->name('admin.eventos.update')->middleware('auth');
 Route::delete('/admin/eventos/{event}', [EventController::class, 'destroy'])->name('admin.eventos.destroy')->middleware(['auth', 'can:admin.eventos.destroy']);
 
 //RUTA PARA BUSCAR LAS LOCALIDADES SEGÚN LA PROVINCIA Y LA LOCALIDAD
 Route::get('/admin/localidades/{idProv}', [LocalidadController::class, 'getLocalidades']);
 Route::get('/admin/codpostales/{idLocal}', [LocalidadController::class, 'getCodigosPostales']);
+
+//RUTA PARA EL ADMIN - WHATSAPP
+Route::post('/admin/eventos/enviar-whatsapp', [EventController::class, 'enviarWhatsApp'])->name('admin.eventos.enviar-whatsapp')->middleware('auth');

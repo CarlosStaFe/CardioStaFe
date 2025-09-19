@@ -257,6 +257,7 @@
                                         <div class="form-goup">
                                             <label for="telefono">Teléfono</label><b>*</b>
                                             <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Ingrese teléfono del paciente" required>
+                                            <small class="form-text text-muted">Ejemplo: 3425123456 (sin espacios ni guiones, sin el 15)</small>
                                         </div>
                                     </div>
                                 </div>
@@ -351,6 +352,11 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        // Forzar visualización del calendario al cargar
+        var calendarioContainer = document.getElementById('calendario-container');
+        if (calendarioContainer) {
+            calendarioContainer.style.display = 'block';
+        }
         // Inicializar el calendario
         var calendarEl = document.getElementById('calendar');
         calendar = new FullCalendar.Calendar(calendarEl, {
@@ -372,26 +378,16 @@
                 day: 'Día'
             },
             eventClick: function(info) {
-                // Manejar clic en evento
                 var evento = info.event;
-                
                 if (evento.title === '- Horario disponible') {
-                    // Es un horario disponible, abrir modal para reservar
                     document.getElementById('evento_id').value = evento.id;
                     document.getElementById('fecha_turno').value = evento.start.toISOString().split('T')[0];
                     document.getElementById('horario').value = evento.start.toTimeString().slice(0, 5);
                     document.getElementById('id_practica').textContent = document.getElementById('practica').value;
-
-                    // Obtener el id de la práctica seleccionada
                     var practicaId = document.getElementById('practica').value;
-
-                    // Limpiar formulario
                     limpiarFormularioReserva();
-                    
-                    // Cargar obras sociales por práctica vía AJAX
                     var obrasSocialesSelect = document.getElementById('obra_social');
                     obrasSocialesSelect.innerHTML = '<option value="">Cargando...</option>';
-                    // Elemento para mostrar el resultado de la consulta
                     var debugObrasSociales = document.getElementById('debug-obras-sociales');
                     if (!debugObrasSociales) {
                         debugObrasSociales = document.createElement('div');
@@ -401,9 +397,6 @@
                     }
                     safeFetch('/admin/obrasociales/por-practica/' + practicaId)
                         .then(function(data) {
-                            // Mostrar resultado en el modal para depuración
-                            //debugObrasSociales.textContent = 'AJAX resultado:\n' + JSON.stringify(data, null, 2);
-                            // Filtrar y poblar el select solo con las obras sociales que tengan el practica_id igual
                             obrasSocialesSelect.innerHTML = '';
                             if (Array.isArray(data) && data.length > 0) {
                                 data.forEach(function(os) {
@@ -425,12 +418,10 @@
                             debugObrasSociales.textContent = 'Error AJAX:\n' + error;
                             obrasSocialesSelect.innerHTML = '<option value="">Error al cargar obras sociales</option>';
                         });
-
                     // Mostrar modal
                     var modal = new bootstrap.Modal(document.getElementById('exampleModal'));
                     modal.show();
                 } else if (evento.title === '- Reservado') {
-                    // Es un turno reservado, mostrar información
                     alert('Turno reservado\n\nInformación:\n' + (evento.extendedProps.description || 'Sin detalles adicionales'));
                 } else {
                     console.log('Evento:', evento.title);
@@ -438,8 +429,6 @@
             }
         });
         calendar.render();
-        
-        // Establecer DNI como tipo por defecto al cargar la página
         document.getElementById('tipo').value = 'DNI';
     });
 
@@ -464,7 +453,9 @@
             campo.classList.remove('is-valid', 'is-invalid');
         });
     }
+</script>
 
+<script>
     function filtrarCalendario() {
         var consultorio = document.getElementById('consultorio').value;
         var practica = document.getElementById('practica').value;
@@ -533,9 +524,9 @@
                     }
                 });
                 // Mostrar por consola el agrupamiento por día y cuántos se agregan
-                Object.keys(eventosPorDia).forEach(fecha => {
-                    console.log('Fecha:', fecha, 'Eventos agregados:', eventosPorDia[fecha].length, eventosPorDia[fecha]);
-                });
+                //Object.keys(eventosPorDia).forEach(fecha => {
+                //    console.log('Fecha:', fecha, 'Eventos agregados:', eventosPorDia[fecha].length, eventosPorDia[fecha]);
+                //});
 
                 // Agregar al calendario solo los eventos seleccionados
                 let horariosDisponiblesMostrados = 0;
@@ -571,65 +562,68 @@
             alert('Error al cargar los eventos. Por favor, inténtelo nuevamente.');
         });
     }
+</script>
 
+<script>
     function buscarPaciente() {
         var documento = document.getElementById('documento').value.trim();
         var tipo = document.getElementById('tipo').value;
-        
-        if (!documento) {
-            return;
-        }
-        
-        // Limpiar el documento de puntos, guiones y espacios extra
+        if (!documento) return;
         var documentoLimpio = documento.replace(/[.\-\s]/g, '');
-        
-        // Mostrar indicador de búsqueda
         var mensaje = document.getElementById('documento-mensaje');
         if (mensaje) {
             mensaje.textContent = 'Buscando paciente...';
             mensaje.className = 'form-text text-info';
         }
-        
         var url = '{{ url("admin/pacientes/buscar") }}?documento=' + encodeURIComponent(documentoLimpio) + '&tipo=' + encodeURIComponent(tipo);
-        
         safeFetch(url)
         .then(data => {
             var mensaje = document.getElementById('documento-mensaje');
             var documentoInput = document.getElementById('documento');
-            
-            if (data.encontrado) {
-                // Paciente encontrado, llenar datos
-                document.getElementById('nombre').value = data.paciente.apel_nombres || '';
-                document.getElementById('email').value = data.paciente.email || '';
-                document.getElementById('telefono').value = data.paciente.telefono || '';
-                document.getElementById('obra_social').value = data.paciente.obra_social || '';
-                
-                // Actualizar el tipo si es diferente
-                if (data.paciente.tipo_documento && data.paciente.tipo_documento !== tipo) {
-                    document.getElementById('tipo').value = data.paciente.tipo_documento;
-                }
-                
-                if (mensaje) {
-                    mensaje.textContent = '✓ Paciente encontrado: ' + data.paciente.apel_nombres;
-                    mensaje.className = 'form-text text-success';
-                }
-                documentoInput.classList.remove('is-invalid', 'is-warning');
-                documentoInput.classList.add('is-valid');
+        if (data.encontrado) {
+            document.getElementById('nombre').value = data.paciente.apel_nombres || '';
+            document.getElementById('email').value = data.paciente.email || '';
+            document.getElementById('telefono').value = data.paciente.telefono || '';
+            document.getElementById('obra_social').value = data.paciente.obra_social || '';
+            if (data.paciente.tipo_documento && data.paciente.tipo_documento !== tipo) {
+                document.getElementById('tipo').value = data.paciente.tipo_documento;
+            }
+            if (mensaje) {
+                mensaje.textContent = '✓ Paciente encontrado: ' + data.paciente.apel_nombres;
+                mensaje.className = 'form-text text-success';
+            }
+            documentoInput.classList.remove('is-invalid', 'is-warning');
+            documentoInput.classList.add('is-valid');
+
+                // Buscar evento reservado del paciente
+                safeFetch('/admin/eventos/buscar-reservado?documento=' + encodeURIComponent(documentoLimpio))
+                .then(ev => {
+                    if (ev.encontrado && ev.evento) {
+                        // Completar campos del modal con datos del evento
+                        document.getElementById('evento_id').value = ev.evento.id;
+                        document.getElementById('fecha_turno').value = ev.evento.fecha;
+                        document.getElementById('horario').value = ev.evento.hora;
+                        document.getElementById('id_practica').value = ev.evento.practica_id;
+                        document.getElementById('obra_social').value = ev.evento.obra_social_id;
+                        // Mostrar botón Suspender
+                        mostrarBotonSuspender(ev.evento.id);
+                    } else {
+                        ocultarBotonSuspender();
+                    }
+                })
+                .catch(() => ocultarBotonSuspender());
             } else {
-                // Paciente no encontrado, limpiar campos excepto documento y tipo
                 document.getElementById('nombre').value = '';
                 document.getElementById('email').value = '';
                 document.getElementById('telefono').value = '';
-                document.getElementById('obra_social').selectedIndex = 0; // Resetear select
-                
+                document.getElementById('obra_social').selectedIndex = 0;
                 if (mensaje) {
                     mensaje.textContent = 'ℹ Paciente no encontrado. Complete los datos para crear uno nuevo.';
                     mensaje.className = 'form-text text-warning';
                 }
                 documentoInput.classList.remove('is-invalid', 'is-valid');
                 documentoInput.classList.add('is-warning');
-                
-                // Enfocar el campo nombre para continuar
+                ocultarBotonSuspender();
                 document.getElementById('nombre').focus();
             }
         })
@@ -641,46 +635,136 @@
                 mensaje.className = 'form-text text-danger';
             }
             document.getElementById('documento').classList.add('is-invalid');
+            ocultarBotonSuspender();
+        });
+    }
+</script>
+
+<script>
+    function ocultarBotonSuspender() {
+        var btn = document.getElementById('btnSuspender');
+        if (btn) {
+            btn.style.display = 'none';
+        }
+    }
+</script>
+
+<script>
+    function mostrarBotonSuspender(eventoId) {
+        var btn = document.getElementById('suspenderEventoBtn');
+        if (!btn) {
+            btn = document.createElement('button');
+            btn.id = 'suspenderEventoBtn';
+            btn.type = 'button';
+            btn.className = 'btn btn-warning';
+            btn.textContent = 'Suspender';
+            btn.style.marginRight = '8px';
+            btn.onclick = function() { suspenderEvento(eventoId); };
+            var footer = document.querySelector('.modal-footer');
+            footer.insertBefore(btn, footer.firstChild);
+        }
+        btn.style.display = 'inline-block';
+
+        // Ocultar el botón Reservar
+        var reservarBtn = document.getElementById('guardarEventoBtn');
+        if (reservarBtn) {
+            reservarBtn.style.display = 'none';
+        }
+
+        // Mostrar mensaje de turno reservado con SweetAlert
+        Swal.fire({
+            icon: 'info',
+            title: 'Turno reservado',
+            text: 'Este paciente ya tiene un turno reservado.',
+            confirmButtonText: 'Aceptar',
+            timer: 3500
         });
     }
 
-    function eliminarEvento() {
-        if (!confirm('¿Está seguro de que desea eliminar este evento?')) {
-            return;
-        }
-        
-        var eventoId = document.getElementById('evento_id').value;
-        if (!eventoId) {
-            alert('No se pudo identificar el evento a eliminar');
-            return;
-        }
-        
-        safeFetch('{{ url("admin/eventos") }}/' + eventoId, {
-            method: 'DELETE',
+    function ocultarBotonSuspender() {
+        var btn = document.getElementById('suspenderEventoBtn');
+        if (btn) btn.style.display = 'none';
+    }
+
+    function suspenderEvento(eventoId) {
+        if (!eventoId) return;
+        if (!confirm('¿Está seguro de que desea suspender este turno?')) return;
+        safeFetch('/admin/eventos/' + eventoId + '/cambiar-estado', {
+            method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
+            },
+            body: JSON.stringify({ nuevo_estado: '- Horario disponible' })
         })
-        .then(data => {
-            if (data.success) {
-                // Cerrar modal
-                var modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
-                if (modal) {
-                    modal.hide();
-                }
-                
-                // Recargar eventos en el calendario
+        .then(resp => {
+            if (resp.success) {
+                Swal.fire('Turno suspendido', 'El turno vuelve a estar disponible.', 'success');
+                ocultarBotonSuspender();
+                limpiarFormularioReserva();
                 filtrarCalendario();
-                
-                alert('Evento eliminado exitosamente');
             } else {
-                alert('Error al eliminar el evento: ' + (data.message || 'Error desconocido'));
+                Swal.fire('Error', resp.message || 'No se pudo suspender el turno.', 'error');
             }
         })
-        .catch(error => {
-            console.error('Error al eliminar evento:', error);
-            alert('Error al eliminar el evento. Por favor, inténtelo nuevamente.');
+        .catch(() => Swal.fire('Error', 'No se pudo suspender el turno.', 'error'));
+    }
+
+</script>
+
+<script>
+    // Validar teléfono al enviar el formulario
+    var eventoForm = document.getElementById('eventoForm');
+    if (eventoForm) {
+        eventoForm.addEventListener('submit', function(e) {
+            var telefonoInput = document.getElementById('telefono');
+            if (telefonoInput) {
+                var esValido = validarTelefonoWhatsApp(telefonoInput, true);
+                if (!esValido) {
+                    e.preventDefault();
+                    telefonoInput.focus();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Teléfono inválido',
+                        text: 'El teléfono ingresado no es válido para WhatsApp. Ejemplo: 3425123456',
+                    });
+                }
+            }
         });
+    }
+</script>
+
+<script>
+    function validarTelefonoWhatsApp(input, returnBool = false) {
+        // Solo dígitos, 10 caracteres, sin espacios, guiones ni el 15
+        var valor = input.value.replace(/\D/g, '');
+        var valido = /^3[4-9][0-9]{8}$/.test(valor); // Ejemplo: 3425123456
+        var mensaje = input.nextElementSibling;
+        if (!mensaje || !mensaje.classList.contains('form-text')) {
+            mensaje = document.createElement('small');
+            mensaje.className = 'form-text';
+            input.parentNode.appendChild(mensaje);
+        }
+        if (valor.length === 0) {
+            input.classList.remove('is-valid', 'is-invalid');
+            mensaje.textContent = 'Ejemplo: 3425123456 (sin espacios ni guiones, sin el 15)';
+            mensaje.className = 'form-text text-muted';
+            if (returnBool) return false;
+            return;
+        }
+        if (valido) {
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid');
+            mensaje.textContent = '✓ Teléfono válido para WhatsApp.';
+            mensaje.className = 'form-text text-success';
+            if (returnBool) return true;
+        } else {
+            input.classList.remove('is-valid');
+            input.classList.add('is-invalid');
+            mensaje.textContent = '✗ Formato inválido. Ejemplo: 3425123456 (sin espacios ni guiones, sin el 15)';
+            mensaje.className = 'form-text text-danger';
+            if (returnBool) return false;
+        }
     }
 </script>
 

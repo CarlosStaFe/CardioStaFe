@@ -25,7 +25,9 @@
         <!-- /.login-logo -->
         <div class="card card-outline card-primary">
             <div class="card-header text-center">
-                <a href="{{url('/')}}" class="h2"><b>Centro de Cardiología Infantil Santa Fe</b></a>
+                <a href="{{url('/')}}">
+                    <img src="{{ asset('assets/img/LogoCompleto.jpg') }}" alt="Logo Centro" style="width:100%; height:100%; object-fit:cover; margin-bottom:5px;">
+                </a>
             </div>
             <div class="card-body">
                 <p class="login-box-msg" style="color: blue;"><b>Registro de Usuario.</b></p>

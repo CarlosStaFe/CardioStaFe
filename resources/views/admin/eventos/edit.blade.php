@@ -18,11 +18,19 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="title">Título <b>*</b></label>
-                            <input type="text" class="form-control @error('title') is-invalid @enderror" 
-                                   id="title" name="title" value="{{ old('title', $evento->title) }}" required>
+                            <select class="form-control @error('title') is-invalid @enderror" id="title" name="title" required>
+                                @php
+                                    $titulos = ['- Horario disponible', '- Reservado', '- En Espera', '- Atendido', '- Suspendido'];
+                                    $selected = old('title', $evento->title);
+                                @endphp
+                                @foreach($titulos as $titulo)
+                                    <option value="{{ $titulo }}" {{ $selected == $titulo ? 'selected' : '' }}>{{ $titulo }}</option>
+                                @endforeach
+                            </select>
                             @error('title')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            
                         </div>
                     </div>
                     <div class="col-md-6">

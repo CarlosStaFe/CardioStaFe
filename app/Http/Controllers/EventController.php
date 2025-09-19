@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
+use Twilio\Rest\Client;
 
 class EventController extends Controller
 {
@@ -38,21 +39,12 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
-        // Log para debugging
-        Log::info('Método store llamado', [
-            'has_evento_id' => $request->has('evento_id'),
-            'has_documento' => $request->has('documento'),
-            'all_request' => $request->all()
-        ]);
-        
         // Detectar si es una reserva individual (desde el modal) o creación masiva de horarios
         if ($request->has('evento_id') && $request->has('documento')) {
             // Es una reserva individual desde el modal
             Log::info('Detectado como reserva individual');
             return $this->reservarTurno($request);
         }
-        
-        Log::info('Detectado como creación masiva');
         
         // Es creación masiva de horarios disponibles
         // Validar los datos recibidos
@@ -174,8 +166,6 @@ class EventController extends Controller
      */
     private function reservarTurno(Request $request)
     {
-        Log::info('Iniciando reserva de turno', ['request_data' => $request->all()]);
-        
         // Validar los datos de la reserva
         $request->validate([
             'evento_id' => 'required|exists:events,id',
@@ -207,8 +197,6 @@ class EventController extends Controller
             $obraSocial = Obrasocial::find($obraSocialId);
             $presentar = $obraSocial ? $obraSocial->documentacion : '';
 
-            Log::info('Obra social encontrada', ['obra_social_id' => $obraSocialId]);
-
             // Buscar o crear el paciente
             $paciente = \App\Models\Paciente::where('num_documento', $request->documento)->first();
             
@@ -226,16 +214,18 @@ class EventController extends Controller
                 $paciente->cod_postal_id = 1;
                 $paciente->obra_social_id = $obraSocialId;
                 $paciente->observacion = 'Paciente creado desde reserva de turno';
-                
                 $paciente->save();
-                Log::info('Nuevo paciente creado', ['paciente_id' => $paciente->id]);
             } else {
-                Log::info('Paciente existente encontrado', ['paciente_id' => $paciente->id]);
+                // Actualizar datos siempre con lo ingresado en el modal
+                $paciente->email = $request->email;
+                $paciente->telefono = $request->telefono;
+                $paciente->obra_social_id = $obraSocialId;
+                $paciente->save();
             }
 
             // Actualizar el evento con los datos de la reserva
             $evento->title = '- Reservado';
-            $evento->description = "Paciente: {$request->nombre}\nDocumento: {$request->documento}\nTeléfono: {$request->telefono}\nEmail: {$request->email}\nObra Social: {$request->obra_social}";
+            $evento->description = "Paciente: {$request->nombre}\nDocumento: {$request->documento}\nTeléfono: {$request->telefono}\nEmail: {$request->email}\nObra Social: " . ($obraSocial && $obraSocial->nombre ? $obraSocial->nombre : '');
             $evento->color = '#dc3545'; // Color rojo para reservado
             $evento->paciente_id = $paciente->id;
             $evento->obra_social_id = $obraSocialId;
@@ -243,8 +233,9 @@ class EventController extends Controller
 
             $evento->save();
 
-            // Enviar email con usuario y contraseña
+            // Enviar email con los datos del turno
             Mail::send([], [], function ($message) use ($email, $request, $presentar, $evento, $obraSocial) {
+                $appUrl = preg_replace('/^https?:\/\//', '', env('APP_URL'));
                 $message->to($email)
                     ->subject('Turno reservado - NO CONTESTAR ESTE MENSAJE')
                     ->html(
@@ -259,28 +250,59 @@ class EventController extends Controller
                         '<p><b>Email:</b> ' . $request->email . '</p>' .
                         '<p><b>Obra Social:</b> ' . ($obraSocial ? $obraSocial->nombre : '') . '</p>' .
                         '<p><b>Documentación requerida:</b> ' . $presentar . '</p>' .
-                        '<p>Link de la aplicación: <a href="' . env('APP_URL') . '">' . env('APP_URL') . '</a></p>'
+                        '<p>Link de la aplicación: <a href="https://' . $appUrl . '">' . $appUrl . '</a></p>'
                     );
             });
-            
-            Log::info('Evento actualizado a reservado', [
-                'evento_id' => $evento->id,
-                'paciente_id' => $paciente->id,
-                'title' => $evento->title
-            ]);
+
+            // Enviar WhatsApp
+            //$appUrl = preg_replace('/^https?:\/\//', '', env('APP_URL'));
+            //$this->enviarWhatsApp($request, $evento, $obraSocial, $presentar, $appUrl);
 
             return redirect()->route('admin.index')
                 ->with('mensaje', 'Turno reservado exitosamente para ' . $request->nombre)
                 ->with('icono', 'success');
 
         } catch (\Exception $e) {
-            Log::error('Error al reservar turno: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
-            ]);
             return redirect()->route('admin.index')
                 ->with('mensaje', 'Error al reservar el turno: ' . $e->getMessage())
                 ->with('icono', 'error');
+        }
+    }
+
+    public function enviarWhatsApp(Request $request, $evento, $obraSocial, $presentar, $appUrl)
+    {
+        // Enviar WhatsApp usando Twilio
+        try {
+            $telefonoWhatsApp = preg_replace('/\D/', '', $request->telefono);
+            if (preg_match('/^3[4-9][0-9]{8}$/', $telefonoWhatsApp)) {
+            $mensajeWhatsapp = "Su turno ha sido reservado.\n" .
+                "Fecha: " . date('d/m/Y', strtotime($evento->start)) . "\n" .
+                "Hora: " . date('H:i', strtotime($evento->start)) . "\n" .
+                "Práctica: " . ($evento->practica ? $evento->practica->nombre : '') . "\n" .
+                "Médico: " . ($evento->medico ? $evento->medico->apel_nombres : '') . "\n" .
+                "Paciente: " . $request->nombre . "\n" .
+                "Documento: " . $request->documento . "\n" .
+                "Obra Social: " . ($obraSocial && $obraSocial->nombre ? $obraSocial->nombre : '') . "\n" .
+                "Documentación requerida: " . $presentar . "\n" .
+                "Link de la aplicación: https://" . $appUrl;
+            $sid = env('TWILIO_SID');
+            $token = env('TWILIO_AUTH_TOKEN');
+            $twilioNumber = env('TWILIO_WHATSAPP_NUMBER'); // Ejemplo: 'whatsapp:+14155238886'
+            $client = new Client($sid, $token);
+            $toWhatsapp = 'whatsapp:+549' . $telefonoWhatsApp;
+            $message = $client->messages->create(
+                $toWhatsapp,
+                [
+                'from' => $twilioNumber,
+                'body' => $mensajeWhatsapp
+                ]
+            );
+            // Mostrar el objeto $message en pantalla
+            //dd($message);
+            print($message->sid);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error enviando WhatsApp: ' . $e->getMessage());
         }
     }
 
@@ -368,7 +390,7 @@ class EventController extends Controller
         }
 
         // Si es una request web, redirigir con mensaje
-        return redirect()->route('admin.horarios.index')->with('success', 'Evento actualizado correctamente');
+        return redirect()->route('admin.eventos.index')->with('success', 'Evento actualizado correctamente');
     }
 
     public function destroy(Request $request, Event $event)
@@ -388,7 +410,7 @@ class EventController extends Controller
                     ], 404);
                 }
                 
-                return redirect()->route('admin.horarios.index')->with('error', 'Evento no encontrado');
+                return redirect()->route('admin.eventos.index')->with('error', 'Evento no encontrado');
             }
 
             // Eliminar el evento
@@ -404,7 +426,7 @@ class EventController extends Controller
                     ]);
                 }
                 
-                return redirect()->route('admin.horarios.index')->with('success', 'Evento eliminado correctamente');
+                return redirect()->route('admin.eventos.index')->with('success', 'Evento eliminado correctamente');
             } else {
                 Log::error('Error al eliminar evento - delete() retornó false', ['event_id' => $event->id]);
                 
@@ -415,7 +437,7 @@ class EventController extends Controller
                     ], 500);
                 }
                 
-                return redirect()->route('admin.horarios.index')->with('error', 'Error al eliminar el evento');
+                return redirect()->route('admin.eventos.index')->with('error', 'Error al eliminar el evento');
             }
             
         } catch (\Exception $e) {
@@ -432,7 +454,7 @@ class EventController extends Controller
                 ], 500);
             }
             
-            return redirect()->route('admin.horarios.index')->with('error', 'Error al eliminar el evento: ' . $e->getMessage());
+            return redirect()->route('admin.eventos.index')->with('error', 'Error al eliminar el evento: ' . $e->getMessage());
         }
     }
 
@@ -445,14 +467,14 @@ class EventController extends Controller
     public function cambiarEstado(Request $request, $id)
     {
         $request->validate([
-            'nuevo_estado' => 'required|string|in:- En Espera,- Atendido'
+            'nuevo_estado' => 'required|string|in:- En Espera,- Atendido,- Horario disponible'
         ]);
 
         try {
             $evento = Event::findOrFail($id);
             
             // Verificar que el cambio de estado sea válido
-            $estadosValidos = ['- En Espera', '- Atendido'];
+            $estadosValidos = ['- En Espera', '- Atendido', '- Horario disponible'];
             if (!in_array($request->nuevo_estado, $estadosValidos)) {
                 return response()->json([
                     'success' => false,
@@ -462,6 +484,16 @@ class EventController extends Controller
 
             // Cambiar el estado
             $evento->title = $request->nuevo_estado;
+            if ($request->nuevo_estado === '- Horario disponible') {
+                $evento->color = '#08e408c7'; // Verde
+                $evento->paciente_id = 1; // Resetear paciente
+                $evento->obra_social_id = 1; // Resetear obra social
+                $evento->description = '';
+            } elseif ($request->nuevo_estado === '- En Espera') {
+                $evento->color = '#ffc107'; // Amarillo
+            } elseif ($request->nuevo_estado === '- Atendido') {
+                $evento->color = '#007bff'; // Azul
+            }
             $evento->save();
 
             Log::info('Estado de evento cambiado', [
@@ -558,4 +590,31 @@ class EventController extends Controller
         //return $pdf->download($filename);
         return $pdf->stream($filename);
     }
+
+    public function buscarReservado(Request $request)
+    {
+        $documento = $request->input('documento');
+        $paciente = \App\Models\Paciente::where('num_documento', $documento)->first();
+        if (!$paciente) {
+            return response()->json(['encontrado' => false]);
+        }
+        $evento = \App\Models\Event::where('paciente_id', $paciente->id)
+            ->where('title', '- Reservado')
+            ->orderBy('start', 'desc')
+            ->first();
+        if ($evento) {
+            return response()->json([
+                'encontrado' => true,
+                'evento' => [
+                    'id' => $evento->id,
+                    'fecha' => date('Y-m-d', strtotime($evento->start)),
+                    'hora' => date('H:i', strtotime($evento->start)),
+                    'practica_id' => $evento->practica_id,
+                    'obra_social_id' => $evento->obra_social_id,
+                ]
+            ]);
+        }
+        return response()->json(['encontrado' => false]);
+    }
+
 }
