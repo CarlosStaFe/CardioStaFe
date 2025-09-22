@@ -13,6 +13,7 @@ class PracticasSeeder extends Seeder
             ['nombre' => 'CONSULTA', 'observacion' => ''],
             ['nombre' => 'CONSULTA + ELECTROCARDIOGRAMA', 'observacion' => ''],
             ['nombre' => 'ECOCARDIOGRAMA DOPPLER COLOR PEDIÁTRICO', 'observacion' => ''],
+            ['nombre' => 'NEUMONÓLOGO', 'observacion' => ''],
         ]);
     }
 }

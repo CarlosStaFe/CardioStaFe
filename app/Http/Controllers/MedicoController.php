@@ -38,6 +38,8 @@ class MedicoController extends Controller
         $usuario->password = bcrypt($request->password);
         $usuario->save();
 
+        $usuario->assignRole('medico'); // Asignar rol de médico
+
         $medico = new Medico();
         $medico->user_id = $usuario->id;
         $medico->apel_nombres = strtoupper($request->apel_nombres);
@@ -48,8 +50,6 @@ class MedicoController extends Controller
         $medico->activo = $request->activo;
         $medico->save();
 
-        $usuario->assignRole(_role: 'medico'); // Asignar rol de médico
-        
         return redirect()->route('admin.medicos.index')
             ->with('mensaje', 'Médico creado con éxito.')
             ->with('icono', 'success');
@@ -96,6 +96,8 @@ class MedicoController extends Controller
             $usuario->password = bcrypt($request->password);
         }
         $usuario->save();
+
+        $usuario->syncRoles(['medico']); // Asignar únicamente el rol de médico al editar
 
         return redirect()->route('admin.medicos.index')
             ->with('mensaje', 'Médico actualizado con éxito.')
