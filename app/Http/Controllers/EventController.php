@@ -594,12 +594,16 @@ class EventController extends Controller
     public function buscarReservado(Request $request)
     {
         $documento = $request->input('documento');
+        $practicaIdBusqueda = $request->input('id_practica');
+        Log::info('Request completo:', $request->all());
+        Log::info('Valor de id_practica recibido:', ['id_practica' => $practicaIdBusqueda]);
         $paciente = \App\Models\Paciente::where('num_documento', $documento)->first();
         if (!$paciente) {
             return response()->json(['encontrado' => false]);
         }
         $evento = \App\Models\Event::where('paciente_id', $paciente->id)
             ->where('title', '- Reservado')
+            ->where('practica_id', $practicaIdBusqueda)
             ->orderBy('start', 'desc')
             ->first();
         if ($evento) {

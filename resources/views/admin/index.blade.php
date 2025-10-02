@@ -186,7 +186,7 @@
                 <input type="hidden" id="form_method" name="_method" value="">
                 <input type="hidden" id="title" name="title" value="">
                 <input type="hidden" id="description" name="description" value="">
-                <input type="hidden" id="id_practica" name="id_practica" value="practicaId">
+                <input type="hidden" id="id_practica" name="id_practica" value="">
                 <!-- Modal fuera del row para evitar problemas de anidamiento -->
                 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -383,8 +383,12 @@
                     document.getElementById('evento_id').value = evento.id;
                     document.getElementById('fecha_turno').value = evento.start.toISOString().split('T')[0];
                     document.getElementById('horario').value = evento.start.toTimeString().slice(0, 5);
-                    document.getElementById('id_practica').textContent = document.getElementById('practica').value;
                     var practicaId = document.getElementById('practica').value;
+                    document.getElementById('id_practica').value = practicaId;
+                    var practicaText = document.getElementById('id_practica_text');
+                    if (practicaText) {
+                        practicaText.textContent = practicaId;
+                    }
                     limpiarFormularioReserva();
                     var obrasSocialesSelect = document.getElementById('obra_social');
                     obrasSocialesSelect.innerHTML = '<option value="">Cargando...</option>';
@@ -596,7 +600,8 @@
             documentoInput.classList.add('is-valid');
 
                 // Buscar evento reservado del paciente
-                safeFetch('/admin/eventos/buscar-reservado?documento=' + encodeURIComponent(documentoLimpio))
+                var idPractica = document.getElementById('id_practica').value;
+                safeFetch('/admin/eventos/buscar-reservado?documento=' + encodeURIComponent(documentoLimpio) + '&id_practica=' + encodeURIComponent(idPractica))
                 .then(ev => {
                     if (ev.encontrado && ev.evento) {
                         // Completar campos del modal con datos del evento

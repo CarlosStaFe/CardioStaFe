@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Paciente;
-use App\Models\ObraSocial;
+use App\Models\Obrasocial;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -18,7 +18,7 @@ class PacienteController extends Controller
 
     public function create()
     {
-        $obrasociales = ObraSocial::all();
+        $obrasociales = Obrasocial::all();
         return view('admin.pacientes.create', compact('obrasociales'));
     }
 
