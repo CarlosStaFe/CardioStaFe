@@ -662,7 +662,7 @@
             btn.id = 'suspenderEventoBtn';
             btn.type = 'button';
             btn.className = 'btn btn-warning';
-            btn.textContent = 'Suspender';
+            btn.textContent = 'Suspender Turno';
             btn.style.marginRight = '8px';
             btn.onclick = function() { suspenderEvento(eventoId); };
             var footer = document.querySelector('.modal-footer');
@@ -679,10 +679,10 @@
         // Mostrar mensaje de turno reservado con SweetAlert
         Swal.fire({
             icon: 'info',
-            title: 'Turno reservado',
+            title: 'Turno reservado anteriormente',
             text: 'Este paciente ya tiene un turno reservado.',
             confirmButtonText: 'Aceptar',
-            timer: 3500
+            timer: 4000
         });
     }
 
@@ -691,6 +691,7 @@
         if (btn) btn.style.display = 'none';
     }
 
+    // Suspender el evento ya reservado
     function suspenderEvento(eventoId) {
         if (!eventoId) return;
         if (!confirm('¿Está seguro de que desea suspender este turno?')) return;

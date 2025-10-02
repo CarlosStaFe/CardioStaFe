@@ -297,8 +297,13 @@
             const nuevoEstado = $(this).data('nuevo-estado');
             const boton = $(this);
             
-            if (confirm(`¿Está seguro de cambiar el estado a "${nuevoEstado}"?`)) {
-                cambiarEstadoEvento(eventoId, nuevoEstado, boton);
+            // Si es suspensión de turno, mostrar modal para motivo
+            if (nuevoEstado === '- Horario disponible') {
+                mostrarModalSuspension(eventoId, boton);
+            } else {
+                if (confirm(`¿Está seguro de cambiar el estado a "${nuevoEstado}"?`)) {
+                    cambiarEstadoEvento(eventoId, nuevoEstado, boton);
+                }
             }
         });
     });
@@ -463,9 +468,18 @@
         });
     }
 
-    function cambiarEstadoEvento(eventoId, nuevoEstado, boton) {
+    function cambiarEstadoEvento(eventoId, nuevoEstado, boton, motivoSuspension = null) {
         // Deshabilitar el botón durante la petición
         boton.prop('disabled', true);
+        
+        const requestBody = {
+            nuevo_estado: nuevoEstado
+        };
+        
+        // Agregar motivo si es una suspensión
+        if (motivoSuspension) {
+            requestBody.motivo_suspension = motivoSuspension;
+        }
         
         fetch(`{{ url('admin/eventos') }}/${eventoId}/cambiar-estado`, {
             method: 'POST',
@@ -474,15 +488,17 @@
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({
-                nuevo_estado: nuevoEstado
-            })
+            body: JSON.stringify(requestBody)
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 // Mostrar mensaje de éxito
-                alert('Estado cambiado correctamente');
+                let mensaje = 'Estado cambiado correctamente';
+                if (nuevoEstado === '- Horario disponible') {
+                    mensaje += '. Se ha enviado un email de notificación al paciente.';
+                }
+                alert(mensaje);
                 // Recargar la página para actualizar la vista
                 location.reload();
             } else {
@@ -496,6 +512,58 @@
         .finally(() => {
             // Rehabilitar el botón
             boton.prop('disabled', false);
+        });
+    }
+
+    function mostrarModalSuspension(eventoId, boton) {
+        // Crear modal dinámicamente
+        const modalHtml = `
+            <div class="modal fade" id="modalSuspension" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Suspender Turno</h5>
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>¿Está seguro de que desea suspender este turno?</p>
+                            <p class="text-warning"><small>Se enviará un email automático al paciente notificando la suspensión.</small></p>
+                            <div class="form-group">
+                                <label for="motivoSuspension">Motivo de la suspensión (opcional):</label>
+                                <textarea class="form-control" id="motivoSuspension" rows="3" 
+                                    placeholder="Ej: Enfermedad del médico, emergencia, etc."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-danger" id="confirmarSuspension">Suspender Turno</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Remover modal existente si existe
+        $('#modalSuspension').remove();
+        
+        // Agregar modal al DOM
+        $('body').append(modalHtml);
+        
+        // Mostrar modal
+        $('#modalSuspension').modal('show');
+        
+        // Manejar confirmación
+        $(document).off('click', '#confirmarSuspension').on('click', '#confirmarSuspension', function() {
+            const motivo = $('#motivoSuspension').val().trim();
+            $('#modalSuspension').modal('hide');
+            cambiarEstadoEvento(eventoId, '- Horario disponible', boton, motivo);
+        });
+        
+        // Limpiar modal al cerrar
+        $('#modalSuspension').on('hidden.bs.modal', function () {
+            $(this).remove();
         });
     }
 

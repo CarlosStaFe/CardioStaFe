@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\SuspensionEvento;
 use Twilio\Rest\Client;
 
 class EventController extends Controller
@@ -467,7 +468,8 @@ class EventController extends Controller
     public function cambiarEstado(Request $request, $id)
     {
         $request->validate([
-            'nuevo_estado' => 'required|string|in:- En Espera,- Atendido,- Horario disponible'
+            'nuevo_estado' => 'required|string|in:- En Espera,- Atendido,- Horario disponible',
+            'motivo_suspension' => 'nullable|string|max:500'
         ]);
 
         try {
@@ -483,12 +485,40 @@ class EventController extends Controller
             }
 
             // Cambiar el estado
+            $estado_anterior = $evento->title;
             $evento->title = $request->nuevo_estado;
+            
             if ($request->nuevo_estado === '- Horario disponible') {
+                // Si había un paciente asignado y se está suspendiendo el turno, enviar email
+                if ($estado_anterior !== '- Horario disponible' && $evento->paciente_id > 1) {
+                    try {
+                        // Cargar las relaciones necesarias antes de resetear los datos
+                        $evento->load(['paciente', 'medico', 'practica', 'consultorio']);
+                        
+                        // Enviar email de suspensión solo si el paciente tiene email
+                        if ($evento->paciente && $evento->paciente->email) {
+                            $motivo = $request->input('motivo_suspension', 'Suspensión por parte del paciente.');
+                            Mail::to($evento->paciente->email)->send(new SuspensionEvento($evento, $motivo));
+                            
+                            Log::info('Email de suspensión enviado', [
+                                'event_id' => $evento->id,
+                                'paciente_email' => $evento->paciente->email,
+                                'paciente_nombre' => $evento->paciente->apel_nombres
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('Error al enviar email de suspensión', [
+                            'event_id' => $evento->id,
+                            'error' => $e->getMessage()
+                        ]);
+                        // No fallar la operación si falla el envío del email
+                    }
+                }
+                
                 $evento->color = '#08e408c7'; // Verde
                 $evento->paciente_id = 1; // Resetear paciente
                 $evento->obra_social_id = 1; // Resetear obra social
-                $evento->description = '';
+                $evento->description = 'CANCELADO';
             } elseif ($request->nuevo_estado === '- En Espera') {
                 $evento->color = '#ffc107'; // Amarillo
             } elseif ($request->nuevo_estado === '- Atendido') {
@@ -619,6 +649,23 @@ class EventController extends Controller
             ]);
         }
         return response()->json(['encontrado' => false]);
+    }
+
+    // Método temporal para probar email de suspensión
+    public function probarEmailSuspension($id)
+    {
+        try {
+            $evento = Event::with(['paciente', 'medico', 'practica', 'consultorio'])->findOrFail($id);
+            
+            if ($evento->paciente && $evento->paciente->email) {
+                Mail::to($evento->paciente->email)->send(new SuspensionEvento($evento, 'Prueba de email de suspensión'));
+                return response()->json(['success' => true, 'message' => 'Email enviado correctamente']);
+            }
+            
+            return response()->json(['success' => false, 'message' => 'El paciente no tiene email']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
     }
 
 }
