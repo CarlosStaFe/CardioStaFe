@@ -260,7 +260,7 @@ class EventController extends Controller
             //$this->enviarWhatsApp($request, $evento, $obraSocial, $presentar, $appUrl);
 
             return redirect()->route('admin.index')
-                ->with('mensaje', 'Turno reservado exitosamente para ' . $request->nombre)
+                ->with('mensaje', 'Turno reservado exitosamente para ' . $request->nombre . '\n\nLE LLEGARÁ UN CORREO A SU CASILLA CON LOS DATOS DEL TURNO.')
                 ->with('icono', 'success');
 
         } catch (\Exception $e) {

@@ -434,6 +434,9 @@
         });
         calendar.render();
         document.getElementById('tipo').value = 'DNI';
+        
+        // Cargar eventos disponibles automáticamente al inicializar
+        cargarEventosIniciales();
     });
 
     function limpiarFormularioReserva() {
@@ -715,7 +718,6 @@
         })
         .catch(() => Swal.fire('Error', 'No se pudo suspender el turno.', 'error'));
     }
-
 </script>
 
 <script>

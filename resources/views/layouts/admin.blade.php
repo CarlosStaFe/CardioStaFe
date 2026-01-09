@@ -340,7 +340,7 @@
                     icon: "{{$icono}}",
                     title: "{{$message}}",
                     showConfirmButton: false,
-                    timer: 3000
+                    timer: 4500
                 });
             </script>
         @endif
