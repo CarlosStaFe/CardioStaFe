@@ -19,9 +19,39 @@ use Twilio\Rest\Client;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $eventos = Event::with(['user', 'consultorio', 'practica', 'medico'])->get();
+        // Construir query base
+        $query = Event::with(['user', 'consultorio', 'practica', 'medico']);
+        
+        // Aplicar filtros si existen
+        if ($request->filled('consultorio_id')) {
+            $query->where('consultorio_id', $request->consultorio_id);
+        }
+        
+        if ($request->filled('medico_id')) {
+            $query->where('medico_id', $request->medico_id);
+        }
+        
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('start', '>=', $request->fecha_desde);
+        }
+        
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('start', '<=', $request->fecha_hasta);
+        }
+        
+        if ($request->filled('estado')) {
+            if ($request->estado === '- Horario Disponible') {
+                $query->whereNotIn('title', ['- Reservado', '- En Espera', '- Atendido']);
+            } else {
+                $query->where('title', $request->estado);
+            }
+        }
+        
+        // Siempre ordenar por fecha y hora (start)
+        $eventos = $query->orderBy('start', 'asc')->get();
+        
         $consultorios = Consultorio::all();
         $practicas = Practica::all();
         $medicos = Medico::all();

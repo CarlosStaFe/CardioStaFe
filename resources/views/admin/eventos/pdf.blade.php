@@ -106,11 +106,12 @@
         @if(isset($filtros['medico']))
             <div class="filtro-item"><strong>Médico:</strong> {{ $filtros['medico'] }}</div>
         @endif
-        @if(isset($filtros['fecha_desde']))
-            <div class="filtro-item"><strong>Fecha desde:</strong> {{ $filtros['fecha_desde'] }}</div>
-        @endif
-        @if(isset($filtros['fecha_hasta']))
-            <div class="filtro-item"><strong>Fecha hasta:</strong> {{ $filtros['fecha_hasta'] }}</div>
+        @if(isset($filtros['fecha_desde']) && isset($filtros['fecha_hasta']))
+            <div class="filtro-item"><strong>Fecha desde:</strong> {{ \Carbon\Carbon::createFromFormat('Y-m-d', $filtros['fecha_desde'])->format('d-m-Y') }} - <strong>Fecha hasta:</strong> {{ \Carbon\Carbon::createFromFormat('Y-m-d', $filtros['fecha_hasta'])->format('d-m-Y') }}</div>
+        @elseif(isset($filtros['fecha_desde']))
+            <div class="filtro-item"><strong>Fecha desde:</strong> {{ \Carbon\Carbon::createFromFormat('Y-m-d', $filtros['fecha_desde'])->format('d-m-Y') }}</div>
+        @elseif(isset($filtros['fecha_hasta']))
+            <div class="filtro-item"><strong>Fecha hasta:</strong> {{ \Carbon\Carbon::createFromFormat('Y-m-d', $filtros['fecha_hasta'])->format('d-m-Y') }}</div>
         @endif
         @if(isset($filtros['estado']))
             <div class="filtro-item"><strong>Estado:</strong> {{ $filtros['estado'] }}</div>
@@ -125,19 +126,19 @@
     <table>
         <thead>
             <tr>
-                <th>Fecha</th>
-                <th>Hora</th>
-                <th>Consultorio</th>
-                <th>Médico</th>
-                <th>Práctica</th>
-                <th>Estado</th>
+                <th style="width: 8%;">Fecha</th>
+                <th style="width: 5%;">Hora</th>
+                <th style="width: 10%;">Consultorio</th>
+                <th style="width: 15%;">Médico</th>
+                <th style="width: 15%;">Práctica</th>
+                <th style="width: 10%;">Estado</th>
                 <th>Descripción</th>
             </tr>
         </thead>
         <tbody>
             @forelse($eventos as $evento)
                 <tr>
-                    <td>{{ \Carbon\Carbon::parse($evento->start)->format('d/m/Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($evento->start)->format('d-m-Y') }}</td>
                     <td>{{ \Carbon\Carbon::parse($evento->start)->format('H:i') }}</td>
                     <td>{{ $evento->consultorio->nombre ?? 'Sin asignar' }}</td>
                     <td>{{ $evento->medico->apel_nombres ?? 'Sin asignar' }}</td>

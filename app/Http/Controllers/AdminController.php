@@ -73,7 +73,9 @@ class AdminController extends Controller
         }
 
         // Todos pueden ver los eventos seleccionados, sin filtrar por rol
-        $eventos = $query->select('id', 'title', 'description', 'color', 'start', 'end')->get();
+        $eventos = $query->select('id', 'title', 'description', 'color', 'start', 'end')
+                        ->orderBy('start', 'asc')
+                        ->get();
 
         return response()->json($eventos);
     }

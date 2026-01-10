@@ -56,8 +56,8 @@
 			<div class="container position-relative d-flex align-items-center justify-content-between">
 				<a href="index.html" class="logo d-flex align-items-center me-auto">
 					<!-- Uncomment the line below if you also wish to use an image logo -->
-					<!-- <img src="assets/img/logo.png" alt=""> -->
-					<h1 class="sitename">Centro de Cardiología</h1>
+					<img src="assets/img/CardioInf.jpeg" alt="Centro de Cardiología Infantil Santa Fe" height="80" style="margin-right: 10px;">
+					<h1 class="sitename">Centro de Cardiología Infantil Santa Fe</h1>
 				</a>
 
 				<nav id="navmenu" class="navmenu">
