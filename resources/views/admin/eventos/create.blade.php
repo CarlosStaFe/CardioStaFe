@@ -114,8 +114,6 @@
                             @enderror
                         </div>
                     </div>
-
-
                 </div>
 
                 <div class="row">
@@ -183,39 +181,98 @@
                     </div>
                 </div>
             </form>
+
+            <!-- Formulario separado para limpiar horarios -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <form action="{{ route('admin.eventos.limpiar') }}" method="POST" class="d-inline" onsubmit="return confirmarLimpieza()">
+                            @csrf
+                            <input type="hidden" name="medico_id" id="limpiar_medico_id">
+                            <input type="hidden" name="consultorio_id" id="limpiar_consultorio_id">
+                            <input type="hidden" name="practica_id" id="limpiar_practica_id">
+                            <input type="hidden" name="fecha_inicio" id="limpiar_fecha_inicio">
+                            <input type="hidden" name="fecha_fin" id="limpiar_fecha_fin">
+                            
+                            <button type="button" class="btn btn-danger float-right" onclick="prepararLimpieza(this.form)">
+                                <i class="fas fa-calendar-minus"></i> Eliminar Horarios Disponibles
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Validar que la fecha fin no sea menor que fecha inicio
-    document.getElementById('fecha_inicio').addEventListener('change', function() {
+    function prepararLimpieza(form) {
+        // Copiar valores del formulario principal al formulario de limpieza
+        const medicoSelect = document.getElementById('medico_id');
+        const consultorioSelect = document.getElementById('consultorio_id');
+        const practicaSelect = document.getElementById('practica_id');
+        const fechaInicio = document.getElementById('fecha_inicio');
         const fechaFin = document.getElementById('fecha_fin');
-        fechaFin.min = this.value;
-        if (fechaFin.value < this.value) {
-            fechaFin.value = this.value;
+        
+        // Validar que los campos estén seleccionados
+        if (!medicoSelect.value || !consultorioSelect.value || !practicaSelect.value || !fechaInicio.value || !fechaFin.value) {
+            alert('Por favor, complete todos los campos antes de eliminar horarios.');
+            return false;
         }
-    });
+        
+        // Copiar valores
+        form.querySelector('#limpiar_medico_id').value = medicoSelect.value;
+        form.querySelector('#limpiar_consultorio_id').value = consultorioSelect.value;
+        form.querySelector('#limpiar_practica_id').value = practicaSelect.value;
+        form.querySelector('#limpiar_fecha_inicio').value = fechaInicio.value;
+        form.querySelector('#limpiar_fecha_fin').value = fechaFin.value;
+        
+        // Mostrar confirmación con detalles
+        const mensaje = `¿Está seguro de que desea eliminar TODOS los horarios disponibles para:
 
-    // Validar que la hora fin sea mayor que hora inicio
-    document.getElementById('hora_inicio').addEventListener('change', function() {
-        const horaFin = document.getElementById('hora_fin');
-        if (horaFin.value <= this.value) {
-            const horaInicio = new Date('2000-01-01 ' + this.value);
-            horaInicio.setMinutes(horaInicio.getMinutes() + 60);
-            horaFin.value = horaInicio.toTimeString().substr(0, 5);
-        }
-    });
+        Médico: ${medicoSelect.options[medicoSelect.selectedIndex].text}
+        Consultorio: ${consultorioSelect.options[consultorioSelect.selectedIndex].text}  
+        Práctica: ${practicaSelect.options[practicaSelect.selectedIndex].text}
+        Desde: ${fechaInicio.value} - Hasta: ${fechaFin.value}
 
-    // Validar que al menos un día esté seleccionado
-    document.querySelector('form').addEventListener('submit', function(e) {
-        const diasSeleccionados = document.querySelectorAll('input[type="checkbox"]:checked');
-        if (diasSeleccionados.length === 0) {
-            e.preventDefault();
-            alert('Debe seleccionar al menos un día de la semana.');
+        Esta acción NO se puede deshacer.`;
+        
+        if (confirm(mensaje)) {
+            form.submit();
         }
-    });
-});
+    }
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validar que la fecha fin no sea menor que fecha inicio
+        document.getElementById('fecha_inicio').addEventListener('change', function() {
+            const fechaFin = document.getElementById('fecha_fin');
+            fechaFin.min = this.value;
+            if (fechaFin.value < this.value) {
+                fechaFin.value = this.value;
+            }
+        });
+
+        // Validar que la hora fin sea mayor que hora inicio
+        document.getElementById('hora_inicio').addEventListener('change', function() {
+            const horaFin = document.getElementById('hora_fin');
+            if (horaFin.value <= this.value) {
+                const horaInicio = new Date('2000-01-01 ' + this.value);
+                horaInicio.setMinutes(horaInicio.getMinutes() + 60);
+                horaFin.value = horaInicio.toTimeString().substr(0, 5);
+            }
+        });
+
+        // Validar que al menos un día esté seleccionado
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const diasSeleccionados = document.querySelectorAll('input[type="checkbox"]:checked');
+            if (diasSeleccionados.length === 0) {
+                e.preventDefault();
+                alert('Debe seleccionar al menos un día de la semana.');
+            }
+        });
+    });
+</script>
+
 @endsection

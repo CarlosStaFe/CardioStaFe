@@ -35,7 +35,9 @@ class PracticaController extends Controller
 
         return redirect()->route('admin.practicas.index')
         ->with('mensaje', 'Práctica creada con éxito.')
-        ->with('icono', 'success');
+        ->with('icono', 'success')
+        ->with('showBtn', 'false')
+        ->with('timer', '4000');
     }
 
     public function show($id)
@@ -68,7 +70,9 @@ class PracticaController extends Controller
 
         return redirect()->route('admin.practicas.index')
         ->with('mensaje', 'Práctica actualizada con éxito.')
-        ->with('icono', 'success');
+        ->with('icono', 'success')
+        ->with('showBtn', 'false')
+        ->with('timer', '4000');
     }
 
     public function confirmDelete($id)
@@ -85,6 +89,8 @@ class PracticaController extends Controller
 
         return redirect()->route('admin.practicas.index')
             ->with('mensaje', 'Práctica eliminada con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 }

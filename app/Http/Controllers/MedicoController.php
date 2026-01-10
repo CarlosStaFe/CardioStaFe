@@ -52,7 +52,9 @@ class MedicoController extends Controller
 
         return redirect()->route('admin.medicos.index')
             ->with('mensaje', 'Médico creado con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 
     public function show($id)
@@ -101,7 +103,9 @@ class MedicoController extends Controller
 
         return redirect()->route('admin.medicos.index')
             ->with('mensaje', 'Médico actualizado con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 
     public function confirmDelete($id)
@@ -123,6 +127,8 @@ class MedicoController extends Controller
 
         return redirect()->route('admin.medicos.index')
             ->with('mensaje', 'Medico eliminado con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 }

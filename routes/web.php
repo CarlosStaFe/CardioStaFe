@@ -104,6 +104,7 @@ Route::delete('/admin/medicos/{id}', [MedicoController::class, 'destroy'])->name
 Route::get('/admin/eventos', [EventController::class, 'index'])->name('admin.eventos.index')->middleware(['auth', 'can:admin.eventos.index']);
 Route::get('/admin/eventos/generar-horarios', [EventController::class, 'create'])->name('admin.eventos.generar')->middleware('auth');
 Route::post('/admin/eventos/create', [EventController::class, 'store'])->name('admin.eventos.create');
+Route::post('/admin/eventos/limpiar-horarios', [EventController::class, 'limpiarHorariosDisponibles'])->name('admin.eventos.limpiar')->middleware('auth');
 Route::get('/admin/eventos/pdf', [EventController::class, 'pdf'])->name('admin.eventos.pdf')->middleware(['auth', 'can:admin.eventos.index']);
 Route::get('/admin/eventos/filtrar', [AdminController::class, 'filtrarEventos'])->name('admin.eventos.filtrar')->middleware('auth');
 Route::get('admin/eventos/buscar-reservado', [EventController::class, 'buscarReservado'])->name('admin.eventos.buscar-reservado')->middleware('auth');

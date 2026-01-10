@@ -38,7 +38,9 @@ class UsuarioController extends Controller
 
         return redirect()->route('admin.usuarios.index')
             ->with('mensaje', 'Usuario creado con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 
     public function show($id)
@@ -71,7 +73,9 @@ class UsuarioController extends Controller
 
         return redirect()->route('admin.usuarios.index')
             ->with('mensaje', 'Usuario actualizado con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 
     public function confirmDelete($id)
@@ -87,7 +91,10 @@ class UsuarioController extends Controller
 
         return redirect()->route('admin.usuarios.index')
             ->with('mensaje', 'Usuario eliminado con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
+
     }
 }
 

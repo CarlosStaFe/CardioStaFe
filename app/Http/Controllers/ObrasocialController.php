@@ -42,7 +42,9 @@ class ObrasocialController extends Controller
 
         return redirect()->route('admin.obrasociales.index')
             ->with('mensaje', 'Obra Social creada con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 
     public function show($id)
@@ -78,7 +80,9 @@ class ObrasocialController extends Controller
 
         return redirect()->route('admin.obrasociales.index')
         ->with('mensaje', 'Obra Social actualizada con éxito.')
-        ->with('icono', 'success');
+        ->with('icono', 'success')
+        ->with('showBtn', 'false')
+        ->with('timer', '4000');
     }
 
         public function confirmDelete($id)
@@ -94,13 +98,17 @@ class ObrasocialController extends Controller
             $obrasocial->delete();
             return redirect()->route('admin.obrasociales.index')
                 ->with('mensaje', 'Obra Social eliminada con éxito.')
-                ->with('icono', 'success');
+                ->with('icono', 'success')
+                ->with('showBtn', 'false')
+                ->with('timer', '4000');
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->getCode() == 23000) {
                 // Error de restricción de clave foránea
                 return redirect()->route('admin.obrasociales.index')
                     ->with('mensaje', 'No se puede eliminar la obra social porque está asociada a uno o más pacientes.')
-                    ->with('icono', 'error');
+                    ->with('icono', 'error')
+                    ->with('showBtn', 'false')
+                    ->with('timer', '4000');
             }
             throw $e;
         }

@@ -47,7 +47,9 @@ class SecretariaController extends Controller
 
         return redirect()->route('admin.secretarias.index')
             ->with('mensaje', 'Secretaria creada con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 
     public function show($id)
@@ -90,7 +92,9 @@ class SecretariaController extends Controller
 
         return redirect()->route('admin.secretarias.index')
             ->with('mensaje', 'Secretaria actualizada con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 
     public function confirmDelete($id)
@@ -112,6 +116,8 @@ class SecretariaController extends Controller
 
         return redirect()->route('admin.secretarias.index')
             ->with('mensaje', 'Secretaria eliminada con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 }

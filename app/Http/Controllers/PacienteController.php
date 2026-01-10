@@ -58,7 +58,9 @@ class PacienteController extends Controller
 
         return redirect()->route('admin.pacientes.index')
             ->with('mensaje', 'Paciente creado con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 
     public function show($id)
@@ -108,7 +110,9 @@ class PacienteController extends Controller
 
         return redirect()->route('admin.pacientes.index')
             ->with('mensaje', 'Paciente actualizado con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 
     public function confirmDelete($id)
@@ -125,7 +129,9 @@ class PacienteController extends Controller
 
         return redirect()->route('admin.pacientes.index')
             ->with('mensaje', 'Paciente eliminada con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 
     public function buscarPorDocumento(Request $request)

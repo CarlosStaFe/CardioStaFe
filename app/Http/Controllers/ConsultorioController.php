@@ -43,7 +43,9 @@ class ConsultorioController extends Controller
 
         return redirect()->route('admin.consultorios.index')
             ->with('mensaje', 'Consultorio creado con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 
     public function show($id)
@@ -74,7 +76,9 @@ class ConsultorioController extends Controller
 
         return redirect()->route('admin.consultorios.index')
         ->with('mensaje', 'Consultorio actualizado con éxito.')
-        ->with('icono', 'success');
+        ->with('icono', 'success')
+        ->with('showBtn', 'false')
+        ->with('timer', '4000');
     }
 
     public function confirmDelete($id)
@@ -91,6 +95,8 @@ class ConsultorioController extends Controller
 
         return redirect()->route('admin.consultorios.index')
             ->with('mensaje', 'Consultorio eliminado con éxito.')
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 }

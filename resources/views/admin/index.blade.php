@@ -530,10 +530,6 @@
                         eventosPorDia[fecha] = eventosPorDia[fecha].slice(0, 3);
                     }
                 });
-                // Mostrar por consola el agrupamiento por día y cuántos se agregan
-                //Object.keys(eventosPorDia).forEach(fecha => {
-                //    console.log('Fecha:', fecha, 'Eventos agregados:', eventosPorDia[fecha].length, eventosPorDia[fecha]);
-                //});
 
                 // Agregar al calendario solo los eventos seleccionados
                 let horariosDisponiblesMostrados = 0;

@@ -333,14 +333,14 @@
         </aside>
 
         <!-- SweetAlert -->
-        @if((($message = Session::get('mensaje')) && ($icono = Session::get('icono'))))
+        @if((($message = Session::get('mensaje')) && ($icono = Session::get('icono')) && ($showBtn = Session::get('showBtn')) && ($timer = Session::get('timer'))))
             <script>
                 Swal.fire({
                     //position: "top-end",
                     icon: "{{$icono}}",
                     title: "{{$message}}",
-                    showConfirmButton: false,
-                    timer: 4500
+                    showConfirmButton: {{$showBtn}},
+                    timer: {{$timer}}
                 });
             </script>
         @endif

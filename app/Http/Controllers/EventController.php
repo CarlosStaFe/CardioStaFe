@@ -77,7 +77,9 @@ class EventController extends Controller
             return redirect()->back()
                 ->withInput()
                 ->with('mensaje', 'Debe seleccionar al menos un día de la semana.')
-                ->with('icono', 'error');
+                ->with('icono', 'error')
+                ->with('showBtn', 'false')
+                ->with('timer', '4000');
         }
 
         // Validar que la hora de inicio sea menor que la hora de fin
@@ -85,7 +87,9 @@ class EventController extends Controller
             return redirect()->back()
                 ->withInput()
                 ->with('mensaje', 'La hora de inicio debe ser menor que la hora de fin.')
-                ->with('icono', 'error');
+                ->with('icono', 'error')
+                ->with('showBtn', 'false')
+                ->with('timer', '4000');
         }
 
         // Mapeo de días a números (0 = domingo, 1 = lunes, etc.)
@@ -159,7 +163,9 @@ class EventController extends Controller
 
         return redirect()->route('admin.index')
             ->with('mensaje', "Se crearon {$eventosCreados} horarios disponibles exitosamente.")
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'false')
+            ->with('timer', '4000');
     }
 
     /**
@@ -190,7 +196,9 @@ class EventController extends Controller
                 Log::warning('Evento no disponible', ['title' => $evento->title]);
                 return redirect()->route('admin.index')
                     ->with('mensaje', 'Este horario ya no está disponible.')
-                    ->with('icono', 'error');
+                    ->with('icono', 'error')
+                    ->with('showBtn', 'true')
+                    ->with('timer', '6000');
             }
 
             // Tomar el id directamente del select
@@ -261,13 +269,16 @@ class EventController extends Controller
 
             return redirect()->route('admin.index')
                 ->with('mensaje', 'Turno reservado exitosamente para ' . $request->nombre . '\n\nLE LLEGARÁ UN CORREO A SU CASILLA CON LOS DATOS DEL TURNO.')
-                ->with('icono', 'success');
-
+                ->with('icono', 'success')
+                ->with('showBtn', 'true')
+                ->with('timer', '100000');
         } catch (\Exception $e) {
             return redirect()->route('admin.index')
                 ->with('mensaje', 'Error al reservar el turno: ' . $e->getMessage())
-                ->with('icono', 'error');
-        }
+                ->with('icono', 'error')
+                ->with('showBtn', 'true')
+                ->with('timer', '6000');
+           }
     }
 
     public function enviarWhatsApp(Request $request, $evento, $obraSocial, $presentar, $appUrl)
@@ -321,12 +332,14 @@ class EventController extends Controller
             ->where('consultorio_id', $request->consultorio_id)
             ->where('practica_id', $request->practica_id)
             ->where('title', '- Horario disponible')
-            ->whereBetween('start', [$request->fecha_inicio, $request->fecha_fin . ' 23:59:59'])
+            ->whereBetween('start', [$request->fecha_inicio . ' 00:00:00', $request->fecha_fin . ' 23:59:59'])
             ->delete();
 
         return redirect()->back()
             ->with('mensaje', "Se eliminaron {$eventosEliminados} horarios disponibles.")
-            ->with('icono', 'success');
+            ->with('icono', 'success')
+            ->with('showBtn', 'true')
+            ->with('timer', '6000');
     }
 
     public function show($id)
