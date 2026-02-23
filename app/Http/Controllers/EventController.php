@@ -42,7 +42,7 @@ class EventController extends Controller
         }
         
         if ($request->filled('estado')) {
-            if ($request->estado === '- Horario Disponible') {
+            if ($request->estado === '- Horario disponible') {
                 $query->whereNotIn('title', ['- Reservado', '- En Espera', '- Atendido']);
             } else {
                 $query->where('title', $request->estado);
@@ -293,15 +293,108 @@ class EventController extends Controller
                     );
             });
 
-            // Enviar WhatsApp
-            //$appUrl = preg_replace('/^https?:\/\//', '', env('APP_URL'));
-            //$this->enviarWhatsApp($request, $evento, $obraSocial, $presentar, $appUrl);
+            // Generar PDF con los mismos datos del turno
+            $appUrl = preg_replace('/^https?:\/\//', '', env('APP_URL'));
+            $htmlContent = '
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <title>Comprobante de Turno</title>
+                <style>
+                    body { font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; }
+                    .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+                    .title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+                    .subtitle { font-size: 14px; color: #666; }
+                    .content { margin: 20px 0; }
+                    .data-row { margin: 8px 0; border-bottom: 1px dotted #ccc; padding-bottom: 5px; }
+                    .label { font-weight: bold; color: #333; }
+                    .value { margin-left: 10px; }
+                    .footer { margin-top: 30px; text-align: center; font-size: 10px; color: #666; border-top: 1px solid #ccc; padding-top: 10px; }
+                    .important { background-color: #fff2cc; padding: 10px; border-left: 4px solid #ffc107; margin: 15px 0; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="title">COMPROBANTE DE TURNO RESERVADO</div>
+                    <div class="subtitle">Centro de Cardiología Infantil Santa Fe</div>
+                </div>
+                
+                <div class="content">
+                    <div class="data-row">
+                        <span class="label">Fecha del Turno:</span>
+                        <span class="value">' . date('d/m/Y', strtotime($evento->start)) . '</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Hora:</span>
+                        <span class="value">' . date('H:i', strtotime($evento->start)) . '</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Práctica:</span>
+                        <span class="value">' . ($evento->practica ? $evento->practica->nombre : '') . '</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Médico:</span>
+                        <span class="value">' . ($evento->medico ? $evento->medico->apel_nombres : '') . '</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Paciente:</span>
+                        <span class="value">' . $request->nombre . '</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Documento:</span>
+                        <span class="value">' . $request->documento . '</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Teléfono:</span>
+                        <span class="value">' . $request->telefono . '</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Email:</span>
+                        <span class="value">' . $request->email . '</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Obra Social:</span>
+                        <span class="value">' . ($obraSocial ? $obraSocial->nombre : '') . '</span>
+                    </div>
+                    
+                    <div class="important">
+                        <div class="label">Documentación requerida:</div>
+                        <div class="value">' . $presentar . '</div>
+                    </div>
+                </div>
+                
+                <div class="footer">
+                    <p>Comprobante generado el ' . date('d/m/Y H:i') . '</p>
+                    <p>Centro de Cardiología Infantil Santa Fe - Catamarca 3373, Santa Fe</p>
+                    <p>Web: https://' . $appUrl . ' | Tel: (0342) 4565514</p>
+                    <p><strong>Conserve este comprobante hasta el día de su turno</strong></p>
+                </div>
+            </body>
+            </html>';
+
+            // Generar el PDF
+            $pdf = Pdf::loadHTML($htmlContent);
+            $nombreArchivo = 'turno_' . date('Ymd_His') . '_' . str_replace(' ', '_', $request->nombre) . '.pdf';
+            
+            // Configurar ruta de almacenamiento público
+            $directorioTurnos = public_path('storage/turnos');
+            $pdfPath = $directorioTurnos . '/' . $nombreArchivo;
+            
+            // Crear directorio si no existe
+            if (!file_exists($directorioTurnos)) {
+                mkdir($directorioTurnos, 0755, true);
+            }
+            
+            $pdf->save($pdfPath);
 
             return redirect()->route('admin.index')
-                ->with('mensaje', 'Turno reservado exitosamente para ' . $request->nombre . '\n\nLE LLEGARÁ UN CORREO A SU CASILLA CON LOS DATOS DEL TURNO.')
+                // ->with('mensaje', 'Turno reservado exitosamente para ' . $request->nombre . '\n\nLE LLEGARÁ UN CORREO A SU CASILLA CON LOS DATOS DEL TURNO.')
+                ->with('mensaje', 'Turno reservado exitosamente.')
                 ->with('icono', 'success')
                 ->with('showBtn', 'true')
-                ->with('timer', '100000');
+                ->with('timer', '100000')
+                ->with('pdf_path', 'storage/turnos/' . $nombreArchivo);
         } catch (\Exception $e) {
             return redirect()->route('admin.index')
                 ->with('mensaje', 'Error al reservar el turno: ' . $e->getMessage())
@@ -309,43 +402,6 @@ class EventController extends Controller
                 ->with('showBtn', 'true')
                 ->with('timer', '6000');
            }
-    }
-
-    public function enviarWhatsApp(Request $request, $evento, $obraSocial, $presentar, $appUrl)
-    {
-        // Enviar WhatsApp usando Twilio
-        try {
-            $telefonoWhatsApp = preg_replace('/\D/', '', $request->telefono);
-            if (preg_match('/^3[4-9][0-9]{8}$/', $telefonoWhatsApp)) {
-            $mensajeWhatsapp = "Su turno ha sido reservado.\n" .
-                "Fecha: " . date('d/m/Y', strtotime($evento->start)) . "\n" .
-                "Hora: " . date('H:i', strtotime($evento->start)) . "\n" .
-                "Práctica: " . ($evento->practica ? $evento->practica->nombre : '') . "\n" .
-                "Médico: " . ($evento->medico ? $evento->medico->apel_nombres : '') . "\n" .
-                "Paciente: " . $request->nombre . "\n" .
-                "Documento: " . $request->documento . "\n" .
-                "Obra Social: " . ($obraSocial && $obraSocial->nombre ? $obraSocial->nombre : '') . "\n" .
-                "Documentación requerida: " . $presentar . "\n" .
-                "Link de la aplicación: https://" . $appUrl;
-            $sid = env('TWILIO_SID');
-            $token = env('TWILIO_AUTH_TOKEN');
-            $twilioNumber = env('TWILIO_WHATSAPP_NUMBER'); // Ejemplo: 'whatsapp:+14155238886'
-            $client = new Client($sid, $token);
-            $toWhatsapp = 'whatsapp:+549' . $telefonoWhatsApp;
-            $message = $client->messages->create(
-                $toWhatsapp,
-                [
-                'from' => $twilioNumber,
-                'body' => $mensajeWhatsapp
-                ]
-            );
-            // Mostrar el objeto $message en pantalla
-            //dd($message);
-            print($message->sid);
-            }
-        } catch (\Exception $e) {
-            Log::error('Error enviando WhatsApp: ' . $e->getMessage());
-        }
     }
 
     public function limpiarHorariosDisponibles(Request $request)
@@ -636,7 +692,7 @@ class EventController extends Controller
         
         // Filtro por estado
         if ($request->filled('estado')) {
-            if ($request->estado === '- Horario Disponible') {
+            if ($request->estado === '- Horario disponible') {
                 $query->whereNotIn('title', ['- Reservado', '- En Espera', '- Atendido']);
             } else {
                 $query->where('title', $request->estado);

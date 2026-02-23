@@ -257,7 +257,7 @@
                                         <div class="form-goup">
                                             <label for="telefono">Teléfono</label><b>*</b>
                                             <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Ingrese teléfono del paciente" required>
-                                            <small class="form-text text-muted">Ejemplo: 3425123456 (sin espacios ni guiones, sin el 15)</small>
+                                            <small class="form-text text-muted">Ingrese un número de teléfono válido</small>
                                         </div>
                                     </div>
                                 </div>
@@ -422,6 +422,9 @@
                             debugObrasSociales.textContent = 'Error AJAX:\n' + error;
                             obrasSocialesSelect.innerHTML = '<option value="">Error al cargar obras sociales</option>';
                         });
+                    // Restaurar estado de botones antes de mostrar modal
+                    restaurarEstadoBotones();
+                    
                     // Mostrar modal
                     var modal = new bootstrap.Modal(document.getElementById('exampleModal'));
                     modal.show();
@@ -434,6 +437,15 @@
         });
         calendar.render();
         document.getElementById('tipo').value = 'DNI';
+        
+        // Event listener para cuando se cierre el modal - restaurar botones
+        var modal = document.getElementById('exampleModal');
+        if (modal) {
+            modal.addEventListener('hidden.bs.modal', function() {
+                console.log('Modal cerrado - restaurando estado de botones');
+                restaurarEstadoBotones();
+            });
+        }
         
         // Cargar eventos disponibles automáticamente al inicializar
         cargarEventosIniciales();
@@ -459,6 +471,25 @@
         campos.forEach(function(campo) {
             campo.classList.remove('is-valid', 'is-invalid');
         });
+        
+        // Restaurar estado de botones
+        restaurarEstadoBotones();
+    }
+
+    function restaurarEstadoBotones() {
+        // Mostrar el botón Reservar
+        var reservarBtn = document.getElementById('guardarEventoBtn');
+        if (reservarBtn) {
+            reservarBtn.style.display = 'inline-block';
+        }
+        
+        // Ocultar el botón Suspender
+        var suspenderBtn = document.getElementById('suspenderEventoBtn');
+        if (suspenderBtn) {
+            suspenderBtn.style.display = 'none';
+        }
+        
+        console.log('Estado de botones restaurado - Reservar visible, Suspender oculto');
     }
 </script>
 
@@ -649,8 +680,14 @@
         var btn = document.getElementById('btnSuspender');
         if (btn) {
             btn.style.display = 'none';
+        }        
+        // Restaurar el botón Reservar
+        var reservarBtn = document.getElementById('guardarEventoBtn');
+        if (reservarBtn) {
+            reservarBtn.style.display = 'inline-block';
         }
-    }
+        
+        console.log('Botón suspender ocultado y botón reservar restaurado');    }
 </script>
 
 <script>
@@ -716,60 +753,79 @@
     }
 </script>
 
+<!-- Script para manejo de descarga de PDF después de reserva -->
 <script>
-    // Validar teléfono al enviar el formulario
-    var eventoForm = document.getElementById('eventoForm');
-    if (eventoForm) {
-        eventoForm.addEventListener('submit', function(e) {
-            var telefonoInput = document.getElementById('telefono');
-            if (telefonoInput) {
-                var esValido = validarTelefonoWhatsApp(telefonoInput, true);
-                if (!esValido) {
-                    e.preventDefault();
-                    telefonoInput.focus();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Teléfono inválido',
-                        text: 'El teléfono ingresado no es válido para WhatsApp. Ejemplo: 3425123456',
-                    });
-                }
-            }
-        });
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(session('pdf_path'))
+            // Mostrar modal con botón de descarga del PDF
+            setTimeout(function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Turno Reservado Exitosamente!',
+                    html: `
+                        <div style="text-align: center;">
+                            <p style="font-size: 16px; margin-bottom: 15px;">Su turno ha sido reservado correctamente.</p>
+                            <p style="color: #28a745; font-weight: bold; margin-bottom: 20px;">✓ Se ha enviado un email con los detalles del turno</p>
+                            <hr style="margin: 20px 0;">
+                            <p style="font-size: 18px; font-weight: bold; color: #007bff; margin-bottom: 15px;">
+                                📄 Comprobante de Turno Disponible
+                            </p>
+                            <p style="margin-bottom: 20px; color: #666;">
+                                Descargue su comprobante en PDF para conservarlo hasta el día del turno
+                            </p>
+                            <a href="{{ asset(session('pdf_path')) }}" 
+                               class="btn btn-primary btn-lg" 
+                               target="_blank"
+                               style="background: linear-gradient(45deg, #007bff, #0056b3); 
+                                      color: white; 
+                                      padding: 12px 30px; 
+                                      text-decoration: none; 
+                                      border-radius: 8px; 
+                                      display: inline-block; 
+                                      margin: 10px;
+                                      font-size: 16px;
+                                      font-weight: bold;
+                                      box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+                                      transition: all 0.3s ease;"
+                               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,123,255,0.4)'"
+                               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(0,123,255,0.3)'">
+                               <i class="fas fa-file-pdf" style="margin-right: 8px;"></i>
+                               Descargar Comprobante PDF
+                            </a>
+                        </div>
+                    `,
+                    showConfirmButton: true,
+                    confirmButtonText: 'Entendido',
+                    allowOutsideClick: false,
+                    customClass: {
+                        popup: 'swal2-large'
+                    },
+                    width: 650,
+                    padding: '2em'
+                });
+            }, 1000);
+        @endif
+        
+        @if(session('mensaje') && !session('pdf_path'))
+            // Mensaje normal sin PDF
+            setTimeout(function() {
+                Swal.fire({
+                    icon: '{{ session("icono") ?? "info" }}',
+                    title: 'Información',
+                    text: '{{ session("mensaje") }}',
+                    timer: {{ session("timer") ?? 5000 }},
+                    showConfirmButton: {{ session("showBtn") === "true" ? "true" : "false" }}
+                });
+            }, 500);
+        @endif
+    });
 </script>
 
-<script>
-    function validarTelefonoWhatsApp(input, returnBool = false) {
-        // Solo dígitos, 10 caracteres, sin espacios, guiones ni el 15
-        var valor = input.value.replace(/\D/g, '');
-        var valido = /^3[4-9][0-9]{8}$/.test(valor); // Ejemplo: 3425123456
-        var mensaje = input.nextElementSibling;
-        if (!mensaje || !mensaje.classList.contains('form-text')) {
-            mensaje = document.createElement('small');
-            mensaje.className = 'form-text';
-            input.parentNode.appendChild(mensaje);
-        }
-        if (valor.length === 0) {
-            input.classList.remove('is-valid', 'is-invalid');
-            mensaje.textContent = 'Ejemplo: 3425123456 (sin espacios ni guiones, sin el 15)';
-            mensaje.className = 'form-text text-muted';
-            if (returnBool) return false;
-            return;
-        }
-        if (valido) {
-            input.classList.remove('is-invalid');
-            input.classList.add('is-valid');
-            mensaje.textContent = '✓ Teléfono válido para WhatsApp.';
-            mensaje.className = 'form-text text-success';
-            if (returnBool) return true;
-        } else {
-            input.classList.remove('is-valid');
-            input.classList.add('is-invalid');
-            mensaje.textContent = '✗ Formato inválido. Ejemplo: 3425123456 (sin espacios ni guiones, sin el 15)';
-            mensaje.className = 'form-text text-danger';
-            if (returnBool) return false;
-        }
+<style>
+    .swal2-large {
+        width: 600px !important;
+        max-width: 90% !important;
     }
-</script>
+</style>
 
 @endsection

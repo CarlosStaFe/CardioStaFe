@@ -118,6 +118,3 @@ Route::delete('/admin/eventos/{event}', [EventController::class, 'destroy'])->na
 //RUTA PARA BUSCAR LAS LOCALIDADES SEGÚN LA PROVINCIA Y LA LOCALIDAD
 Route::get('/admin/localidades/{idProv}', [LocalidadController::class, 'getLocalidades']);
 Route::get('/admin/codpostales/{idLocal}', [LocalidadController::class, 'getCodigosPostales']);
-
-//RUTA PARA EL ADMIN - WHATSAPP
-Route::post('/admin/eventos/enviar-whatsapp', [EventController::class, 'enviarWhatsApp'])->name('admin.eventos.enviar-whatsapp')->middleware('auth');
