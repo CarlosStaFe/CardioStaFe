@@ -8,6 +8,7 @@ use App\Models\Practica;
 use App\Models\Medico;
 use App\Models\Obrasocial;
 use App\Models\Paciente;
+use App\Models\Agenda;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -139,6 +140,7 @@ class EventController extends Controller
         $rangoMinutos = (int)$request->rango;
 
         $eventosCreados = 0;
+        $agendasCreadas = 0;
 
         // Iterar por cada día en el rango de fechas
         for ($fecha = clone $fechaInicio; $fecha <= $fechaFin; $fecha->modify('+1 day')) {
@@ -147,6 +149,8 @@ class EventController extends Controller
 
             // Verificar si este día está seleccionado
             if (in_array($diaSemanaTexto, $diasSeleccionados)) {
+                $eventosDelDia = 0; // Contador para eventos creados en este día
+                
                 // Generar horarios para este día usando strings de tiempo
                 $horaActual = $horaInicioStr;
                 
@@ -181,6 +185,7 @@ class EventController extends Controller
                             $evento->save();
                             
                             $eventosCreados++;
+                            $eventosDelDia++;
                         }
                     }
                     
@@ -188,14 +193,36 @@ class EventController extends Controller
                     $timestampSiguiente = strtotime($horaActual) + ($rangoMinutos * 60);
                     $horaActual = date('H:i', $timestampSiguiente);
                 }
+                
+                // Si se crearon eventos para este día, crear o actualizar registro en agenda
+                if ($eventosDelDia > 0) {
+                    $existeAgenda = Agenda::where('fecha', $fecha->format('Y-m-d'))
+                        ->where('medico_id', $request->medico_id)
+                        ->where('consultorio_id', $request->consultorio_id)
+                        ->where('practica_id', $request->practica_id)
+                        ->first();
+                        
+                    if (!$existeAgenda) {
+                        Agenda::create([
+                            'fecha' => $fecha->format('Y-m-d'),
+                            'medico_id' => $request->medico_id,
+                            'practica_id' => $request->practica_id,
+                            'consultorio_id' => $request->consultorio_id,
+                            'hora_inicio' => $horaInicioStr,
+                            'hora_fin' => $horaFinStr
+                        ]);
+                        $agendasCreadas++;
+                    }
+                }
             }
         }
 
-        return redirect()->route('admin.index')
-            ->with('mensaje', "Se crearon {$eventosCreados} horarios disponibles exitosamente.")
+        return redirect()->route('admin.eventos.generar')
+            ->with('mensaje', "Se crearon {$eventosCreados} horarios disponibles y {$agendasCreadas} registros de agenda exitosamente.")
             ->with('icono', 'success')
             ->with('showBtn', 'false')
-            ->with('timer', '4000');
+            ->with('timer', '4000')
+            ->with('actualizar_calendario', true);
     }
 
     /**
@@ -295,6 +322,15 @@ class EventController extends Controller
 
             // Generar PDF con los mismos datos del turno
             $appUrl = preg_replace('/^https?:\/\//', '', env('APP_URL'));
+            
+            // Obtener el logo en base64
+            $logoPath = public_path('assets/img/LogoCompletoChico.jpg');
+            $logoBase64 = '';
+            if (file_exists($logoPath)) {
+                $logoData = file_get_contents($logoPath);
+                $logoBase64 = 'data:image/jpeg;base64,' . base64_encode($logoData);
+            }
+            
             $htmlContent = '
             <!DOCTYPE html>
             <html>
@@ -304,6 +340,8 @@ class EventController extends Controller
                 <style>
                     body { font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; }
                     .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+                    .logo { margin-bottom: 10px; }
+                    .logo img { max-width: 150px; height: auto; }
                     .title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
                     .subtitle { font-size: 14px; color: #666; }
                     .content { margin: 20px 0; }
@@ -316,6 +354,7 @@ class EventController extends Controller
             </head>
             <body>
                 <div class="header">
+                    ' . ($logoBase64 ? '<div class="logo"><img src="' . $logoBase64 . '" alt="Logo Centro"></div>' : '') . '
                     <div class="title">COMPROBANTE DE TURNO RESERVADO</div>
                     <div class="subtitle">Centro de Cardiología Infantil Santa Fe</div>
                 </div>
@@ -414,6 +453,7 @@ class EventController extends Controller
             'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
         ]);
 
+        // Eliminar eventos (el event listener del modelo se encarga automáticamente de agenda)
         $eventosEliminados = Event::where('medico_id', $request->medico_id)
             ->where('consultorio_id', $request->consultorio_id)
             ->where('practica_id', $request->practica_id)
@@ -421,8 +461,47 @@ class EventController extends Controller
             ->whereBetween('start', [$request->fecha_inicio . ' 00:00:00', $request->fecha_fin . ' 23:59:59'])
             ->delete();
 
+        Log::info('Limpieza masiva de horarios', [
+            'eventos_eliminados' => $eventosEliminados,
+            'criterios' => [
+                'medico_id' => $request->medico_id,
+                'consultorio_id' => $request->consultorio_id,
+                'practica_id' => $request->practica_id,
+                'fecha_inicio' => $request->fecha_inicio,
+                'fecha_fin' => $request->fecha_fin
+            ]
+        ]);
+
+        // Eliminar registros de agenda correspondientes a los criterios del formulario
+        $agendaEliminada = 0;
+        for ($fecha = $request->fecha_inicio; $fecha <= $request->fecha_fin; $fecha = date('Y-m-d', strtotime($fecha . ' +1 day'))) {
+            $agendaResponse = Agenda::where('fecha', $fecha)
+                ->where('medico_id', $request->medico_id)
+                ->where('practica_id', $request->practica_id)
+                ->where('consultorio_id', $request->consultorio_id)
+                ->delete();
+            
+            $agendaEliminada += $agendaResponse;
+        }
+
+        Log::info('Limpieza de agenda por criterios del formulario', [
+            'agenda_eliminada' => $agendaEliminada,
+            'criterios' => [
+                'medico_id' => $request->medico_id,
+                'consultorio_id' => $request->consultorio_id,
+                'practica_id' => $request->practica_id,
+                'fecha_inicio' => $request->fecha_inicio,
+                'fecha_fin' => $request->fecha_fin
+            ]
+        ]);
+
+        $mensajeCompleto = "Se eliminaron {$eventosEliminados} horarios disponibles";
+        if ($agendaEliminada > 0) {
+            $mensajeCompleto .= " y {$agendaEliminada} registros de agenda";
+        }
+
         return redirect()->back()
-            ->with('mensaje', "Se eliminaron {$eventosEliminados} horarios disponibles.")
+            ->with('mensaje', $mensajeCompleto . ".")
             ->with('icono', 'success')
             ->with('showBtn', 'true')
             ->with('timer', '6000');
@@ -513,7 +592,7 @@ class EventController extends Controller
                 return redirect()->route('admin.eventos.index')->with('error', 'Evento no encontrado');
             }
 
-            // Eliminar el evento
+            // Eliminar el evento (el event listener del modelo se encargará de eliminar agenda automáticamente)
             $deleted = $event->delete();
             
             if ($deleted) {
@@ -561,7 +640,63 @@ class EventController extends Controller
     public function confirmDelete($id)
     {
         $evento = Event::findOrFail($id);
-        return view('admin.eventos.confirm-delete', compact('evento'));
+        
+        // Verificar si hay registros de agenda correspondientes
+        $fechaEvento = date('Y-m-d', strtotime($evento->start));
+        $agendaCoincidentes = Agenda::where('fecha', $fechaEvento)
+            ->where('medico_id', $evento->medico_id)
+            ->where('practica_id', $evento->practica_id)
+            ->where('consultorio_id', $evento->consultorio_id)
+            ->get();
+        
+        Log::info('Confirmación de eliminación - Verificando agenda', [
+            'event_id' => $evento->id,
+            'agenda_coincidentes' => $agendaCoincidentes->count(),
+            'criterios' => [
+                'fecha' => $fechaEvento,
+                'medico_id' => $evento->medico_id,
+                'practica_id' => $evento->practica_id,  
+                'consultorio_id' => $evento->consultorio_id,
+            ]
+        ]);
+        
+        return view('admin.eventos.confirm-delete', compact('evento', 'agendaCoincidentes'));
+    }
+
+    public function verificarEventosConAgenda()
+    {
+        // Obtener todos los registros de agenda
+        $agendaRecords = Agenda::all();
+        $eventosConAgenda = [];
+        
+        foreach ($agendaRecords as $agenda) {
+            $fechaStr = $agenda->fecha->format('Y-m-d');
+            
+            $eventos = Event::whereDate('start', $fechaStr)
+                ->where('medico_id', $agenda->medico_id)
+                ->where('practica_id', $agenda->practica_id)
+                ->where('consultorio_id', $agenda->consultorio_id)
+                ->get();
+            
+            if ($eventos->count() > 0) {
+                $eventosConAgenda[] = [
+                    'agenda' => $agenda,
+                    'eventos' => $eventos,
+                    'fecha' => $fechaStr
+                ];
+            }
+        }
+        
+        Log::info('Verificación de eventos con agenda', [
+            'total_agenda_records' => $agendaRecords->count(),
+            'eventos_con_agenda_coincidente' => count($eventosConAgenda)
+        ]);
+        
+        return response()->json([
+            'agenda_records' => $agendaRecords->count(),
+            'eventos_con_agenda' => $eventosConAgenda,
+            'message' => 'Solo los eventos que coincidan exactamente con fecha, médico, práctica y consultorio eliminarán agenda'
+        ]);
     }
 
     public function cambiarEstado(Request $request, $id)
@@ -764,6 +899,51 @@ class EventController extends Controller
             return response()->json(['success' => false, 'message' => 'El paciente no tiene email']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Obtener datos de la agenda para el calendario
+     */
+    public function obtenerAgenda()
+    {
+        try {
+            $agendas = Agenda::with(['medico', 'practica', 'consultorio'])
+                ->whereDate('fecha', '>=', now()->format('Y-m-d'))
+                ->orderBy('fecha', 'asc')
+                ->get();
+
+            $eventos = [];
+            foreach ($agendas as $agenda) {
+                // Asignar color según el médico
+                $colores = [
+                    1 => '#87CEEB', // Celeste
+                    2 => '#FFD700', // Amarillo  
+                    3 => '#FFB6C1', // Rosado
+                    4 => '#FFA500'  // Naranja
+                ];
+                $colorMedico = isset($colores[$agenda->medico_id]) ? $colores[$agenda->medico_id] : '#17a2b8';
+                
+                $eventos[] = [
+                    'id' => 'agenda_' . $agenda->id,
+                    'title' => ($agenda->medico ? $agenda->medico->apel_nombres : 'Médico no encontrado'),
+                    'extendedProps' => [
+                        'medico' => $agenda->medico ? $agenda->medico->apel_nombres : 'Médico no encontrado',
+                        'practica' => $agenda->practica ? $agenda->practica->nombre : 'Práctica no encontrada',
+                        'consultorio' => $agenda->consultorio ? $agenda->consultorio->nombre : 'No especificado',
+                        'horario' => $agenda->hora_inicio . ' - ' . $agenda->hora_fin
+                    ],
+                    'start' => $agenda->fecha->format('Y-m-d') . 'T' . $agenda->hora_inicio,
+                    'end' => $agenda->fecha->format('Y-m-d') . 'T' . $agenda->hora_fin,
+                    'color' => $colorMedico,
+                    'allDay' => false
+                ];
+            }
+            
+            return response()->json($eventos);
+        } catch (\Exception $e) {
+            \Log::error('Error al obtener agenda: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener datos de la agenda'], 500);
         }
     }
 

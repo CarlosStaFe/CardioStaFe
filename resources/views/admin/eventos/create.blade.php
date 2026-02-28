@@ -205,6 +205,18 @@
     </div>
 </div>
 
+<!-- ***** CALENDARIO DE HORARIOS ***** -->
+<div class="col-md-12">
+    <div class="card card-info">
+        <div class="card-header">
+            <h3 class="card-title">Agenda de trabajo de médicos</h3>
+        </div>
+        <div class="card-body">
+            <div id="calendar-preview"></div>
+        </div>
+    </div>
+</div>
+
 <script>
     function prepararLimpieza(form) {
         // Copiar valores del formulario principal al formulario de limpieza
@@ -273,6 +285,111 @@
             }
         });
     });
+</script>
+
+<script>
+    let calendar;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar el calendario
+        var calendarEl = document.getElementById('calendar-preview');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: ''
+            },
+            initialView: 'dayGridMonth',
+            locale: 'es',
+            selectable: false,
+            selectMirror: true,
+            dayMaxEvents: false,
+            dayMaxEventRows: false,
+            weekends: false,
+            height: 'auto',
+            eventDisplay: 'block',
+            eventTextColor: '#000',
+            eventBorderWidth: 2,
+            stickyHeaderDates: true,
+            expandRows: true,
+            eventContent: function(eventInfo) {
+                var event = eventInfo.event;
+                var props = event.extendedProps;
+                
+                return {
+                    html: '<div style="padding: 2px; line-height: 1.2; font-size: 11px;">' +
+                          '<div style="font-weight: bold; margin-bottom: 1px;">' + (props.medico || event.title) + '</div>' +
+                          '<div style="margin-bottom: 1px;">🏥 ' + (props.consultorio || '') + '</div>' +
+                          '<div style="margin-bottom: 1px;">⚕️ ' + (props.practica || '') + '</div>' +
+                          '<div>⏰ ' + (props.horario || '') + '</div>' +
+                          '</div>'
+                };
+            },
+            events: function(fetchInfo, successCallback, failureCallback) {
+                cargarEventosCalendario(fetchInfo, successCallback, failureCallback);
+            }
+        });
+        calendar.render();
+        
+        // Agregar eventos a los campos del formulario para actualizar calendario
+        ['medico_id', 'consultorio_id', 'practica_id', 'fecha_inicio', 'fecha_fin'].forEach(function(fieldId) {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('change', function() {
+                    actualizarCalendario();
+                });
+            }
+        });
+        
+        // Cargar eventos inicialmente
+        actualizarCalendario();
+        
+        // Actualizar calendario si se generaron horarios nuevos
+        @if(session('actualizar_calendario'))
+        setTimeout(function() {
+            actualizarCalendario();
+            console.log('Calendario actualizado automáticamente después de generar horarios');
+        }, 1000);
+        @endif
+    });
+    
+    function cargarEventosCalendario(fetchInfo, successCallback, failureCallback) {
+        console.log('Iniciando carga de agenda...');
+        
+        // Cargar datos de la tabla agenda
+        fetch('{{ route("admin.agenda.obtener") }}', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            console.log('Respuesta recibida:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Datos recibidos:', data);
+            if (Array.isArray(data)) {
+                console.log('Cargando', data.length, 'eventos de agenda');
+                successCallback(data);
+            } else {
+                console.error('Error en respuesta:', data);
+                successCallback([]);
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar agenda:', error);
+            failureCallback(error);
+        });
+    }
+    
+    function actualizarCalendario() {
+        if (calendar) {
+            calendar.refetchEvents();
+        }
+    }
 </script>
 
 @endsection

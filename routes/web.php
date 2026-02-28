@@ -105,8 +105,10 @@ Route::get('/admin/eventos', [EventController::class, 'index'])->name('admin.eve
 Route::get('/admin/eventos/generar-horarios', [EventController::class, 'create'])->name('admin.eventos.generar')->middleware('auth');
 Route::post('/admin/eventos/create', [EventController::class, 'store'])->name('admin.eventos.create');
 Route::post('/admin/eventos/limpiar-horarios', [EventController::class, 'limpiarHorariosDisponibles'])->name('admin.eventos.limpiar')->middleware('auth');
+Route::get('/admin/eventos/verificar-agenda', [EventController::class, 'verificarEventosConAgenda'])->name('admin.eventos.verificar-agenda')->middleware('auth');
 Route::get('/admin/eventos/pdf', [EventController::class, 'pdf'])->name('admin.eventos.pdf')->middleware(['auth', 'can:admin.eventos.index']);
 Route::get('/admin/eventos/filtrar', [AdminController::class, 'filtrarEventos'])->name('admin.eventos.filtrar')->middleware('auth');
+Route::get('/admin/agenda', [EventController::class, 'obtenerAgenda'])->name('admin.agenda.obtener')->middleware('auth');
 Route::get('admin/eventos/buscar-reservado', [EventController::class, 'buscarReservado'])->name('admin.eventos.buscar-reservado')->middleware('auth');
 Route::get('/admin/eventos/{id}/edit', [EventController::class, 'edit'])->name('admin.eventos.edit')->middleware('auth');
 Route::get('/admin/eventos/{id}/confirm-delete', [EventController::class, 'confirmDelete'])->name('admin.eventos.confirm-delete')->middleware('auth');
