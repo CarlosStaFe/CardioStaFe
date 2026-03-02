@@ -11,6 +11,7 @@ use App\Http\Controllers\PracticaController;
 use App\Http\Controllers\ObrasocialController;
 use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\BackupController;
 
 use App\Http\Controllers\LocalidadController;
 
@@ -116,6 +117,13 @@ Route::post('/admin/eventos/{id}/cambiar-estado', [EventController::class, 'camb
 Route::get('/admin/eventos/{id}', [EventController::class, 'show'])->name('admin.eventos.show')->middleware('auth');
 Route::put('/admin/eventos/{id}', [EventController::class, 'update'])->name('admin.eventos.update')->middleware('auth');
 Route::delete('/admin/eventos/{event}', [EventController::class, 'destroy'])->name('admin.eventos.destroy')->middleware(['auth', 'can:admin.eventos.destroy']);
+
+//RUTAS PARA COPIAS DE SEGURIDAD - Solo Administrador y Secretaria
+Route::get('/admin/backup', [BackupController::class, 'index'])->name('admin.backup.index')->middleware('auth');
+Route::post('/admin/backup/create', [BackupController::class, 'create'])->name('admin.backup.create')->middleware('auth');
+Route::post('/admin/backup/restore', [BackupController::class, 'restore'])->name('admin.backup.restore')->middleware('auth');
+Route::delete('/admin/backup/{filename}', [BackupController::class, 'delete'])->name('admin.backup.delete')->middleware('auth');
+Route::get('/admin/backup/download/{filename}', [BackupController::class, 'download'])->name('admin.backup.download')->middleware('auth');
 
 //RUTA PARA BUSCAR LAS LOCALIDADES SEGÚN LA PROVINCIA Y LA LOCALIDAD
 Route::get('/admin/localidades/{idProv}', [LocalidadController::class, 'getLocalidades']);

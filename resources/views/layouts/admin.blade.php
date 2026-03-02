@@ -296,6 +296,23 @@
                             </li>
                         @endcan
 
+                        <!-- Copias de Seguridad - Solo para Administrador y Secretaria -->
+                        @if(Auth::user()->hasRole('admin') || Auth::user()->hasRole('secretaria'))
+                            <li class="nav-item">
+                                <a href="{{ route('admin.backup.index') }}" class="nav-link active">
+                                    <i class="nav-icon bi bi-shield-lock"></i>
+                                    <p>
+                                        Copias de Seguridad
+                                        @if(Auth::user()->hasRole('admin'))
+                                            <small class="badge badge-success right">Admin</small>
+                                        @else
+                                            <small class="badge badge-warning right">Secretaria</small>
+                                        @endif
+                                    </p>
+                                </a>
+                            </li>
+                        @endif
+
                         <li class="nav-item">
                             <a href="{{ route('logout') }}" class="nav-link" style="background-color: #a9200e;"
                                 onclick="event.preventDefault();
