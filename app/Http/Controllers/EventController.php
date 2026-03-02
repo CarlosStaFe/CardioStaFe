@@ -404,7 +404,7 @@ class EventController extends Controller
                 </div>
                 
                 <div class="footer">
-                    <p>Comprobante generado el ' . date('d/m/Y H:i') . '</p>
+                    <p>Comprobante generado por ' . (Auth::user()->name ?? Auth::user()->email) . ' el ' . date('d/m/Y H:i') . '</p>
                     <p>Centro de Cardiología Infantil Santa Fe - Catamarca 3373, Santa Fe</p>
                     <p>Web: https://' . $appUrl . ' | Tel: (0342) 4565514</p>
                     <p><strong>Conserve este comprobante hasta el día de su turno</strong></p>
@@ -944,6 +944,265 @@ class EventController extends Controller
         } catch (\Exception $e) {
             \Log::error('Error al obtener agenda: ' . $e->getMessage());
             return response()->json(['error' => 'Error al obtener datos de la agenda'], 500);
+        }
+    }
+
+    /**
+     * Mostrar formulario de backup y restore
+     */
+    public function backup()
+    {
+        try {
+            Log::info('Accediendo a backup', ['user' => Auth::user()->email]);
+            
+            // Obtener lista de backups existentes
+            $backupPath = storage_path('app/backups');
+            $backups = [];
+            
+            if (is_dir($backupPath)) {
+                $files = glob($backupPath . '/*.sql');
+                foreach ($files as $file) {
+                    $backups[] = [
+                        'filename' => basename($file),
+                        'size' => number_format(filesize($file) / 1024 / 1024, 2) . ' MB',
+                        'created_at' => date('d/m/Y H:i', filemtime($file))
+                    ];
+                }
+                // Ordenar por fecha de creación descendente
+                usort($backups, function($a, $b) {
+                    return filemtime(storage_path('app/backups/' . $b['filename'])) - 
+                           filemtime(storage_path('app/backups/' . $a['filename']));
+                });
+            }
+            
+            return view('admin.eventos.backup', compact('backups'));
+        } catch (\Exception $e) {
+            Log::error('Error al cargar backup: ' . $e->getMessage());
+            return redirect()->back()->with('mensaje', 'Error al cargar la página: ' . $e->getMessage())
+                ->with('icono', 'error')->with('showBtn', 'true')->with('timer', '6000');
+        }
+    }
+
+    /**
+     * Crear backup de la base de datos
+     */
+    public function createBackup(Request $request)
+    {
+        try {
+            $dbName = env('DB_DATABASE');
+            $dbUser = env('DB_USERNAME');
+            $dbPass = env('DB_PASSWORD');
+            $dbHost = env('DB_HOST', 'localhost');
+            $dbPort = env('DB_PORT', '3306');
+            
+            // Crear directorio de backups si no existe
+            $backupPath = storage_path('app/backups');
+            if (!is_dir($backupPath)) {
+                mkdir($backupPath, 0755, true);
+            }
+            
+            // Nombre del archivo de backup
+            $filename = 'backup_' . $dbName . '_' . date('Y-m-d_H-i-s') . '.sql';
+            $filepath = $backupPath . '/' . $filename;
+            
+            // Comando mysqldump
+            $command = sprintf(
+                'mysqldump --host=%s --port=%s --user=%s --password=%s --single-transaction --routines --triggers %s > "%s"',
+                escapeshellarg($dbHost),
+                escapeshellarg($dbPort),
+                escapeshellarg($dbUser),
+                escapeshellarg($dbPass),
+                escapeshellarg($dbName),
+                $filepath
+            );
+            
+            // Ejecutar el comando
+            $output = [];
+            $returnCode = 0;
+            exec($command . ' 2>&1', $output, $returnCode);
+            
+            if ($returnCode === 0 && file_exists($filepath) && filesize($filepath) > 0) {
+                Log::info('Backup creado exitosamente', [
+                    'filename' => $filename,
+                    'size' => filesize($filepath),
+                    'user' => Auth::user()->email
+                ]);
+                
+                return redirect()->route('admin.eventos.backup')
+                    ->with('mensaje', 'Backup creado exitosamente: ' . $filename)
+                    ->with('icono', 'success')
+                    ->with('showBtn', 'true')
+                    ->with('timer', '6000');
+            } else {
+                Log::error('Error al crear backup', [
+                    'command' => $command,
+                    'return_code' => $returnCode,
+                    'output' => implode("\n", $output)
+                ]);
+                
+                return redirect()->back()
+                    ->with('mensaje', 'Error al crear backup. Verifique la configuración de MySQL.')
+                    ->with('icono', 'error')
+                    ->with('showBtn', 'true')
+                    ->with('timer', '6000');
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('Excepción al crear backup: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('mensaje', 'Error al crear backup: ' . $e->getMessage())
+                ->with('icono', 'error')
+                ->with('showBtn', 'true')
+                ->with('timer', '6000');
+        }
+    }
+
+    /**
+     * Restaurar backup de la base de datos
+     */
+    public function restoreBackup(Request $request)
+    {
+        $request->validate([
+            'backup_file' => 'required|string'
+        ]);
+        
+        try {
+            $backupPath = storage_path('app/backups/' . $request->backup_file);
+            
+            if (!file_exists($backupPath)) {
+                return redirect()->back()
+                    ->with('mensaje', 'Archivo de backup no encontrado.')
+                    ->with('icono', 'error')
+                    ->with('showBtn', 'true')
+                    ->with('timer', '6000');
+            }
+            
+            $dbName = env('DB_DATABASE');
+            $dbUser = env('DB_USERNAME');
+            $dbPass = env('DB_PASSWORD');
+            $dbHost = env('DB_HOST', 'localhost');
+            $dbPort = env('DB_PORT', '3306');
+            
+            // Comando mysql para restaurar
+            $command = sprintf(
+                'mysql --host=%s --port=%s --user=%s --password=%s %s < "%s"',
+                escapeshellarg($dbHost),
+                escapeshellarg($dbPort),
+                escapeshellarg($dbUser),
+                escapeshellarg($dbPass),
+                escapeshellarg($dbName),
+                $backupPath
+            );
+            
+            // Ejecutar el comando
+            $output = [];
+            $returnCode = 0;
+            exec($command . ' 2>&1', $output, $returnCode);
+            
+            if ($returnCode === 0) {
+                Log::info('Backup restaurado exitosamente', [
+                    'filename' => $request->backup_file,
+                    'user' => Auth::user()->email
+                ]);
+                
+                return redirect()->route('admin.eventos.backup')
+                    ->with('mensaje', 'Base de datos restaurada exitosamente desde: ' . $request->backup_file)
+                    ->with('icono', 'success')
+                    ->with('showBtn', 'true')
+                    ->with('timer', '6000');
+            } else {
+                Log::error('Error al restaurar backup', [
+                    'filename' => $request->backup_file,
+                    'return_code' => $returnCode,
+                    'output' => implode("\n", $output)
+                ]);
+                
+                return redirect()->back()
+                    ->with('mensaje', 'Error al restaurar backup. Verifique el archivo y la configuración.')
+                    ->with('icono', 'error')
+                    ->with('showBtn', 'true')
+                    ->with('timer', '6000');
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('Excepción al restaurar backup: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('mensaje', 'Error al restaurar backup: ' . $e->getMessage())
+                ->with('icono', 'error')
+                ->with('showBtn', 'true')
+                ->with('timer', '6000');
+        }
+    }
+
+    /**
+     * Eliminar archivo de backup
+     */
+    public function deleteBackup($filename)
+    {
+        try {
+            $backupPath = storage_path('app/backups/' . basename($filename));
+            
+            if (file_exists($backupPath)) {
+                unlink($backupPath);
+                
+                Log::info('Backup eliminado', [
+                    'filename' => $filename,
+                    'user' => Auth::user()->email
+                ]);
+                
+                return redirect()->route('admin.eventos.backup')
+                    ->with('mensaje', 'Backup eliminado exitosamente: ' . $filename)
+                    ->with('icono', 'success')
+                    ->with('showBtn', 'true')
+                    ->with('timer', '4000');
+            } else {
+                return redirect()->back()
+                    ->with('mensaje', 'Archivo de backup no encontrado.')
+                    ->with('icono', 'error')
+                    ->with('showBtn', 'true')
+                    ->with('timer', '4000');
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar backup: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('mensaje', 'Error al eliminar backup: ' . $e->getMessage())
+                ->with('icono', 'error')
+                ->with('showBtn', 'true')
+                ->with('timer', '6000');
+        }
+    }
+
+    /**
+     * Descargar archivo de backup
+     */
+    public function downloadBackup($filename)
+    {
+        try {
+            $backupPath = storage_path('app/backups/' . basename($filename));
+            
+            if (file_exists($backupPath)) {
+                Log::info('Backup descargado', [
+                    'filename' => $filename,
+                    'user' => Auth::user()->email
+                ]);
+                
+                return response()->download($backupPath);
+            } else {
+                return redirect()->back()
+                    ->with('mensaje', 'Archivo de backup no encontrado.')
+                    ->with('icono', 'error')
+                    ->with('showBtn', 'true')
+                    ->with('timer', '4000');
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('Error al descargar backup: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('mensaje', 'Error al descargar backup: ' . $e->getMessage())
+                ->with('icono', 'error')
+                ->with('showBtn', 'true')
+                ->with('timer', '6000');
         }
     }
 
