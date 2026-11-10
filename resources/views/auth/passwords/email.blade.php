@@ -5,14 +5,18 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
+                <div class="card-header">{{ __('Resetear Contraseña') }}</div>
 
                 <div class="card-body">
                     @if (session('status'))
-                        <div class="alert alert-success" role="alert">
+                        <div class="alert alert-success alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h5><i class="icon fas fa-check"></i> ¡Email enviado!</h5>
                             {{ session('status') }}
                         </div>
                     @endif
+
+                    <p class="mb-3">Ingrese su dirección de email para recibir un enlace de restablecimiento de contraseña.</p>
 
                     <form method="POST" action="{{ route('password.email') }}">
                         @csrf
@@ -31,14 +35,20 @@
                             </div>
                         </div>
 
-                        <div class="row mb-0">
+                        <div class="row mb-3">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
-                                    {{ __('Send Password Reset Link') }}
+                                    {{ __('Enviar Enlace de Restablecimiento') }}
                                 </button>
                             </div>
                         </div>
                     </form>
+                    
+                    <div class="text-center mt-3">
+                        <a href="{{ route('login') }}" class="text-muted">
+                            <i class="fas fa-arrow-left"></i> Volver al Login
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

@@ -16,10 +16,17 @@ use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SuspensionEvento;
-use Twilio\Rest\Client;
+use App\Services\TwilioService;
 
 class EventController extends Controller
 {
+    protected $twilioService;
+
+    public function __construct(TwilioService $twilioService)
+    {
+        $this->twilioService = $twilioService;
+    }
+
     public function index(Request $request)
     {
         // Construir query base
@@ -307,6 +314,8 @@ class EventController extends Controller
                     ->html(
                         '<p>Su turno ha sido reservado.</p><br>' .
                         '<p><b>Fecha:</b> ' . date('d/m/Y', strtotime($evento->start)) . '</p>' .
+                        '<p><b>Hora:</b> ' . date('H:i', strtotime($evento->start)) . '</p>' .
+                        '<p><b>Domicilio:</b> Catamarca 3373 - (3000) - Santa Fe</p>' .
                         '<p><b>Hora:</b> ' . date('H:i', strtotime($evento->start)) . '</p>' .
                         '<p><b>Práctica:</b> ' . ($evento->practica ? $evento->practica->nombre : '') . '</p>' .
                         '<p><b>Médico:</b> ' . ($evento->medico ? $evento->medico->apel_nombres : '') . '</p>' .
@@ -723,15 +732,15 @@ class EventController extends Controller
             $evento->title = $request->nuevo_estado;
             
             if ($request->nuevo_estado === '- Horario disponible') {
-                // Si había un paciente asignado y se está suspendiendo el turno, enviar email
+                // Si había un paciente asignado y se está suspendiendo el turno, enviar notificaciones
                 if ($estado_anterior !== '- Horario disponible' && $evento->paciente_id > 1) {
                     try {
                         // Cargar las relaciones necesarias antes de resetear los datos
                         $evento->load(['paciente', 'medico', 'practica', 'consultorio']);
+                        $motivo = $request->input('motivo_suspension', 'Suspensión por parte del paciente.');
                         
                         // Enviar email de suspensión solo si el paciente tiene email
                         if ($evento->paciente && $evento->paciente->email) {
-                            $motivo = $request->input('motivo_suspension', 'Suspensión por parte del paciente.');
                             Mail::to($evento->paciente->email)->send(new SuspensionEvento($evento, $motivo));
                             
                             Log::info('Email de suspensión enviado', [
@@ -740,12 +749,32 @@ class EventController extends Controller
                                 'paciente_nombre' => $evento->paciente->apel_nombres
                             ]);
                         }
+
+                        // Enviar SMS de suspensión si el paciente tiene teléfono y Twilio está configurado
+                        if ($evento->paciente && $evento->paciente->telefono && $this->twilioService->estaConfigurado()) {
+                            try {
+                                $mensajeSMS = $this->twilioService->crearMensajeSuspension($evento, $motivo);
+                                $this->twilioService->enviarSMS($evento->paciente->telefono, $mensajeSMS);
+                                
+                                Log::info('SMS de suspensión enviado', [
+                                    'event_id' => $evento->id,
+                                    'paciente_telefono' => $evento->paciente->telefono,
+                                    'paciente_nombre' => $evento->paciente->apel_nombres
+                                ]);
+                            } catch (\Exception $smsError) {
+                                Log::error('Error al enviar SMS de suspensión', [
+                                    'event_id' => $evento->id,
+                                    'error' => $smsError->getMessage()
+                                ]);
+                            }
+                        }
+                        
                     } catch (\Exception $e) {
-                        Log::error('Error al enviar email de suspensión', [
+                        Log::error('Error al enviar notificaciones de suspensión', [
                             'event_id' => $evento->id,
                             'error' => $e->getMessage()
                         ]);
-                        // No fallar la operación si falla el envío del email
+                        // No fallar la operación si falla el envío de notificaciones
                     }
                 }
                 

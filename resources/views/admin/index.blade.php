@@ -168,9 +168,23 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3 d-flex align-items-center mt-4">
+            </div>
+            
+            <div class="row mb-2">
+                <div class="col-md-12">
+                    <span class="text-muted text-left d-block" style="font-style: italic; font-size: 16px;">
+                        <i class="fas fa-info-circle"></i> Tanto para buscar un turno o para suspenderlo debe seleccionar Consultorios-Prácticas-Médicos
+                    </span>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-4 d-flex align-items-center mt-4">
                     <button type="button" class="btn btn-primary ml-3 mr-2" id="buscarTurnoBtn" onclick="filtrarCalendario()">
                         Buscar Turno
+                    </button>
+                    <button type="button" class="btn btn-danger ml-3 mr-2" id="suspenderTurnoBtn" onclick="suspenderTurno()">
+                        Suspender Turno
                     </button>
                 </div>
             </div>
@@ -191,16 +205,18 @@
                 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            {{-- <div>
-                                <label for="id_practica" class="form-label">ID Práctica:</label>
-                                <span id="id_practica_text">{{ old('id_practica', $id_practica ?? '') }}</span>
-                            </div> --}}
                             <div class="modal-header">
                                 <h1 class="modal-title fs-5" id="exampleModalLabel"><b>Reservar Turno</b></h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div>
                                 <h4 class="ms-3" style="color: #1b5a10ff;">*** Datos del paciente ***</h4>
+                                <div class="ms-3 mb-2" id="mensaje-modo-suspension" style="display: none;">
+                                    <small class="text-warning">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <strong>Modo Suspensión:</strong> Al ingresar el documento del paciente se mostrarán automáticamente los datos del turno reservado.
+                                    </small>
+                                </div>
                             </div>
                             <div class="modal-body">
                                 <div class="row">
@@ -438,17 +454,25 @@
         calendar.render();
         document.getElementById('tipo').value = 'DNI';
         
-        // Event listener para cuando se cierre el modal - restaurar botones
+        // Event listener para cuando se cierre el modal - restaurar botones y título
         var modal = document.getElementById('exampleModal');
         if (modal) {
             modal.addEventListener('hidden.bs.modal', function() {
                 console.log('Modal cerrado - restaurando estado de botones');
+                
+                // Restaurar título original
+                var modalTitle = document.getElementById('exampleModalLabel');
+                if (modalTitle) {
+                    modalTitle.innerHTML = '<b>Reservar Turno</b>';
+                }
+                
+                // Restaurar botones
                 restaurarEstadoBotones();
             });
         }
         
         // Cargar eventos disponibles automáticamente al inicializar
-        cargarEventosIniciales();
+        // cargarEventosIniciales(); // Función comentada temporalmente
     });
 
     function limpiarFormularioReserva() {
@@ -487,6 +511,12 @@
         var suspenderBtn = document.getElementById('suspenderEventoBtn');
         if (suspenderBtn) {
             suspenderBtn.style.display = 'none';
+        }
+        
+        // Ocultar mensaje de modo suspensión
+        var mensajeSuspension = document.getElementById('mensaje-modo-suspension');
+        if (mensajeSuspension) {
+            mensajeSuspension.style.display = 'none';
         }
         
         console.log('Estado de botones restaurado - Reservar visible, Suspender oculto');
@@ -750,6 +780,189 @@
             }
         })
         .catch(() => Swal.fire('Error', 'No se pudo suspender el turno.', 'error'));
+    }
+</script>
+
+<script>
+    // Función para abrir el modal en modo suspensión
+    function suspenderTurno() {
+        // Verificar que los filtros estén configurados
+        var consultorio = document.getElementById('consultorio').value;
+        var practica = document.getElementById('practica').value;
+        var medico = document.getElementById('medico').value;
+
+        if (consultorio == 0 && practica == 0 && medico == 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Filtros requeridos',
+                text: 'Por favor, seleccione un consultorio, una práctica o un médico antes de suspender un turno.',
+                confirmButtonText: 'Entendido'
+            });
+            return;
+        }
+
+        // Limpiar el formulario
+        limpiarFormularioReserva();
+        
+        // Cambiar el título del modal
+        var modalTitle = document.getElementById('exampleModalLabel');
+        if (modalTitle) {
+            modalTitle.innerHTML = '<b>Suspender Turno</b>';
+        }
+        
+        // Configurar el modal para modo suspensión
+        configurarModalParaSuspension();
+        
+        // Mostrar mensaje informativo
+        Swal.fire({
+            icon: 'info',
+            title: 'Modo Suspensión Activado',
+            html: `
+                <div style="text-align: left;">
+                    <p><strong>Para suspender un turno:</strong></p>
+                    <ol>
+                        <li>Ingrese el documento del paciente</li>
+                        <li>Si el paciente tiene un turno reservado, aparecerá el botón "Suspender"</li>
+                        <li>Haga clic en "Suspender Turno" para cancelar la reserva</li>
+                    </ol>
+                    <hr>
+                    <p><small>El turno volvera a estar disponible para otros pacientes.</small></p>
+                </div>
+            `,
+            confirmButtonText: 'Continuar'
+        }).then(() => {
+            // Abrir el modal
+            var modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+            modal.show();
+            
+            // Enfocar el campo de documento
+            setTimeout(() => {
+                document.getElementById('documento').focus();
+            }, 500);
+        });
+    }
+
+    // Función para configurar el modal en modo suspensión
+    function configurarModalParaSuspension() {
+        // Ocultar el botón Reservar
+        var reservarBtn = document.getElementById('guardarEventoBtn');
+        if (reservarBtn) {
+            reservarBtn.style.display = 'none';
+        }
+        
+        // Obtener los filtros seleccionados
+        var consultorio = document.getElementById('consultorio').value;
+        var practica = document.getElementById('practica').value;
+        var medico = document.getElementById('medico').value;
+        
+        // Configurar los campos de práctica seleccionada
+        if (practica != 0) {
+            document.getElementById('id_practica').value = practica;
+            var practicaText = document.getElementById('id_practica_text');
+            if (practicaText) {
+                practicaText.textContent = practica;
+            }
+        }
+        
+        // Blanquear campos inicialmente
+        var fechaTurno = document.getElementById('fecha_turno');
+        var horario = document.getElementById('horario');
+        
+        if (fechaTurno) {
+            fechaTurno.value = '';
+        }
+        
+        if (horario) {
+            horario.value = '';
+        }
+        
+        // Precargar obras sociales para la práctica seleccionada
+        if (practica != 0) {
+            var obrasSocialesSelect = document.getElementById('obra_social');
+            obrasSocialesSelect.innerHTML = '<option value="">Cargando...</option>';
+            
+            safeFetch('/admin/obrasociales/por-practica/' + practica)
+                .then(function(data) {
+                    obrasSocialesSelect.innerHTML = '';
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach(function(os) {
+                            if (os.practica_id == practica) {
+                                var option = document.createElement('option');
+                                option.value = os.id;
+                                option.textContent = os.nombre;
+                                obrasSocialesSelect.appendChild(option);
+                            }
+                        });
+                        if (obrasSocialesSelect.options.length === 0) {
+                            obrasSocialesSelect.innerHTML = '<option value="">No hay obras sociales para esta práctica</option>';
+                        }
+                    } else {
+                        obrasSocialesSelect.innerHTML = '<option value="">No hay obras sociales disponibles</option>';
+                    }
+                })
+                .catch(function(error) {
+                    obrasSocialesSelect.innerHTML = '<option value="">Error al cargar obras sociales</option>';
+                });
+        }
+        
+        console.log('Modal configurado para modo suspensión - filtros aplicados:', {
+            consultorio: consultorio, 
+            practica: practica, 
+            medico: medico
+        });
+        
+        // Buscar turnos reservados automáticamente si hay filtros seleccionados
+        buscarTurnosReservadosParaSuspender();
+        
+        // Mostrar mensaje específico de modo suspensión
+        var mensajeSuspension = document.getElementById('mensaje-modo-suspension');
+        if (mensajeSuspension) {
+            mensajeSuspension.style.display = 'block';
+        }
+    }
+    
+    // Función para buscar turnos reservados basados en filtros
+    function buscarTurnosReservadosParaSuspender() {
+        var consultorio = document.getElementById('consultorio').value;
+        var practica = document.getElementById('practica').value;
+        var medico = document.getElementById('medico').value;
+        
+        if (consultorio == 0 && practica == 0 && medico == 0) {
+            return; // No hay filtros seleccionados
+        }
+        
+        // Construir URL con parámetros para buscar turnos reservados
+        var url = '{{ url("admin/eventos/filtrar") }}';
+        var params = [];
+        
+        if (consultorio != 0) params.push('consultorio_id=' + consultorio);
+        if (practica != 0) params.push('practica_id=' + practica);
+        if (medico != 0) params.push('medico_id=' + medico);
+        params.push('solo_reservados=1'); // Parámetro adicional para filtrar solo reservados
+        
+        if (params.length > 0) {
+            url += '?' + params.join('&');
+        }
+        
+        safeFetch(url)
+        .then(eventos => {
+            if (eventos && eventos.length > 0) {
+                // Filtrar solo eventos reservados
+                var turnosReservados = eventos.filter(e => e.title === '- Reservado');
+                
+                if (turnosReservados.length > 0) {
+                    // Mostrar mensaje informativo sobre turnos encontrados
+                    var mensaje = document.getElementById('documento-mensaje');
+                    if (mensaje) {
+                        mensaje.innerHTML = `<i class="fas fa-info-circle"></i> Ingrese el documento del paciente para buscar su turno específico.`;
+                        mensaje.className = 'form-text text-info';
+                    }
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error al buscar turnos reservados:', error);
+        });
     }
 </script>
 

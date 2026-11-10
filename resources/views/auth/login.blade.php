@@ -32,6 +32,16 @@
             <div class="card-body">
                 <p class="login-box-msg" style="color: blue;"><b>Ingrese para iniciar la sesión.</b></p>
 
+                @if (session('status'))
+                    <div class="alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        <h5><i class="icon fas fa-check"></i> ¡Contraseña Restablecida!</h5>
+                        {{ session('status') }}
+                        <hr>
+                        <small><strong>Importante:</strong> Use su <u>nueva contraseña</u> para iniciar sesión.</small>
+                    </div>
+                @endif
+
                 <form action="{{route ('login')}}" method="POST">
                     @csrf
                     <div>
@@ -76,6 +86,11 @@
                     </div>
                 </form>
                 <br>
+                <div class="text-center mb-3">
+                    <a href="{{ route('password.request') }}" class="text-muted">
+                        <i class="fas fa-key"></i> ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
                 <p class="mb-0">
                     <div class="d-flex justify-content-center">
                         <a href="{{url('register')}}" class="btn btn-info">
